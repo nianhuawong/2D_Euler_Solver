@@ -1,7 +1,4 @@
-﻿// 2D_Euler_Solver.h: 标准系统包含文件的包含文件
-// 或项目特定的包含文件。
-
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 
@@ -15,10 +12,21 @@ public:
 	void Run();
 
 };
-int iter, numberOfTimeSteps;
 
-void Init_Global_Param() {};
-void Generate_Mesh() {};
-void Flow_Initialization() {};
+int current_step,		max_num_of_steps;
+int grid_point_num_x,	grid_point_num_y;
+int num_of_prim_vars;
+double dx, dy;
+double cfl_num, time_step;
+vector<double> x_coord, y_coord;
+vector< vector< vector< double > > > qField;
+vector< vector< int    > > marker;
 
-// TODO: 在此处引用程序需要的其他标头。
+#define IR 0
+#define IU 1
+#define IV 2
+#define IP 3
+
+void Init_Global_Param();
+void Generate_Mesh();
+void Flow_Initialization();
