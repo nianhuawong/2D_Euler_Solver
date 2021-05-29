@@ -2,28 +2,29 @@
 #include<vector>
 using namespace std;
 
-int num_of_prim_vars;
+namespace GLOBAL
+{
+	int num_of_prim_vars;
 
-int current_step, max_num_of_steps;
+	int current_step, max_num_of_steps;
 
-int grid_point_num_x, grid_point_num_y, ghost_point_num;
+	int grid_point_num_x, grid_point_num_y, ghost_point_num;
 
-int total_points_x, total_points_y;
+	int total_points_x, total_points_y;
 
-int Iw, Jw1, Jw2;
+	int Iw, Jw1, Jw2;
 
-double dx, dy;
+	double dx, dy;
 
-double cfl_num, time_step;
+	double cfl_num, time_step;
 
-vector<double> x_coord, y_coord;
+	vector<double> x_coord, y_coord;
 
-vector< vector< int > > marker;
-vector< vector< vector< double > > > qField;
-vector< vector< vector< double > > > half_node_Q_l;
-vector< vector< vector< double > > > half_node_Q_r;
-vector< vector< vector< double > > > half_node_flux_l;
-vector< vector< vector< double > > > half_node_flux_r;
+	vector< vector< int > > marker;
+	vector< vector< vector< double > > > qField;
+	vector< vector< vector< double > > > half_node_Q_l;
+	vector< vector< vector< double > > > half_node_Q_r;
+	vector< vector< vector< double > > > half_node_flux;
 
 #define IR 0
 #define IU 1
@@ -34,3 +35,5 @@ void Init_Global_Param();
 void Generate_Mesh();
 void Flow_Initialization();
 void Compute_Boundary();
+
+}

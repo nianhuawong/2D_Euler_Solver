@@ -1,6 +1,7 @@
 #include "Global_Variables.h"
+using namespace GLOBAL;
 
-void Init_Global_Param()
+void GLOBAL::Init_Global_Param()
 {
 	max_num_of_steps = 10000;
 
@@ -27,7 +28,7 @@ void Init_Global_Param()
 	}
 }
 
-void Generate_Mesh()
+void GLOBAL::Generate_Mesh()
 {
 	double hx = 4.0, hy = 2.0;
 	double hx1 = 0.6, hy1 = 0.8, hy2 = 1.2;
@@ -80,7 +81,7 @@ void Generate_Mesh()
 	}
 }
 
-void Flow_Initialization()
+void GLOBAL::Flow_Initialization()
 {
 	//流场赋初值
 	for (int i = 0; i < total_points_x; i++)
@@ -97,7 +98,7 @@ void Flow_Initialization()
 	}
 }
 
-void Compute_Boundary()
+void GLOBAL::Compute_Boundary()
 {
 	//左边界：超声速入口
 	for (int i = 0; i < ghost_point_num; i++)

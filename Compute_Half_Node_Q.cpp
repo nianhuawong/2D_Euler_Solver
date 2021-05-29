@@ -1,8 +1,7 @@
-#include <vector>
 #include <iostream>
 #include "Compute_Half_Node_Q.h"
 #include "Global_Variables.h"
-using namespace std;
+using namespace GLOBAL;
 
 void Half_Node_Q()
 {
@@ -45,7 +44,7 @@ void Half_Node_Q_Solver::Half_Node_Q()
 	}
 	else if (method_of_half_q == 2)
 	{
-
+		//WENO无需进行半节点插值
 	}
 	else if (method_of_half_q == 3)
 	{
