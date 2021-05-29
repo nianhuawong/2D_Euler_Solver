@@ -1,9 +1,12 @@
 #include <iostream>
 #include "Global_Variables.h"
 #include "Compute_Half_Node_Flux.h"
+#include "2D_Euler_Solver.h"
+#include "Geometry.h"
+
 using namespace GLOBAL;
 
-void Half_Node_Flux()
+void GLOBAL::Half_Node_Flux()
 {
 	auto* half_node_flux = new Half_Node_Flux_Solver();
 

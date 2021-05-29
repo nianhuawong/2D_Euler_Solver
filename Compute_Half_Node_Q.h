@@ -1,25 +1,34 @@
 #pragma once
+#include <vector>
+using namespace std;
 
-class Half_Node_Q_Solver
+namespace GLOBAL 
 {
-public:
-	Half_Node_Q_Solver();
-	~Half_Node_Q_Solver() {};
-protected:
+	vector< vector< vector< double > > > qField;
+	vector< vector< vector< double > > > half_node_Q_l;
+	vector< vector< vector< double > > > half_node_Q_r;
 
-public:
-	void Half_Node_Q();
-protected:
-	double Limiter_Function(double ita);
-	void Half_Node_Q_MUSCL();
-	void Half_Node_Q_WCNS ();
+	class Half_Node_Q_Solver
+	{
+	public:
+		Half_Node_Q_Solver();
+		~Half_Node_Q_Solver() {};
+	protected:
 
-	void Half_Node_Q_MUSCL_Y();
+	public:
+		void Half_Node_Q();
+	protected:
+		double Limiter_Function(double ita);
+		void Half_Node_Q_MUSCL();
+		void Half_Node_Q_WCNS();
 
-protected:
-	double minmod_limiter(double a, double b);
-	double vanleer_limiter(double a, double);
-	double superbee_limiter(double a, double);
-};
+		void Half_Node_Q_MUSCL_Y();
 
-void Half_Node_Q();
+	protected:
+		double minmod_limiter(double a, double b);
+		double vanleer_limiter(double a, double);
+		double superbee_limiter(double a, double);
+	};
+
+	
+}

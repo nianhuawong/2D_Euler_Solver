@@ -1,9 +1,12 @@
 #include <iostream>
 #include "Compute_Half_Node_Q.h"
 #include "Global_Variables.h"
+#include "Geometry.h"
+#include "2D_Euler_Solver.h"
+
 using namespace GLOBAL;
 
-void Half_Node_Q()
+void GLOBAL::Half_Node_Q()
 {
 	auto * half_node_q = new Half_Node_Q_Solver();
 
