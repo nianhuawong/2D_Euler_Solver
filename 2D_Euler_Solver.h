@@ -12,9 +12,9 @@ public:
 namespace GLOBAL {
 	void Init_Global_Param();
 	void Generate_Mesh();
-	void Flow_Initialization();
+	void Flow_Init();
 	void Compute_Boundary();
-	void Half_Node_Q();
-	void Half_Node_Flux();
+	void Solve_QlQr();
+	void Solve_Flux();
 }
 

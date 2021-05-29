@@ -1,6 +1,6 @@
 #include "2D_Euler_Solver.h"
-#include "Compute_Half_Node_Q.h"
-#include "Global_Variables.h"
+#include "QlQr_Solver.h"
+#include "Global.h"
 #include "Geometry.h"
 using namespace GLOBAL;
 
@@ -23,7 +23,7 @@ void GLOBAL::Init_Global_Param()
 	num_grid_point_y = 51;
 }
 
-void GLOBAL::Flow_Initialization()
+void GLOBAL::Flow_Init()
 {
 	//流场初始化
 	qField.resize(num_of_prim_vars);

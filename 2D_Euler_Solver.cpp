@@ -1,5 +1,5 @@
 ﻿#include "2D_Euler_Solver.h"
-#include "Global_Variables.h"
+#include "Global.h"
 using namespace GLOBAL;
 
 int main(int argc, char ** argv )
@@ -20,7 +20,7 @@ void Simulation::Run()
 
 	Generate_Mesh();
 
-	Flow_Initialization();
+	Flow_Init();
 
 	Compute_Boundary();
 
@@ -29,9 +29,9 @@ void Simulation::Run()
 		//先计算x方向
 		//Load_Q();
 
-		Half_Node_Q();
+		Solve_QlQr();
 
-		Half_Node_Flux();
+		Solve_Flux();
 
 		//Spatial_Derivative();
 

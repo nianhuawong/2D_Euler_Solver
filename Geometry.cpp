@@ -1,5 +1,5 @@
 #include "Geometry.h"
-#include "Global_Variables.h"
+#include "Global.h"
 #include "2D_Euler_Solver.h"
 using namespace GLOBAL;
 
