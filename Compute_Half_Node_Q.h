@@ -6,10 +6,7 @@ public:
 	Half_Node_Q_Solver();
 	~Half_Node_Q_Solver() {};
 protected:
-	int M_Dim, N_Dim;
-	int method_of_half_q;
-	int method_of_limiter;
-	double muscl_k;
+
 public:
 	void Half_Node_Q();
 protected:

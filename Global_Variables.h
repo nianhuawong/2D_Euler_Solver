@@ -8,9 +8,11 @@ namespace GLOBAL
 
 	int current_step, max_num_of_steps;
 
-	int grid_point_num_x, grid_point_num_y, ghost_point_num;
+	int num_grid_point_x, num_grid_point_y, num_ghost_point;
 
 	int total_points_x, total_points_y;
+
+	int num_half_point_x, num_half_point_y;
 
 	int Iw, Jw1, Jw2;
 
@@ -18,9 +20,12 @@ namespace GLOBAL
 
 	double cfl_num, time_step;
 
-	vector<double> x_coord, y_coord;
+	int method_of_half_q;
+	int method_of_limiter;
+	int method_of_flux;
+	double muscl_k;
+	double entropy_fix_coeff;
 
-	vector< vector< int > > marker;
 	vector< vector< vector< double > > > qField;
 	vector< vector< vector< double > > > half_node_Q_l;
 	vector< vector< vector< double > > > half_node_Q_r;
@@ -46,3 +51,35 @@ void Allocate_2D_Vector(vector< vector< T > > & array, int dim1, int dim2)
 	}
 }
 }
+
+class Point
+{
+public:
+	Point(){}
+	~Point() {}
+
+protected:
+	double xPoint;
+	double yPoint;
+
+public:
+	void Get_Point_Coord(double* xNode, double* yNode) { *xNode = this->xPoint; *yNode = this->yPoint; }
+	void Set_Point_Coord(double xNode,  double  yNode) { this->xPoint = xNode;  this->yPoint = yNode; }
+};
+
+class Structured_Mesh
+{
+public:
+	Structured_Mesh();
+	~Structured_Mesh() {};
+
+protected:
+	vector< vector< Point > > grid_points;
+	vector< vector< int > > marker;
+
+public:
+	vector< vector< Point > >& Get_Grid_Points() { return grid_points; }
+	vector< vector< int > >& Get_Marker() { return marker; }
+};
+
+Structured_Mesh* mesh;

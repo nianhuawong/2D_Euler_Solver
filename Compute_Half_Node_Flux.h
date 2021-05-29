@@ -8,10 +8,7 @@ public:
 	Half_Node_Flux_Solver();
 	~Half_Node_Flux_Solver() {};
 protected:
-	int M_Dim, N_Dim;
-	int method_of_flux;
 	double gama;
-	double eps;
 
 	vector< vector< vector< double > > > half_node_flux_l;
 	vector< vector< vector< double > > > half_node_flux_r;

@@ -15,43 +15,15 @@ void Half_Node_Flux()
 Half_Node_Flux_Solver::Half_Node_Flux_Solver()
 {
 	this->gama = 1.4;
-	this->eps  = 0.01;
-	this->method_of_flux = 1;		//1-Roe, 2-WENO, 3-WCNS
 
-	this->M_Dim = grid_point_num_x - 1;   //半点个数，即单元数，点数减1
-	this->N_Dim = grid_point_num_y - 1;
-
-	//GLOBAL::half_node_flux.resize(num_of_prim_vars);
-	//this->half_node_flux_l.resize(num_of_prim_vars);
-	//this->half_node_flux_r.resize(num_of_prim_vars);
-
-	//for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-	//{
-	//	half_node_flux.resize		 (M_Dim);
-	//	half_node_flux_l[iVar].resize(M_Dim);
-	//	half_node_flux_r[iVar].resize(M_Dim);
-	//	for (int i = 0; i < M_Dim; i++)
-	//	{
-	//		half_node_flux  [iVar][i].resize(N_Dim);
-	//		half_node_flux_l[iVar][i].resize(N_Dim);
-	//		half_node_flux_r[iVar][i].resize(N_Dim);
-	//	}
-	//}
-
-	GLOBAL::half_node_flux.resize(M_Dim);
-	this->half_node_flux_l.resize(M_Dim);
-	this->half_node_flux_r.resize(M_Dim);
-	for (int i = 0; i < M_Dim; i++)
+	GLOBAL::half_node_flux.resize(num_half_point_x);
+	this->half_node_flux_l.resize(num_half_point_x);
+	this->half_node_flux_r.resize(num_half_point_x);
+	for (int i = 0; i < num_half_point_x; i++)
 	{
-		half_node_flux  [i].resize(N_Dim);
-		half_node_flux_l[i].resize(N_Dim);
-		half_node_flux_r[i].resize(N_Dim);
-		for (int j = 0; j < N_Dim; j++)
-		{
-			half_node_flux  [i][j].resize(num_of_prim_vars);
-			half_node_flux_l[i][j].resize(num_of_prim_vars);
-			half_node_flux_r[i][j].resize(num_of_prim_vars);
-		}
+		Allocate_2D_Vector(half_node_flux  [i], num_half_point_y, num_of_prim_vars);
+		Allocate_2D_Vector(half_node_flux_l[i], num_half_point_y, num_of_prim_vars);
+		Allocate_2D_Vector(half_node_flux_r[i], num_half_point_y, num_of_prim_vars);
 	}
 
 	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
@@ -68,9 +40,9 @@ void Half_Node_Flux_Solver::Half_Node_Flux_LR_Roe()
 {
 	vector< vector< vector< double > > >& ql = half_node_Q_l;
 	vector< vector< vector< double > > >& qr = half_node_Q_r;
-	for (int j = 0; j < N_Dim; j++)
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = 0; i < M_Dim; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			double rho1 = ql[IR][i][j];
 			double u1   = ql[IU][i][j];
@@ -115,9 +87,9 @@ void Half_Node_Flux_Solver::Roe_Scheme()
 {
 	vector< vector< vector< double > > >& ql = half_node_Q_l;
 	vector< vector< vector< double > > >& qr = half_node_Q_r;
-	for (int j = 0; j < N_Dim; j++)
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = 0; i < M_Dim; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			double rho1 = ql[IR][i][j];
 			double u1   = ql[IU][i][j];
@@ -184,6 +156,7 @@ void Half_Node_Flux_Solver::EntropyFix(double& lamda1, double& lamda2, double& l
 
 double Half_Node_Flux_Solver::EntropyFix_Harten(double lamda)
 {
+	double eps = entropy_fix_coeff;
 	return abs(lamda) > eps ? abs(lamda) : ((lamda * lamda + eps * eps) / 2.0 / eps);
 }
 

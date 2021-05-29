@@ -1,10 +1,10 @@
 ﻿#include <vector>
 #include <iostream>
-using namespace std;
 #include "2D_Euler_Solver.h"
 #include "Compute_Half_Node_Q.h"
 #include "Compute_Half_Node_Flux.h"
 #include "Global_Variables.h"
+using namespace std;
 using namespace GLOBAL;
 
 int main(int argc, char ** argv )

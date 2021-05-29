@@ -14,25 +14,13 @@ void Half_Node_Q()
 
 Half_Node_Q_Solver::Half_Node_Q_Solver()
 {
-	method_of_half_q  = 1;	//1-MUSCL,		2-WENO,		3-WCNS
-	method_of_limiter = 1;	//1-vanleer,	2-minmod,	3-superbee	
-	muscl_k = 0.0;			//0.0-二阶迎风偏置，1/3-二阶迎风偏置
-
 	half_node_Q_l.resize(num_of_prim_vars);
 	half_node_Q_r.resize(num_of_prim_vars);
 
-	M_Dim = grid_point_num_x - 1;   //半点个数，即单元数，点数减1
-	N_Dim = grid_point_num_y - 1;
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
-		half_node_Q_l[iVar].resize(M_Dim);
-		half_node_Q_r[iVar].resize(M_Dim);
-
-		for (int i = 0; i < M_Dim; i++)
-		{
-			half_node_Q_l[iVar][i].resize(N_Dim);
-			half_node_Q_r[iVar][i].resize(N_Dim);
-		}
+		Allocate_2D_Vector(half_node_Q_l[iVar], num_half_point_x, num_half_point_y);
+		Allocate_2D_Vector(half_node_Q_r[iVar], num_half_point_x, num_half_point_y);
 	}
 }
 
@@ -62,9 +50,9 @@ void Half_Node_Q_Solver::Half_Node_Q_MUSCL()
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
 		vector< vector< double > >& qField0 = qField[iVar];
-		for (int j = 0; j < N_Dim; j++)
+		for (int j = 0; j < num_half_point_y; j++)
 		{
-			for (int i = 0; i < M_Dim; i++)
+			for (int i = 0; i < num_half_point_x; i++)
 			{
 				double du_p1 = qField0[i + 1][j] - qField0[i    ][j];
 				double du_m1 = qField0[i    ][j] - qField0[i - 1][j];
@@ -96,9 +84,9 @@ void Half_Node_Q_Solver::Half_Node_Q_MUSCL_Y()
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
 		vector< vector< double > >& qField0 = qField[iVar];
-		for (int i = 0; i < M_Dim; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
-			for (int j = 0; j < N_Dim; j++)
+			for (int j = 0; j < num_half_point_y; j++)
 			{
 				double du_p1 = qField0[i][j + 1] - qField0[i][j    ];
 				double du_m1 = qField0[i][j    ] - qField0[i][j - 1];
