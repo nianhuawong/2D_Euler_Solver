@@ -36,4 +36,13 @@ void Generate_Mesh();
 void Flow_Initialization();
 void Compute_Boundary();
 
+template < typename T >
+void Allocate_2D_Vector(vector< vector< T > > & array, int dim1, int dim2)
+{
+	array.resize(dim1);
+	for (int i = 0; i < dim1; i++)
+	{
+		array[i].resize(dim2);
+	}
+}
 }
