@@ -26,7 +26,7 @@ void Simulation::Run()
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
 	{
 		//先计算x方向
-		//Load_Q();
+		Load_Q();
 
 		Solve_QlQr();
 
@@ -34,7 +34,7 @@ void Simulation::Run()
 
 		Spatial_Derivative();
 
-		//Time_Integral();
+		Time_Integral();
 	}
 
 	//再计算y方向

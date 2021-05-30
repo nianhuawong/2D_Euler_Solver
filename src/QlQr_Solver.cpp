@@ -16,6 +16,9 @@ void Solve_QlQr()
 vector< vector< vector< double > > > qField;
 vector< vector< vector< double > > > qField1;
 vector< vector< vector< double > > > qField2;
+vector< vector< vector< double > > > qField_N1;
+vector< vector< vector< double > > > qField_N2;
+vector< vector< vector< double > > > qField_N3;
 QlQr_Solver::QlQr_Solver()
 {
 	qField1.resize(num_of_prim_vars);

@@ -5,7 +5,10 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("2D_Euler_Solver")
 
+#包含目录
+include_directories("./include")
+
 # 将源代码添加到此项目的可执行文件。
-add_executable (2D_Euler_Solver "2D_Euler_Solver.cpp" "2D_Euler_Solver.h" "QlQr_Solver.cpp" "Global.h" "Flux_Solver.h" "Flux_Solver.cpp" "Global.cpp" "Geometry.cpp" "Geometry.h" "Spatial_Derivative.cpp" "Spatial_Derivative.h")
+add_executable (2D_Euler_Solver "src/2D_Euler_Solver.cpp" "include/2D_Euler_Solver.h" "src/QlQr_Solver.cpp" "include/Global.h" "include/Flux_Solver.h" "src/Flux_Solver.cpp" "src/Global.cpp" "src/Geometry.cpp" "include/Geometry.h" "src/Spatial_Derivative.cpp" "include/Spatial_Derivative.h" "include/Time_Integral.h" "src/Time_Integral.cpp")
 
 # TODO: 如有需要，请添加测试并安装目标。

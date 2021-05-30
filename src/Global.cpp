@@ -34,10 +34,16 @@ void Init_Global_Param()
 void Flow_Init()
 {
 	//流场初始化
-	qField.resize(num_of_prim_vars);
+	qField.resize   (num_of_prim_vars);
+	qField_N1.resize(num_of_prim_vars);
+	qField_N2.resize(num_of_prim_vars);
+	qField_N3.resize(num_of_prim_vars);
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
-		Allocate_2D_Vector(qField[iVar], total_points_x, total_points_y);
+		Allocate_2D_Vector(qField   [iVar], total_points_x, total_points_y);
+		Allocate_2D_Vector(qField_N1[iVar], total_points_x, total_points_y);
+		Allocate_2D_Vector(qField_N2[iVar], total_points_x, total_points_y);
+		Allocate_2D_Vector(qField_N3[iVar], total_points_x, total_points_y);
 	}
 
 	//流场赋初值
@@ -145,4 +151,9 @@ void Compute_Boundary()
 			qField[IP][i][j] = qField[IP][i][j - 1];
 		}
 	}
+}
+
+void Load_Q()
+{
+	qField = qField_N1;
 }
