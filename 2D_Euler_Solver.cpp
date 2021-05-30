@@ -32,7 +32,7 @@ void Simulation::Run()
 
 		Solve_Flux();
 
-		//Spatial_Derivative();
+		Spatial_Derivative();
 
 		//Time_Integral();
 	}
