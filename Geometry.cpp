@@ -1,7 +1,6 @@
 #include "Geometry.h"
 #include "Global.h"
 #include "2D_Euler_Solver.h"
-using namespace GLOBAL;
 
 Point::Point()
 {
@@ -9,7 +8,7 @@ Point::Point()
 	yPoint = 0.0;
 }
 
-void GLOBAL::Generate_Mesh()
+void Generate_Mesh()
 {
 	mesh = new Structured_Mesh(num_grid_point_x, num_grid_point_y);
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();

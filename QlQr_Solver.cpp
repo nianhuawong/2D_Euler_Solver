@@ -4,9 +4,7 @@
 #include "Geometry.h"
 #include "2D_Euler_Solver.h"
 
-using namespace GLOBAL;
-
-void GLOBAL::Solve_QlQr()
+void Solve_QlQr()
 {
 	auto * half_node_q = new QlQr_Solver();
 
@@ -126,7 +124,7 @@ double QlQr_Solver::Limiter_Function( double ita )
 }
 
 //ÏÞÖÆÆ÷º¯Êý
-double GLOBAL::minmod_limiter(double a, double b)
+double minmod_limiter(double a, double b)
 {
 	if (a * b <= 0)
 		return 0;
@@ -139,12 +137,12 @@ double GLOBAL::minmod_limiter(double a, double b)
 	}
 }
 
-double GLOBAL::vanleer_limiter(double a, double)
+double vanleer_limiter(double a, double)
 {
 	return (a + abs(a)) / (1.0 + abs(a));
 }
 
-double GLOBAL::superbee_limiter(double a, double)
+double superbee_limiter(double a, double)
 {
 	double tmp1 = min(2.0 * a, 1.0);
 	double tmp2 = min(a, 2.0);

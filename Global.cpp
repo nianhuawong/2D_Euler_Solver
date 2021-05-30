@@ -2,9 +2,8 @@
 #include "QlQr_Solver.h"
 #include "Global.h"
 #include "Geometry.h"
-using namespace GLOBAL;
 
-void GLOBAL::Init_Global_Param()
+void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
 
@@ -23,7 +22,7 @@ void GLOBAL::Init_Global_Param()
 	num_grid_point_y = 51;
 }
 
-void GLOBAL::Flow_Init()
+void Flow_Init()
 {
 	//流场初始化
 	qField.resize(num_of_prim_vars);
@@ -48,7 +47,7 @@ void GLOBAL::Flow_Init()
 	}
 }
 
-void GLOBAL::Compute_Boundary()
+void Compute_Boundary()
 {
 	vector< vector< int > >& marker = mesh->Get_Marker();
 	//左边界：超声速入口

@@ -1,9 +1,14 @@
 ﻿#include "2D_Euler_Solver.h"
 #include "Global.h"
-using namespace GLOBAL;
 
 int main(int argc, char ** argv )
 {
+	vector < vector< double > > A = { {1,2,3},{3,2,1},{1,3,2} };
+	vector < vector< double > > B = { {2,3,4},{3,4,2},{4,2,3} };
+	vector < vector< double > > C;
+	Allocate_2D_Vector(C,3,3);
+	MatrixMultiply(A,B,C,3,3,3);
+
 	Simulation * two_dim_Euler_Solver = new Simulation();
 
 	two_dim_Euler_Solver->Run();

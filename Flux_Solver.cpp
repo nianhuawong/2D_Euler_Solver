@@ -5,9 +5,7 @@
 #include "2D_Euler_Solver.h"
 #include "Geometry.h"
 
-using namespace GLOBAL;
-
-void GLOBAL::Solve_Flux()
+void Solve_Flux()
 {
 	auto* fluxVector = new Flux_Solver();
 
@@ -20,7 +18,7 @@ Flux_Solver::Flux_Solver()
 {
 	this->gama = 1.4;
 
-	GLOBAL::fluxVector.resize(num_half_point_x);
+	fluxVector.resize(num_half_point_x);
 	this->fluxVector1.resize (num_half_point_x);
 	this->fluxVector2.resize (num_half_point_x);
 	for (int i = 0; i < num_half_point_x; i++)
@@ -120,17 +118,14 @@ void Flux_Solver::Roe_Scheme()
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe, lamda1, lamda2, lamda3, lamda4);
 
-			vector< double >dq(num_of_prim_vars);
+			vector< double > dq(num_of_prim_vars);
 			dq[IR] = qField2[IR][i][j] - qField1[IR][i][j];
 			dq[IU] = qField2[IU][i][j] - qField1[IU][i][j];
 			dq[IV] = qField2[IV][i][j] - qField1[IV][i][j];
 			dq[IP] = qField2[IP][i][j] - qField1[IP][i][j];
 
 			vector<double> flux_add(num_of_prim_vars);
-			flux_add[IR] = Jacobian_A[IR][0] * dq[0] + Jacobian_A[IR][1] * dq[1] + Jacobian_A[IR][2] * dq[2] + Jacobian_A[IR][3] * dq[3];
-			flux_add[IU] = Jacobian_A[IU][0] * dq[0] + Jacobian_A[IU][1] * dq[1] + Jacobian_A[IU][2] * dq[2] + Jacobian_A[IU][3] * dq[3];
-			flux_add[IV] = Jacobian_A[IV][0] * dq[0] + Jacobian_A[IV][1] * dq[1] + Jacobian_A[IV][2] * dq[2] + Jacobian_A[IV][3] * dq[3];
-			flux_add[IP] = Jacobian_A[IP][0] * dq[0] + Jacobian_A[IP][1] * dq[1] + Jacobian_A[IP][2] * dq[2] + Jacobian_A[IP][3] * dq[3];
+			MatrixMultiply(Jacobian_A, dq, flux_add, 4, 4);
 
 			fluxVector[i][j][IR] = 0.5 * (fluxVector1[i][j][IR] + fluxVector2[i][j][IR] + flux_add[IR]);
 			fluxVector[i][j][IU] = 0.5 * (fluxVector1[i][j][IU] + fluxVector2[i][j][IU] + flux_add[IU]);
@@ -163,8 +158,23 @@ double Flux_Solver::EntropyFix_Harten(double lamda)
 void Flux_Solver::Compute_Jacobian(vector < vector<double> >& Jacobian, double u, double v, double a, double h,
 	double lamda1, double lamda2, double lamda3, double lamda4)
 {
-	//double gm = gama;
-	//Jacobian[0][0] = lamda3 * (u / (2 * a) + ((u * u + v * v) * (gm - 1)) / (4 * a * a)) - lamda1 * (((u * u + v * v) * (gm - 1)) / (2 * a * a) - 1) - lamda4 * (u / (2 * a) - ((u * u + v * v) * (gm - 1)) / (4 * a * a));
-	//Jacobian[0][1] = lamda4 * (1 / (2 * a) - (u * (gm - 1)) / (2 * a * a)) - lamda3 * (1 / (2 * a) + (u * (gm - 1)) / (2 * a * a)) + (lamda1 * u * (gm - 1)) / a / a;
-	//Jacobian[0][2] = 
+	vector < vector< double > > Lmdx = { {lamda1,0,0,0},{0,lamda2,0,0},{0,0,lamda3,0},{0,0,0,lamda4} };
+
+	vector < vector< double > > Rx = { {1,						 0,   1,			1			},
+									   {u,						 0,   u - a,		u + a		},
+									   {0,						 1,   v,			v,			},
+									   {(u * u - v * v) / 2,     v,   h - a * u,    h + a * u	} };
+	double b2 = (gama - 1) / a / a;
+	double b1 = b2 * (u * u + v * v) / 2.0;
+
+	vector < vector< double > > Lx = { {1 - b1,				 b2 * u,				b2 * v,			 - b2		},
+									   {-b1 * v,			 b2 * u * v,            1 + b2 * v * v,  - b2 * v	},
+									   {(b1 + u / a) / 2, - (b2 * u + 1 / a) / 2, - b2 * v / 2,      b2 / 2		},
+									   {(b1 - u / a) / 2, - (b2 * u - 1 / a) / 2, - b2 * v / 2,		 b2 / 2		}};
+
+	vector < vector< double > > tmp1;
+	Allocate_2D_Vector(tmp1, 4, 4);
+
+	MatrixMultiply(Rx,   Lmdx, tmp1,     4, 4, 4);
+	MatrixMultiply(tmp1, Lx,   Jacobian, 4, 4, 4);
 }
