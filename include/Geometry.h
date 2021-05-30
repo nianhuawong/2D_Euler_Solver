@@ -22,7 +22,7 @@ protected:
 	double yPoint;
 
 public:
-	void Get_Point_Coord(double* xNode, double* yNode) { *xNode = this->xPoint; *yNode = this->yPoint; }
+	void Get_Point_Coord(double& xNode, double& yNode) { xNode = this->xPoint; yNode = this->yPoint; }
 	void Set_Point_Coord(double xNode, double  yNode) { this->xPoint = xNode;  this->yPoint = yNode; }
 };
 

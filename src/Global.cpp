@@ -13,8 +13,9 @@ double muscl_k;
 double entropy_fix_coeff;
 char solve_direction;
 int residual_output_steps;
+int flow_save_steps;
 double converge_criterion;
-bool stop_by_residual;
+
 void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
@@ -35,11 +36,9 @@ void Init_Global_Param()
 
 	solve_direction = 'x';
 
-	residual_output_steps = 20;
-
-	converge_criterion = 1e-8;
-
-	stop_by_residual = 0;
+	residual_output_steps = 20;		//残差输出间隔步数
+	flow_save_steps		  = 100;	//流场输出间隔步数
+	converge_criterion	  = 1e-8;	//残差收敛标准
 }
 
 void Flow_Init()

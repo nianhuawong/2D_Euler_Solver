@@ -53,6 +53,8 @@ void Simulation::Run()
 
 		Compute_Residual();
 
+		Output_Flowfield();
+
 		if (stop_by_residual)
 		{
 			break;

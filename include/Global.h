@@ -17,6 +17,7 @@ extern double muscl_k;
 extern double entropy_fix_coeff;
 extern char solve_direction;
 extern int residual_output_steps;
+extern int flow_save_steps;
 extern double converge_criterion;
 extern bool stop_by_residual;
 
