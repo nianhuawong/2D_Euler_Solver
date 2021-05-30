@@ -19,6 +19,7 @@ void Set_Solve_Direction(char direction);
 void Solve_QlQr();
 void Solve_Flux();
 void Solve_Spatial_Derivative();
+void Solve_Time_Step();
 void Time_Integral();
 void Compute_Residual();
 bool Stop_by_Residual();

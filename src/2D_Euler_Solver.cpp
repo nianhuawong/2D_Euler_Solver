@@ -36,6 +36,8 @@ void Simulation::Run()
 
 		Solve_Spatial_Derivative();
 
+		Solve_Time_Step();
+
 		Time_Integral();
 
 		//再计算y方向
@@ -48,6 +50,8 @@ void Simulation::Run()
 		Solve_Flux();
 
 		Solve_Spatial_Derivative();
+
+		Solve_Time_Step();
 
 		Time_Integral();
 
