@@ -5,6 +5,8 @@
 #include "2D_Euler_Solver.h"
 #include "Geometry.h"
 
+vector< vector< vector< double > > > fluxVector;
+
 void Solve_Flux()
 {
 	auto* fluxVector = new Flux_Solver();

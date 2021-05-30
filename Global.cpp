@@ -3,6 +3,15 @@
 #include "Global.h"
 #include "Geometry.h"
 
+int num_of_prim_vars;
+int current_step, max_num_of_steps;
+double cfl_num, time_step;
+int method_of_half_q;
+int method_of_limiter;
+int method_of_flux;
+double muscl_k;
+double entropy_fix_coeff;
+
 void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数

@@ -2,8 +2,7 @@
 #include<vector>
 using namespace std;
 
-vector< vector< vector< double > > > fluxVector;
-
+extern vector< vector< vector< double > > > fluxVector;
 class Flux_Solver
 {
 public:

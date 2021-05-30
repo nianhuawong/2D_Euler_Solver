@@ -2,12 +2,13 @@
 #include "Global.h"
 #include "2D_Euler_Solver.h"
 
-Point::Point()
-{
-	xPoint = 0.0;
-	yPoint = 0.0;
-}
-
+Structured_Mesh* mesh;
+int num_ghost_point;
+int num_grid_point_x, num_grid_point_y;
+int total_points_x,   total_points_y;
+int num_half_point_x, num_half_point_y;
+int Iw, Jw1, Jw2;
+double dx, dy;
 void Generate_Mesh()
 {
 	mesh = new Structured_Mesh(num_grid_point_x, num_grid_point_y);
@@ -50,10 +51,21 @@ void Generate_Mesh()
 	}
 }
 
+void Set_Mesh_Dimension(int NI, int NJ)
+{
+	num_grid_point_x = NI; num_grid_point_y = NJ;
+}
+
 Structured_Mesh::Structured_Mesh(int NI, int NJ)
 {
 	this->NI = NI;
 	this->NJ = NJ;
 	Allocate_2D_Vector(grid_points, NI, NJ);
 	Allocate_2D_Vector(marker, NI, NJ);
+}
+
+Point::Point()
+{
+	xPoint = 0.0;
+	yPoint = 0.0;
 }

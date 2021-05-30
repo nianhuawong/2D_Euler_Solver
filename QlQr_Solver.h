@@ -2,9 +2,9 @@
 #include <vector>
 using namespace std;
 
-vector< vector< vector< double > > > qField;
-vector< vector< vector< double > > > qField1;
-vector< vector< vector< double > > > qField2;
+extern vector< vector< vector< double > > > qField;
+extern vector< vector< vector< double > > > qField1;
+extern vector< vector< vector< double > > > qField2;
 
 class QlQr_Solver
 {

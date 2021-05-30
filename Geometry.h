@@ -2,15 +2,14 @@
 #include <vector>
 using namespace std;
 
-int num_grid_point_x, num_grid_point_y, num_ghost_point;
-
-int total_points_x, total_points_y;
-
-int num_half_point_x, num_half_point_y;
-
-int Iw, Jw1, Jw2;
-
-double dx, dy;
+class Structured_Mesh;
+extern Structured_Mesh* mesh;
+extern int num_ghost_point;
+extern int num_grid_point_x, num_grid_point_y;
+extern int total_points_x, total_points_y;
+extern int num_half_point_x, num_half_point_y;
+extern int Iw, Jw1, Jw2;
+extern double dx, dy;
 
 class Point
 {
@@ -45,4 +44,4 @@ public:
 	void Set_Mesh_Dimension(int NI, int NJ) { this->NI = NI; this->NJ = NJ; }
 };
 
-Structured_Mesh* mesh;
+void Set_Mesh_Dimension(int NI, int NJ);

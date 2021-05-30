@@ -13,6 +13,9 @@ void Solve_QlQr()
 	delete half_node_q;
 }
 
+vector< vector< vector< double > > > qField;
+vector< vector< vector< double > > > qField1;
+vector< vector< vector< double > > > qField2;
 QlQr_Solver::QlQr_Solver()
 {
 	qField1.resize(num_of_prim_vars);
