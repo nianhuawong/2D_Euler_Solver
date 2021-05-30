@@ -23,10 +23,10 @@ void Time_Step::Compute_Time_Step()
 	{
 		for (int j = 0; j < num_half_point_y; j++)
 		{
-			double rho = qField1[IR][i][j];
-			double u = qField1[IU][i][j];
-			double v = qField1[IV][i][j];
-			double E = qField1[IP][i][j];
+			double rho = qField[IR][i][j];
+			double u = qField[IU][i][j];
+			double v = qField[IV][i][j];
+			double E = qField[IP][i][j];
 			double p = Energy_2_Pressure(E, rho, u, v);
 
 			double a = gama * p / rho;

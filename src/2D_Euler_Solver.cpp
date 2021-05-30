@@ -28,32 +28,12 @@ void Simulation::Run()
 		//先计算x方向
 		Set_Solve_Direction('x');
 
-		Load_Q();
-
-		Solve_QlQr();
-
-		Solve_Flux();
-
-		Solve_Spatial_Derivative();
-
-		Solve_Time_Step();
-
-		Time_Integral();
+		Time_Integration();
 
 		//再计算y方向
 		Set_Solve_Direction('y');
 
-		Load_Q();
-
-		Solve_QlQr();
-
-		Solve_Flux();
-
-		Solve_Spatial_Derivative();
-
-		Solve_Time_Step();
-
-		Time_Integral();
+		Time_Integration();
 
 		Compute_Residual();
 
