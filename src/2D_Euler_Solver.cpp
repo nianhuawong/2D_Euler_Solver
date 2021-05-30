@@ -26,19 +26,31 @@ void Simulation::Run()
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
 	{
 		//先计算x方向
+		Set_Solve_Direction('x');
+
 		Load_Q();
 
 		Solve_QlQr();
 
 		Solve_Flux();
 
-		Spatial_Derivative();
+		Solve_Spatial_Derivative();
 
 		Time_Integral();
+
+		//先计算y方向
+		Set_Solve_Direction('y');
+
+		Load_Q();
+
+		Solve_QlQr();
+
+		Solve_Flux();
+
+		Solve_Spatial_Derivative();
+
+		Time_Integral();		
 	}
-
-	//再计算y方向
-
 }
 
 void Test()

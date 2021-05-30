@@ -22,6 +22,7 @@ protected:
 	void QlQr_MUSCL();
 	void QlQr_WCNS();
 
+	void QlQr_MUSCL_X();
 	void QlQr_MUSCL_Y();
 
 protected:

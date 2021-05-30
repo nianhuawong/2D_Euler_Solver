@@ -35,12 +35,42 @@ Flux_Solver::Flux_Solver()
 
 void Flux_Solver::Solve_Flux()
 {
-	Flux_LR_Roe();
+	if (method_of_flux == 1)
+	{
+		Flux_LR_Roe();
+		Roe_Scheme();
+	}
+	else if (method_of_flux == 2)
+	{
+		//WENO+Steger-Warming
+	}
+	else if (method_of_flux == 3)
+	{
+		//WCNS+Roe
+	}
+	else
+	{
+		cout << "flux计算方法选择错误，请检查！" << endl;
+	}
 
-	Roe_Scheme();
+}
+void Flux_Solver::Flux_LR_Roe()
+{
+	if (solve_direction == 'x')
+	{
+		this->Flux_LR_Roe_X();
+	}
+	else if (solve_direction == 'y')
+	{
+		this->Flux_LR_Roe_Y();
+	}
+	else
+	{
+		cout << "出错，请检查！" << endl;
+	}
 }
 
-void Flux_Solver::Flux_LR_Roe()
+void Flux_Solver::Flux_LR_Roe_X()
 {
 	for (int j = 0; j < num_half_point_y; j++)
 	{
@@ -58,6 +88,28 @@ void Flux_Solver::Flux_LR_Roe()
 			double v2   = qField2[IV][i][j];
 			double p2   = qField2[IP][i][j];
 			Inviscid_Flux_F(fluxVector2[i][j], rho2, u2, v2, p2);
+		}
+	}
+}
+
+void Flux_Solver::Flux_LR_Roe_Y()
+{
+	for (int i = 0; i < num_half_point_x; i++)
+	{
+		for (int j = 0; j < num_half_point_y; j++)
+		{
+			double rho1 = qField1[IR][i][j];
+			double u1 = qField1[IU][i][j];
+			double v1 = qField1[IV][i][j];
+			double p1 = qField1[IP][i][j];
+
+			Inviscid_Flux_G(fluxVector1[i][j], rho1, u1, v1, p1);
+
+			double rho2 = qField2[IR][i][j];
+			double u2 = qField2[IU][i][j];
+			double v2 = qField2[IV][i][j];
+			double p2 = qField2[IP][i][j];
+			Inviscid_Flux_G(fluxVector2[i][j], rho2, u2, v2, p2);
 		}
 	}
 }

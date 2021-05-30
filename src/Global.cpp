@@ -11,7 +11,7 @@ int method_of_limiter;
 int method_of_flux;
 double muscl_k;
 double entropy_fix_coeff;
-
+char solve_direction;
 void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
@@ -29,6 +29,8 @@ void Init_Global_Param()
 
 	num_grid_point_x = 101;
 	num_grid_point_y = 51;
+
+	solve_direction = 'x';
 }
 
 void Flow_Init()
@@ -156,4 +158,9 @@ void Compute_Boundary()
 void Load_Q()
 {
 	qField = qField_N1;
+}
+
+void Set_Solve_Direction(char direction)
+{
+	solve_direction = direction;
 }

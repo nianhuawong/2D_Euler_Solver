@@ -53,7 +53,24 @@ void QlQr_Solver::Solve_QlQr()
 
 void QlQr_Solver::QlQr_MUSCL()
 {
-	//先在x方向进行插值
+	if (solve_direction == 'x')
+	{
+		this->QlQr_MUSCL_X();
+	}
+	else if (solve_direction == 'y')
+	{
+		this->QlQr_MUSCL_Y();
+	}
+	else
+	{
+		cout << "MUSCL插值出错，请检查！" << endl;
+	}
+}
+
+void QlQr_Solver::QlQr_MUSCL_X()
+{
+	vector< vector< int > >& marker = mesh->Get_Marker();
+	//在x方向进行插值
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
 		vector< vector< double > >& qv = qField[iVar];
@@ -61,6 +78,8 @@ void QlQr_Solver::QlQr_MUSCL()
 		{
 			for (int i = 0; i < num_half_point_x; i++)
 			{
+				if (marker[i][j] == 0) continue;
+
 				double du_p1 = qv[i + 1][j] - qv[i    ][j];
 				double du_m1 = qv[i    ][j] - qv[i - 1][j];
 				double du_p3 = qv[i + 2][j] - qv[i + 1][j];
@@ -69,14 +88,14 @@ void QlQr_Solver::QlQr_MUSCL()
 				double ita_p1_m = du_m1 / du_p1;
 				double ita_p3_m = du_p1 / du_p3;
 				double ita_p1_p = du_p3 / du_p1;
-				
+
 				double fai1 = Limiter_Function(ita_m1_p);
 				double fai2 = Limiter_Function(ita_p1_m);
 				double fai3 = Limiter_Function(ita_p3_m);
 				double fai4 = Limiter_Function(ita_p1_p);
 
-				qField1[iVar][i][j] = qv[i    ][j] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
-																+ (1 + muscl_k) * fai2 * du_p1);
+				qField1[iVar][i][j] = qv[i][j] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
+															+ (1 + muscl_k) * fai2 * du_p1);
 
 				qField2[iVar][i][j] = qv[i + 1][j] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
 																+ (1 + muscl_k) * fai4 * du_p1);
@@ -84,9 +103,10 @@ void QlQr_Solver::QlQr_MUSCL()
 		}
 	}
 }
-
 void QlQr_Solver::QlQr_MUSCL_Y()
 {
+	vector< vector< int > >& marker = mesh->Get_Marker();
+
 	//在y方向进行插值
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{

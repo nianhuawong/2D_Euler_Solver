@@ -18,6 +18,8 @@ protected:
 public:
 	void Solve_Flux();
 	void Flux_LR_Roe();
+	void Flux_LR_Roe_X();
+	void Flux_LR_Roe_Y();
 	void Flux_LR_Steger_Warming();
 
 protected:
