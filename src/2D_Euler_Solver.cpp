@@ -38,7 +38,7 @@ void Simulation::Run()
 
 		Time_Integral();
 
-		//先计算y方向
+		//再计算y方向
 		Set_Solve_Direction('y');
 
 		Load_Q();
@@ -49,8 +49,17 @@ void Simulation::Run()
 
 		Solve_Spatial_Derivative();
 
-		Time_Integral();		
+		Time_Integral();
+
+		Compute_Residual();
+
+		if (stop_by_residual)
+		{
+			break;
+		}
 	}
+
+	Output_Flowfield();	
 }
 
 void Test()

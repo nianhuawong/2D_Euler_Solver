@@ -20,5 +20,8 @@ void Solve_QlQr();
 void Solve_Flux();
 void Solve_Spatial_Derivative();
 void Time_Integral();
+void Compute_Residual();
+bool Stop_by_Residual();
+void Output_Flowfield();
 
 void Test();

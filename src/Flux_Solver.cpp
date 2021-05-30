@@ -79,14 +79,17 @@ void Flux_Solver::Flux_LR_Roe_X()
 			double rho1 = qField1[IR][i][j];
 			double u1   = qField1[IU][i][j];
 			double v1	= qField1[IV][i][j];
-			double p1   = qField1[IP][i][j];
+			double E1   = qField1[IP][i][j];
+			double p1	= Energy_2_Pressure(E1, rho1, u1, v1);
 
 			Inviscid_Flux_F(fluxVector1[i][j], rho1, u1, v1, p1);
 
 			double rho2 = qField2[IR][i][j];
 			double u2   = qField2[IU][i][j];
 			double v2   = qField2[IV][i][j];
-			double p2   = qField2[IP][i][j];
+			double E2   = qField2[IP][i][j];
+			double p2	= Energy_2_Pressure(E2, rho2, u2, v2);
+
 			Inviscid_Flux_F(fluxVector2[i][j], rho2, u2, v2, p2);
 		}
 	}
@@ -101,14 +104,17 @@ void Flux_Solver::Flux_LR_Roe_Y()
 			double rho1 = qField1[IR][i][j];
 			double u1 = qField1[IU][i][j];
 			double v1 = qField1[IV][i][j];
-			double p1 = qField1[IP][i][j];
+			double E1 = qField1[IP][i][j];
+			double p1 = Energy_2_Pressure(E1, rho1, u1, v1);
 
 			Inviscid_Flux_G(fluxVector1[i][j], rho1, u1, v1, p1);
 
 			double rho2 = qField2[IR][i][j];
 			double u2 = qField2[IU][i][j];
 			double v2 = qField2[IV][i][j];
-			double p2 = qField2[IP][i][j];
+			double E2 = qField2[IP][i][j];
+			double p2 = Energy_2_Pressure(E2, rho2, u2, v2);
+
 			Inviscid_Flux_G(fluxVector2[i][j], rho2, u2, v2, p2);
 		}
 	}
@@ -146,13 +152,15 @@ void Flux_Solver::Roe_Scheme()
 			double rho1 = qField1[IR][i][j];
 			double u1   = qField1[IU][i][j];
 			double v1	= qField1[IV][i][j];
-			double p1   = qField1[IP][i][j];		
+			double E1   = qField1[IP][i][j];
+			double p1   = Energy_2_Pressure(E1, rho1, u1, v1);
 			double H1   = Enthalpy(rho1, p1, gama);
 
 			double rho2 = qField2[IR][i][j];
 			double u2   = qField2[IU][i][j];
 			double v2   = qField2[IV][i][j];
-			double p2   = qField2[IP][i][j];
+			double E2   = qField2[IP][i][j];
+			double p2   = Energy_2_Pressure(E2, rho2, u2, v2);
 			double H2   = Enthalpy(rho2, p2, gama);
 
 			double D = sqrt(rho2 / rho1);
@@ -232,3 +240,4 @@ void Flux_Solver::Compute_Jacobian(vector < vector<double> >& Jacobian, double u
 	MatrixMultiply(Rx,   Lmdx, tmp1,     4, 4, 4);
 	MatrixMultiply(tmp1, Lx,   Jacobian, 4, 4, 4);
 }
+

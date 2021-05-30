@@ -12,6 +12,9 @@ int method_of_flux;
 double muscl_k;
 double entropy_fix_coeff;
 char solve_direction;
+int residual_output_steps;
+double converge_criterion;
+bool stop_by_residual;
 void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
@@ -31,6 +34,12 @@ void Init_Global_Param()
 	num_grid_point_y = 51;
 
 	solve_direction = 'x';
+
+	residual_output_steps = 20;
+
+	converge_criterion = 1e-8;
+
+	stop_by_residual = 0;
 }
 
 void Flow_Init()
@@ -163,4 +172,10 @@ void Load_Q()
 void Set_Solve_Direction(char direction)
 {
 	solve_direction = direction;
+}
+
+double Energy_2_Pressure(double E, double rho, double u, double v)
+{
+	double gama = 1.4;
+	return (gama - 1) * (E - 0.5 * rho * (u * u + v * v));
 }
