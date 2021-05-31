@@ -1,5 +1,6 @@
 #pragma once
-#include<vector>
+#include <vector>
+#include <string>
 using namespace std;
 
 #define IR 0
@@ -21,6 +22,7 @@ extern int residual_output_steps;
 extern int flow_save_steps;
 extern double converge_criterion;
 extern bool stop_by_residual;
+extern string tec_file_name;
 
 typedef vector < int      > VInt;
 typedef vector < VInt     > VInt2D;

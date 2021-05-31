@@ -106,8 +106,9 @@ void Output_Flowfield()
 	VInt2D& marker = mesh->Get_Marker();
 
 	cout << "dumping flowfield..." << endl;
+	
 	fstream file;
-	file.open("./flow.plt", ios_base::out);
+	file.open(tec_file_name, ios_base::out);
 
 	file << "VARIABLES = \"x\", \"y\", \"rho\", \"u\",\"v\", \"p\"" << endl;
 	file << "ZONE T = \"Zone 1\"" << endl;

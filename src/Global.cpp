@@ -15,12 +15,13 @@ char solve_direction;
 int residual_output_steps;
 int flow_save_steps;
 double converge_criterion;
+string tec_file_name;
 
 void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
 
-	max_num_of_steps = 115;
+	max_num_of_steps = 10000;
 
 	cfl_num   = 0.1;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
@@ -36,9 +37,10 @@ void Init_Global_Param()
 
 	solve_direction = 'x';
 
-	residual_output_steps = 1;		//残差输出间隔步数
-	flow_save_steps		  = 100;	//流场输出间隔步数
+	residual_output_steps = 20;		//残差输出间隔步数
+	flow_save_steps		  = 200;	//流场输出间隔步数
 	converge_criterion	  = 1e-8;	//残差收敛标准
+	tec_file_name		  = "../../flow.plt";
 }
 
 void Init_Flow()
