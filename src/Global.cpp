@@ -35,7 +35,7 @@ void Init_Global_Param()
 	num_grid_point_x = 101;
 	num_grid_point_y = 51;
 
-	solve_direction = 'x';
+	solve_direction  = 'x';
 
 	residual_output_steps = 20;		//残差输出间隔步数
 	flow_save_steps		  = 200;	//流场输出间隔步数
@@ -66,6 +66,46 @@ void Init_Flow()
 			qField[i][j][IU] = 3.0;
 			qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = 0.71429;
+		}
+	}
+
+	qField_N1 = qField;
+}
+
+void Init_Flow_Double_Mach()
+{
+	//流场初始化
+	Allocate_3D_Vector(qField, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(qField_N1, total_points_x, total_points_y, num_of_prim_vars);
+
+	//流场赋初值
+	VInt2D& marker = mesh->Get_Marker();
+	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
+	
+	double gama = 1.4;
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+	for (int i = ist; i < ied; i++)
+	{
+		for (int j = jst; j < jed; j++)
+		{
+			double x_node, y_node;
+
+			grid_points[i][j].Get_Point_Coord(x_node, y_node);
+			if (x_node <= (1.0 / 6.0 + y_node / tan(PI / 3)))
+			{
+				qField[i][j][IR] =  8.0;
+				qField[i][j][IU] =  8.25 * cos(PI / 6);
+				qField[i][j][IV] = -8.25 * sin(PI / 6);
+				qField[i][j][IP] = 116.5;
+			}
+			else //if (x_node > (1.0 / 6.0 + y_node / tan(PI / 3)))
+			{
+				qField[i][j][IR] = 1.4;
+				qField[i][j][IU] = 0.0;
+				qField[i][j][IV] = 0.0;
+				qField[i][j][IP] = 1.0;
+			}
 		}
 	}
 
@@ -161,6 +201,91 @@ void Compute_Boundary()
 			qField[i][j][IU] = 0.0;
 			qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = qField[i][j - 1][IP];
+		}
+	}
+}
+
+void Compute_Boundary_Double_Mach()
+{
+	VInt2D& marker = mesh->Get_Marker();
+	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
+
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+
+	double physical_time = current_step * time_step;
+	double ssw = 10.0 / sin(PI / 3);
+	double xsw = 1.0 / 6 + 1.0 / tan(PI / 3) + ssw * physical_time;
+
+	//左边界：inflow
+	for (int i = 0; i < ist; i++)
+	{
+		for (int j = jst; j < jed; j++)
+		{
+			qField[i][j][IR] =  8.0;
+			qField[i][j][IU] =  8.25 * cos(PI / 6);
+			qField[i][j][IV] = -8.25 * sin(PI / 6);
+			qField[i][j][IP] = 116.5;
+		}
+	}
+
+	//上边界：symmetry
+	for (int i = ist; i < ied; i++)
+	{
+		for (int j = jed; j < total_points_y; j++)
+		{
+			double x_node, y_node;
+			grid_points[i][j].Get_Point_Coord(x_node, y_node);
+			if (x_node <= xsw)
+			{
+				qField[i][j][IR] =  8.0;
+				qField[i][j][IU] =  8.25 * cos(PI / 6);
+				qField[i][j][IV] = -8.25 * sin(PI / 6);
+				qField[i][j][IP] = 116.5;
+			}
+			else if(x_node > xsw && x_node <= 4)
+			{
+				qField[i][j][IR] = 1.4;
+				qField[i][j][IU] = 0.0;
+				qField[i][j][IV] = 0.0;
+				qField[i][j][IP] = 1.0;
+			}
+		}
+	}
+
+	//右边界：outflow
+	for (int j = jst; j < jed; j++)
+	{
+		for (int i = ied; i < total_points_x; i++)
+		{
+			qField[i][j][IR] = qField[i - 1][j][IR];
+			qField[i][j][IU] = qField[i - 1][j][IU];
+			qField[i][j][IV] = qField[i - 1][j][IV];
+			qField[i][j][IP] = qField[i - 1][j][IP];
+		}
+	}
+
+	//下边界
+	for (int i = ist; i < ied; i++)
+	{
+		for (int j = jst - 1; j >= 0; j--)
+		{
+			double x_node, y_node;
+			grid_points[i][j].Get_Point_Coord(x_node, y_node);
+			if (x_node <= 1.0/6)
+			{
+				qField[i][j][IR] = 8.0;
+				qField[i][j][IU] = 8.25 * cos(PI / 6);
+				qField[i][j][IV] = -8.25 * sin(PI / 6);
+				qField[i][j][IP] = 116.5;
+			}
+			else if (x_node > 1.0 / 6 && x_node <= 4)
+			{
+				qField[i][j][IR] = qField[i][j - 1][IR];
+				qField[i][j][IU] = qField[i][j - 1][IU];
+				qField[i][j][IV] = 0.0;
+				qField[i][j][IP] = qField[i][j - 1][IP];
+			}
 		}
 	}
 }

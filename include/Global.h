@@ -8,6 +8,7 @@ using namespace std;
 #define IV 2
 #define IP 3
 #define SMALL 1E-40
+#define PI 3.141592653589793238
 
 extern int num_of_prim_vars;
 extern int current_step, max_num_of_steps;

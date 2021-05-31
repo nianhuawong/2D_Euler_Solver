@@ -18,8 +18,8 @@ void Simulation::Run()
 
 	Generate_Mesh();
 
-	Init_Flow();
-
+	//Init_Flow();
+	Init_Flow_Double_Mach();
 	//Compute_Boundary();
 
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
@@ -34,7 +34,8 @@ void Simulation::Run()
 
 		Load_Q();
 
-		Compute_Boundary();
+		//Compute_Boundary();
+		Compute_Boundary_Double_Mach();
 
 		Time_Integration();
 

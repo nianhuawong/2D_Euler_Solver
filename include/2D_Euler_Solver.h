@@ -13,7 +13,9 @@ public:
 void Init_Global_Param();
 void Generate_Mesh();
 void Init_Flow();
+void Init_Flow_Double_Mach();
 void Compute_Boundary();
+void Compute_Boundary_Double_Mach();
 void Load_Q();
 void Set_Solve_Direction(char direction);
 void Solve_QlQr();
