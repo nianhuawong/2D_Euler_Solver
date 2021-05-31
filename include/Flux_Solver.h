@@ -2,7 +2,7 @@
 #include<vector>
 using namespace std;
 
-extern vector< vector< vector< double > > > fluxVector;
+extern VDouble3D fluxVector;
 class Flux_Solver
 {
 public:
@@ -11,8 +11,8 @@ public:
 protected:
 	double gama;
 
-	vector< vector< vector< double > > > fluxVector1;
-	vector< vector< vector< double > > > fluxVector2;
+	VDouble3D fluxVector1;
+	VDouble3D fluxVector2;
 	vector < vector<double> > Jacobian_A;
 
 public:

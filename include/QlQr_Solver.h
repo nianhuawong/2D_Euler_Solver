@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
+#include "Global.h"
 using namespace std;
 
-extern vector< vector< vector< double > > > qField;
-extern vector< vector< vector< double > > > qField1;
-extern vector< vector< vector< double > > > qField2;
-extern vector< vector< vector< double > > > qField_N1;
-extern vector< vector< vector< double > > > qField_N2;
-extern vector< vector< vector< double > > > qField_N3;
+extern VDouble3D qField;
+extern VDouble3D qField1;
+extern VDouble3D qField2;
+extern VDouble3D qField_N1;
+extern VDouble3D qField_N2;
+extern VDouble3D qField_N3;
 class QlQr_Solver
 {
 public:

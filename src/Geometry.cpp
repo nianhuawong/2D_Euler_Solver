@@ -9,33 +9,37 @@ int total_points_x,   total_points_y;
 int num_half_point_x, num_half_point_y;
 int Iw, Jw1, Jw2;
 double dx, dy;
+
 void Generate_Mesh()
 {
-	mesh = new Structured_Mesh(num_grid_point_x, num_grid_point_y);
-	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
-	vector< vector< int > >& marker = mesh->Get_Marker();
-
-	double hx = 4.0, hy = 2.0;
+//===================================================================================
+	double hx  = 4.0, hy  = 2.0;
 	double hx1 = 0.6, hy1 = 0.8, hy2 = 1.2;
-
+	Iw  = hx1 / hx * (num_grid_point_x - 1); //物面左边界的标号I，起始标号为0，不包含虚拟点
+	Jw1 = hy1 / hy * (num_grid_point_y - 1); //物面下边界的标号J
+	Jw2 = hy2 / hy * (num_grid_point_y - 1); //物面上边界的标号J
+//===================================================================================
 	num_ghost_point = 2;
-
 	total_points_x = num_grid_point_x + 2 * num_ghost_point;
 	total_points_y = num_grid_point_y + 2 * num_ghost_point;
 
 	num_half_point_x = num_grid_point_x - 1;   //半点个数，即单元数，点数减1
 	num_half_point_y = num_grid_point_y - 1;   //半点个数，即单元数，点数减1
 	
-	Iw  = hx1 / hx * (num_grid_point_x - 1); //物面左边界的标号I，起始标号为0，不包含虚拟点
-	Jw1 = hy1 / hy * (num_grid_point_y - 1); //物面下边界的标号J
-	Jw2 = hy2 / hy * (num_grid_point_y - 1); //物面上边界的标号J
-
 	dx = hx / (num_grid_point_x - 1);
 	dy = hy / (num_grid_point_y - 1);
 
-	for (int i = 0; i < num_grid_point_x; i++)
+	mesh = new Structured_Mesh(total_points_x, total_points_y);
+	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
+	vector< vector< int > >& marker = mesh->Get_Marker();
+
+	mesh->Set_Dxdy(dx, dy);
+
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = 0; j < num_grid_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			double x_node = i * dx;
 			double y_node = j * dy;
@@ -58,6 +62,8 @@ void Set_Mesh_Dimension(int NI, int NJ)
 
 Structured_Mesh::Structured_Mesh(int NI, int NJ)
 {
+	this->dx = 0.0;
+	this->dy = 0.0;
 	this->NI = NI;
 	this->NJ = NJ;
 	Allocate_2D_Vector(grid_points, NI, NJ);

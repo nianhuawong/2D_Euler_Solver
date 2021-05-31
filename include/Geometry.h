@@ -35,6 +35,7 @@ public:
 
 protected:
 	int NI, NJ;
+	double dx, dy;
 	vector< vector< Point > > grid_points;
 	vector< vector< int > > marker;
 
@@ -42,6 +43,8 @@ public:
 	vector< vector< Point > >& Get_Grid_Points() { return grid_points; }
 	vector< vector< int > >& Get_Marker() { return marker; }
 	void Set_Mesh_Dimension(int NI, int NJ) { this->NI = NI; this->NJ = NJ; }
+	void Set_Dxdy(double dx, double dy) { this->dx = dx; this->dy = dy; }
 };
 
 void Set_Mesh_Dimension(int NI, int NJ);
+void Get_IJK_Region(int& ist, int& ied, int& jst, int& jed);

@@ -21,6 +21,14 @@ extern int flow_save_steps;
 extern double converge_criterion;
 extern bool stop_by_residual;
 
+typedef vector < int      > VInt;
+typedef vector < VInt     > VInt2D;
+typedef vector < VInt2D   > VInt3D;
+
+typedef vector < double      > VDouble;
+typedef vector < VDouble     > VDouble2D;
+typedef vector < VDouble2D   > VDouble3D;
+
 template < typename T >
 void Allocate_2D_Vector(vector< vector< T > >& array, int dim1, int dim2)
 {
@@ -28,6 +36,16 @@ void Allocate_2D_Vector(vector< vector< T > >& array, int dim1, int dim2)
 	for (int i = 0; i < dim1; i++)
 	{
 		array[i].resize(dim2);
+	}
+}
+
+template < typename T >
+void Allocate_3D_Vector(vector< vector< vector< T > > >& array, int dim1, int dim2, int dim3)
+{
+	array.resize(dim1);
+	for (int i = 0; i < dim1; i++)
+	{
+		Allocate_2D_Vector(array[i], dim2, dim3);
 	}
 }
 

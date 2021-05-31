@@ -41,26 +41,22 @@ void Init_Global_Param()
 	converge_criterion	  = 1e-8;	//残差收敛标准
 }
 
-void Flow_Init()
+void Init_Flow()
 {
 	//流场初始化
-	qField.resize   (num_of_prim_vars);
-	qField_N1.resize(num_of_prim_vars);
-	qField_N2.resize(num_of_prim_vars);
-	qField_N3.resize(num_of_prim_vars);
-	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-	{
-		Allocate_2D_Vector(qField   [iVar], total_points_x, total_points_y);
-		Allocate_2D_Vector(qField_N1[iVar], total_points_x, total_points_y);
-		Allocate_2D_Vector(qField_N2[iVar], total_points_x, total_points_y);
-		Allocate_2D_Vector(qField_N3[iVar], total_points_x, total_points_y);
-	}
+	Allocate_3D_Vector(qField,    num_of_prim_vars, total_points_x, total_points_y);
+	Allocate_3D_Vector(qField_N1, num_of_prim_vars, total_points_x, total_points_y);
+	Allocate_3D_Vector(qField_N2, num_of_prim_vars, total_points_x, total_points_y);
+	Allocate_3D_Vector(qField_N3, num_of_prim_vars, total_points_x, total_points_y);	
 
 	//流场赋初值
 	vector< vector< int > >& marker = mesh->Get_Marker();
-	for (int i = 0; i < total_points_x; i++)
+
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = 0; j < total_points_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -75,10 +71,12 @@ void Flow_Init()
 void Compute_Boundary()
 {
 	vector< vector< int > >& marker = mesh->Get_Marker();
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
 	//左边界：超声速入口
-	for (int i = 0; i < num_ghost_point; i++)
+	for (int i = 0; i < ist; i++)
 	{
-		for (int j = num_ghost_point; j < num_ghost_point + num_grid_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			qField[IR][i][j] = 1.0;
 			qField[IU][i][j] = 3.0;
@@ -88,9 +86,9 @@ void Compute_Boundary()
 	}
 
 	//上边界：outflow
-	for (int i = num_ghost_point; i < num_ghost_point + num_grid_point_x; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = num_ghost_point + num_grid_point_y; j < total_points_y; j++)
+		for (int j = jed; j < total_points_y; j++)
 		{
 			qField[IR][i][j] = qField[IR][i][j - 1];
 			qField[IU][i][j] = qField[IU][i][j - 1];
@@ -100,9 +98,9 @@ void Compute_Boundary()
 	}
 
 	//右边界：outflow
-	for (int i = num_ghost_point + num_grid_point_x; i < total_points_x; i++)
+	for (int i = ied; i < total_points_x; i++)
 	{
-		for (int j = num_ghost_point; j < num_ghost_point + num_grid_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			if (marker[i - 1][j] == 0) continue;
 
@@ -114,9 +112,9 @@ void Compute_Boundary()
 	}
 
 	//下边界, no-slip wall
-	for (int i = num_ghost_point; i < num_ghost_point + num_grid_point_x; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = num_ghost_point - 1; j >= 0; j--)
+		for (int j = jst - 1; j >= 0; j--)
 		{
 			qField[IR][i][j] = qField[IR][i][j + 1];
 			qField[IU][i][j] = 0.0;
@@ -126,9 +124,9 @@ void Compute_Boundary()
 	}
 
 	//左物面, no-slip wall
-	for (int i = num_ghost_point + Iw; i < num_ghost_point + Iw + num_ghost_point; i++)
+	for (int i = ist + Iw; i < ist + Iw + num_ghost_point; i++)
 	{
-		for (int j = num_ghost_point + Jw1; j < num_ghost_point + Jw2; j++)
+		for (int j = jst + Jw1; j < jst + Jw2; j++)
 		{
 			qField[IR][i][j] = qField[IR][i - 1][j];
 			qField[IU][i][j] = 0.0;
@@ -138,10 +136,10 @@ void Compute_Boundary()
 	}
 
 	//上物面, no-slip wall
-	for (int i = num_ghost_point + Iw; i < num_ghost_point + num_grid_point_x; i++)
+	for (int i = ist + Iw; i < ied; i++)
 	{
 		//for (int j = Jw2; j < num_ghost_point + Jw2; j++)
-		for (int j = num_ghost_point + Jw2 - 1; j >= Jw2; j--)
+		for (int j = jst + Jw2 - 1; j >= Jw2; j--)
 		{
 			qField[IR][i][j] = qField[IR][i][j + 1];
 			qField[IU][i][j] = 0.0;
@@ -151,9 +149,9 @@ void Compute_Boundary()
 	}
 
 	//下物面, no-slip wall
-	for (int i = num_ghost_point + Iw; i < num_ghost_point + num_grid_point_x; i++)
+	for (int i = ist + Iw; i < ied; i++)
 	{
-		for (int j = num_ghost_point + Jw1; j < num_ghost_point + Jw1 + num_ghost_point; j++)
+		for (int j = jst + Jw1; j < jst + Jw1 + num_ghost_point; j++)
 		{
 			qField[IR][i][j] = qField[IR][i][j - 1];
 			qField[IU][i][j] = 0.0;
@@ -177,4 +175,14 @@ double Energy_2_Pressure(double E, double rho, double u, double v)
 {
 	double gama = 1.4;
 	return (gama - 1) * (E - 0.5 * rho * (u * u + v * v));
+}
+
+//计算点的标号范围
+void Get_IJK_Region(int& ist, int& ied, int& jst, int& jed)
+{
+	ist = num_ghost_point;
+	ied = num_ghost_point + num_grid_point_x;
+
+	jst = num_ghost_point;
+	jed = num_ghost_point + num_grid_point_y;
 }

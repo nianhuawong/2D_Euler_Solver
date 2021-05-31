@@ -5,7 +5,7 @@
 #include "Flux_Solver.h"
 #include <iostream>
 
-vector< vector< vector< double > > > rhs;
+VDouble3D rhs;
 void Solve_Spatial_Derivative()
 {
 	auto* spatial_derivative = new Spatial_Derivative();

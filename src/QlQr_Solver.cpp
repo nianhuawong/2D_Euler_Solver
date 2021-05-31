@@ -1,6 +1,5 @@
 #include <iostream>
 #include "QlQr_Solver.h"
-#include "Global.h"
 #include "Geometry.h"
 #include "2D_Euler_Solver.h"
 
@@ -13,22 +12,16 @@ void Solve_QlQr()
 	delete half_node_q;
 }
 
-vector< vector< vector< double > > > qField;
-vector< vector< vector< double > > > qField1;
-vector< vector< vector< double > > > qField2;
-vector< vector< vector< double > > > qField_N1;
-vector< vector< vector< double > > > qField_N2;
-vector< vector< vector< double > > > qField_N3;
+VDouble3D qField;
+VDouble3D qField1;
+VDouble3D qField2;
+VDouble3D qField_N1;
+VDouble3D qField_N2;
+VDouble3D qField_N3;
 QlQr_Solver::QlQr_Solver()
 {
-	qField1.resize(num_of_prim_vars);
-	qField2.resize(num_of_prim_vars);
-
-	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-	{
-		Allocate_2D_Vector(qField1[iVar], num_half_point_x, num_half_point_y);
-		Allocate_2D_Vector(qField2[iVar], num_half_point_x, num_half_point_y);
-	}
+	Allocate_3D_Vector(qField1, num_of_prim_vars, num_half_point_x, num_half_point_y);
+	Allocate_3D_Vector(qField2, num_of_prim_vars, num_half_point_x, num_half_point_y);
 }
 
 void QlQr_Solver::Solve_QlQr()

@@ -12,7 +12,7 @@ public:
 
 void Init_Global_Param();
 void Generate_Mesh();
-void Flow_Init();
+void Init_Flow();
 void Compute_Boundary();
 void Load_Q();
 void Set_Solve_Direction(char direction);

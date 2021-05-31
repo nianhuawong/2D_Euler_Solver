@@ -14,12 +14,11 @@ int main(int argc, char ** argv )
 
 void Simulation::Run()
 {
-	//建立全局参数、变量、流场
 	Init_Global_Param();
 
 	Generate_Mesh();
 
-	Flow_Init();
+	Init_Flow();
 
 	Compute_Boundary();
 
@@ -34,6 +33,8 @@ void Simulation::Run()
 		Set_Solve_Direction('y');
 
 		Time_Integration();
+
+		Compute_Boundary();
 
 		Compute_Residual();
 

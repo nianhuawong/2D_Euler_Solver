@@ -5,7 +5,7 @@
 #include "2D_Euler_Solver.h"
 #include "Geometry.h"
 
-vector< vector< vector< double > > > fluxVector;
+VDouble3D fluxVector;
 
 void Solve_Flux()
 {

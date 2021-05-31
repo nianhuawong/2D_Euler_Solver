@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
+#include "Global.h"
 using namespace std;
 
-extern vector< vector< vector< double > > > rhs;
+extern VDouble3D rhs;
 
 class Spatial_Derivative
 {
