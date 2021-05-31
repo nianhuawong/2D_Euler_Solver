@@ -113,10 +113,12 @@ void Output_Flowfield()
 
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
-	for (int i = ist; i < ied; i++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int i = ist; i < ied; i++)
 		{
+			//if (marker[i][j] == 0) continue;
+
 			double xcoord, ycoord;
 			grid_points[i][j].Get_Point_Coord(xcoord, ycoord);
 
