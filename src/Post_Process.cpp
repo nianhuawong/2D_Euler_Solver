@@ -100,9 +100,9 @@ void Output_Flowfield()
 
 	cout << "dumping flowfield..." << endl;
 	fstream file;
-	file.open("./tecflow/flow.plt", ios_base::out);
+	file.open("./flow.plt", ios_base::out);
 
-	file << "VARIABLES         = \"x\", \"y\", \"rho\", \"u\",\"v\", \"p\"" << endl;
+	file << "VARIABLES = \"x\", \"y\", \"rho\", \"u\",\"v\", \"p\"" << endl;
 	file << "ZONE T = \"Zone 1\"" << endl;
 	file << "I = " << num_grid_point_x << "  J = " << num_grid_point_y << "  K =1" << "  ZONETYPE=Ordered" << endl;
 	file << "DATAPACKING=POINT"   << endl;

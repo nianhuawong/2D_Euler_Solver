@@ -43,8 +43,8 @@ void Generate_Mesh()
 	{
 		for (int j = jst; j < jed; j++)
 		{
-			double x_node = i * dx;
-			double y_node = j * dy;
+			double x_node = (i - ist) * dx;
+			double y_node = (j - jst) * dy;
 
 			grid_points[i][j].Set_Point_Coord(x_node, y_node);
 
