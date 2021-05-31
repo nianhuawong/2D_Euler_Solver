@@ -27,10 +27,10 @@ void Time_Step::Compute_Time_Step()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField[IR][i][j];
-			double u = qField[IU][i][j];
-			double v = qField[IV][i][j];
-			double p = qField[IP][i][j];
+			double rho = qField[i][j][IR];
+			double u   = qField[i][j][IU];
+			double v   = qField[i][j][IV];
+			double p   = qField[i][j][IP];
 
 			double a = gama * p / rho;
 

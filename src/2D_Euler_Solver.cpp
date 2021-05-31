@@ -36,11 +36,13 @@ void Simulation::Run()
 
 		Time_Integration();
 
-		Compute_Boundary();
-
 		Compute_Residual();
 
 		Output_Flowfield();
+
+		Load_Q();
+
+		Compute_Boundary();
 
 		if (stop_by_residual)
 		{

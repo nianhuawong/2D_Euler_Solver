@@ -72,7 +72,7 @@ void QlQr_Solver::QlQr_MUSCL_X()
 			if (marker[i][j] == 0) continue;
 
 			VDouble qVector_m1 = qField[i - 1][j];
-			VDouble qVector_c0 = qField[i][j];
+			VDouble qVector_c0 = qField[i    ][j];
 			VDouble qVector_p1 = qField[i + 1][j];
 			VDouble qVector_p2 = qField[i + 2][j];
 
@@ -93,15 +93,15 @@ void QlQr_Solver::QlQr_MUSCL_X()
 				double fai4 = Limiter_Function(ita_p1_p);
 
 				qField1[i][j][iVar] = qVector_c0[iVar] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
-					+ (1 + muscl_k) * fai2 * du_p1);
+																	+ (1 + muscl_k) * fai2 * du_p1);
 
 				qField2[i][j][iVar] = qVector_p1[iVar] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
-					+ (1 + muscl_k) * fai4 * du_p1);
+																	+ (1 + muscl_k) * fai4 * du_p1);
 			}
 		}
 	}
-
 }
+
 void QlQr_Solver::QlQr_MUSCL_Y()
 {
 	//在y方向进行插值
@@ -113,7 +113,7 @@ void QlQr_Solver::QlQr_MUSCL_Y()
 			if (marker[i][j] == 0) continue;
 
 			VDouble qVector_m1 = qField[i][j - 1];
-			VDouble qVector_c0 = qField[i][j];
+			VDouble qVector_c0 = qField[i][j    ];
 			VDouble qVector_p1 = qField[i][j + 1];
 			VDouble qVector_p2 = qField[i][j + 2];
 
@@ -134,10 +134,10 @@ void QlQr_Solver::QlQr_MUSCL_Y()
 				double fai4 = Limiter_Function(ita_p1_p);
 
 				qField1[i][j][iVar] = qVector_c0[iVar] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
-					+ (1 + muscl_k) * fai2 * du_p1);
+																	+ (1 + muscl_k) * fai2 * du_p1);
 
 				qField2[i][j][iVar] = qVector_p1[iVar] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
-					+ (1 + muscl_k) * fai4 * du_p1);
+																	+ (1 + muscl_k) * fai4 * du_p1);
 			}
 		}
 	}

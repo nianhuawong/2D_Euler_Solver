@@ -75,17 +75,17 @@ void Flux_Solver::Flux_LR_Roe_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho1 = qField1[IR][i][j];
-			double u1   = qField1[IU][i][j];
-			double v1	= qField1[IV][i][j];
-			double p1   = qField1[IP][i][j];
+			double rho1 = qField1[i][j][IR];
+			double u1   = qField1[i][j][IU];
+			double v1	= qField1[i][j][IV];
+			double p1   = qField1[i][j][IP];
 
 			Inviscid_Flux_F(fluxVector1[i][j], rho1, u1, v1, p1);
 
-			double rho2 = qField2[IR][i][j];
-			double u2   = qField2[IU][i][j];
-			double v2   = qField2[IV][i][j];
-			double p2   = qField2[IP][i][j];
+			double rho2 = qField2[i][j][IR];
+			double u2   = qField2[i][j][IU];
+			double v2   = qField2[i][j][IV];
+			double p2   = qField2[i][j][IP];
 
 			Inviscid_Flux_F(fluxVector2[i][j], rho2, u2, v2, p2);
 		}
@@ -101,17 +101,17 @@ void Flux_Solver::Flux_LR_Roe_Y()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho1 = qField1[IR][i][j];
-			double u1   = qField1[IU][i][j];
-			double v1   = qField1[IV][i][j];
-			double p1   = qField1[IP][i][j];
+			double rho1 = qField1[i][j][IR];
+			double u1   = qField1[i][j][IU];
+			double v1   = qField1[i][j][IV];
+			double p1   = qField1[i][j][IP];
 
 			Inviscid_Flux_G(fluxVector1[i][j], rho1, u1, v1, p1);
 
-			double rho2 = qField2[IR][i][j];
-			double u2   = qField2[IU][i][j];
-			double v2   = qField2[IV][i][j];
-			double p2   = qField2[IP][i][j];
+			double rho2 = qField2[i][j][IR];
+			double u2   = qField2[i][j][IU];
+			double v2   = qField2[i][j][IV];
+			double p2   = qField2[i][j][IP];
 
 			Inviscid_Flux_G(fluxVector2[i][j], rho2, u2, v2, p2);
 		}
@@ -150,17 +150,17 @@ void Flux_Solver::Roe_Scheme()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho1 = qField1[IR][i][j];
-			double u1   = qField1[IU][i][j];
-			double v1	= qField1[IV][i][j];
-			double p1   = qField1[IP][i][j];
+			double rho1 = qField1[i][j][IR];
+			double u1   = qField1[i][j][IU];
+			double v1	= qField1[i][j][IV];
+			double p1   = qField1[i][j][IP];
 			double He1  = Enthalpy(rho1, p1, gama);
 			double H1   = He1 + 0.5 * (u1 * u1 + v1 * v1);
 
-			double rho2 = qField2[IR][i][j];
-			double u2   = qField2[IU][i][j];
-			double v2   = qField2[IV][i][j];
-			double p2   = qField2[IP][i][j];
+			double rho2 = qField2[i][j][IR];
+			double u2   = qField2[i][j][IU];
+			double v2   = qField2[i][j][IV];
+			double p2   = qField2[i][j][IP];
 			double He2  = Enthalpy(rho2, p2, gama);
 			double H2   = He2 + 0.5 * (u2 * u2 + v2 * v2);
 
@@ -174,8 +174,8 @@ void Flux_Solver::Roe_Scheme()
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			
-			VDouble qPrimitive1 = { qField1[IR][i][j],qField1[IU][i][j],qField1[IV][i][j],qField1[IP][i][j] };
-			VDouble qPrimitive2 = { qField2[IR][i][j],qField2[IU][i][j],qField2[IV][i][j],qField2[IP][i][j] };
+			VDouble qPrimitive1 = qField1[i][j];
+			VDouble qPrimitive2 = qField2[i][j];
 			
 			VDouble qConservative1(num_of_prim_vars);
 			VDouble qConservative2(num_of_prim_vars);

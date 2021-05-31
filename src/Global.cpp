@@ -36,7 +36,7 @@ void Init_Global_Param()
 
 	solve_direction = 'x';
 
-	residual_output_steps = 20;		//残差输出间隔步数
+	residual_output_steps = 1;		//残差输出间隔步数
 	flow_save_steps		  = 100;	//流场输出间隔步数
 	converge_criterion	  = 1e-8;	//残差收敛标准
 }
@@ -161,6 +161,7 @@ void Compute_Boundary()
 	}
 
 	qField_N1 = qField;
+	//qField_N2 = qField;
 }
 
 void Load_Q()

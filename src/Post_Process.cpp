@@ -32,14 +32,14 @@ void Residual::Compute_Residual()
 	{
 		int count = 0;
 		double res_max = -1e40;
-		vector< vector< double > >& qv = qField[iVar];
+		
 		for (int i = ist; i < ied; i++)
 		{
 			for (int j = jst; j < jed; j++)
 			{
 				if (marker[i][j] == 0) continue;
 				
-				double res1 = abs( qField_N1[iVar][i][j] - qField[iVar][i][j] );
+				double res1 = abs( qField_N1[i][j][iVar] - qField[i][j] [iVar]);
 
 				double res2 = res1 * res1;
 
@@ -58,6 +58,7 @@ void Residual::Compute_Residual()
 	
 	this->OutputResidual();
 }
+
 void Residual::OutputResidual()
 {
 	bool flag = current_step % residual_output_steps;//整除时flag=0,输出残差，非整除时flag=1，不输出
@@ -122,10 +123,10 @@ void Output_Flowfield()
 			double xcoord, ycoord;
 			grid_points[i][j].Get_Point_Coord(xcoord, ycoord);
 
-			double rho = qField_N1[IR][i][j];
-			double u   = qField_N1[IU][i][j];
-			double v   = qField_N1[IV][i][j];
-			double p   = qField_N1[IP][i][j];
+			double rho = qField_N1[i][j][IR];
+			double u   = qField_N1[i][j][IU];
+			double v   = qField_N1[i][j][IV];
+			double p   = qField_N1[i][j][IP];
 
 			file << xcoord << "    " << ycoord << "    " << rho << "    " << u << "    " 
 				 << v      << "    " << p << endl;
