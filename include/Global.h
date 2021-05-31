@@ -6,6 +6,7 @@ using namespace std;
 #define IU 1
 #define IV 2
 #define IP 3
+#define SMALL 1E-40
 
 extern int num_of_prim_vars;
 extern int current_step, max_num_of_steps;

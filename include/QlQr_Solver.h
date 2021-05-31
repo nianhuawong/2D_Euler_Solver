@@ -15,7 +15,7 @@ public:
 	QlQr_Solver();
 	~QlQr_Solver() {};
 protected:
-
+	int ist, ied, jst, jed;
 public:
 	void Solve_QlQr();
 protected:

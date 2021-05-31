@@ -159,6 +159,8 @@ void Compute_Boundary()
 			qField[IP][i][j] = qField[IP][i][j - 1];
 		}
 	}
+
+	qField_N1 = qField;
 }
 
 void Load_Q()
