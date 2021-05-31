@@ -21,8 +21,8 @@ VDouble3D qField_N3;
 QlQr_Solver::QlQr_Solver()
 {
 	Get_IJK_Region(ist, ied, jst, jed);
-	Allocate_3D_Vector(qField1, num_of_prim_vars, num_half_point_x, num_half_point_y);
-	Allocate_3D_Vector(qField2, num_of_prim_vars, num_half_point_x, num_half_point_y);
+	Allocate_3D_Vector(qField1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(qField2, num_half_point_x, num_half_point_y, num_of_prim_vars);
 }
 
 void QlQr_Solver::Solve_QlQr()
@@ -63,20 +63,24 @@ void QlQr_Solver::QlQr_MUSCL()
 
 void QlQr_Solver::QlQr_MUSCL_X()
 {
-	vector< vector< int > >& marker = mesh->Get_Marker();
 	//在x方向进行插值
-	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+	vector< vector< int > >& marker = mesh->Get_Marker();
+	for (int j = jst; j < jed - 1; j++)
 	{
-		vector< vector< double > >& qv = qField[iVar];
-		for (int j = jst; j < jed - 1; j++)
+		for (int i = ist; i < ied - 1; i++)
 		{
-			for (int i = ist; i < ied - 1; i++)
-			{
-				if (marker[i][j] == 0) continue;
+			if (marker[i][j] == 0) continue;
 
-				double du_p1 = qv[i + 1][j] - qv[i    ][j] + SMALL;
-				double du_m1 = qv[i    ][j] - qv[i - 1][j] + SMALL;
-				double du_p3 = qv[i + 2][j] - qv[i + 1][j] + SMALL;
+			VDouble qVector_m1 = qField[i - 1][j];
+			VDouble qVector_c0 = qField[i][j];
+			VDouble qVector_p1 = qField[i + 1][j];
+			VDouble qVector_p2 = qField[i + 2][j];
+
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				double du_p1 = qVector_p1[iVar] - qVector_c0[iVar] + SMALL;
+				double du_m1 = qVector_c0[iVar] - qVector_m1[iVar] + SMALL;
+				double du_p3 = qVector_p2[iVar] - qVector_p1[iVar] + SMALL;
 
 				double ita_m1_p = du_p1 / du_m1;
 				double ita_p1_m = du_m1 / du_p1;
@@ -87,32 +91,37 @@ void QlQr_Solver::QlQr_MUSCL_X()
 				double fai2 = Limiter_Function(ita_p1_m);
 				double fai3 = Limiter_Function(ita_p3_m);
 				double fai4 = Limiter_Function(ita_p1_p);
-				
-				qField1[iVar][i][j] = qv[i    ][j] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
-															    + (1 + muscl_k) * fai2 * du_p1);
 
-				qField2[iVar][i][j] = qv[i + 1][j] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
-																+ (1 + muscl_k) * fai4 * du_p1);
+				qField1[i][j][iVar] = qVector_c0[iVar] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
+					+ (1 + muscl_k) * fai2 * du_p1);
+
+				qField2[i][j][iVar] = qVector_p1[iVar] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
+					+ (1 + muscl_k) * fai4 * du_p1);
 			}
 		}
 	}
+
 }
 void QlQr_Solver::QlQr_MUSCL_Y()
 {
+	//在y方向进行插值
 	vector< vector< int > >& marker = mesh->Get_Marker();
-	//在x方向进行插值
-	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+	for (int i = ist; i < ied - 1; i++)
 	{
-		vector< vector< double > >& qv = qField[iVar];
-		for (int i = ist; i < ied - 1; i++)
+		for (int j = jst; j < jed - 1; j++)
 		{
-			for (int j = jst; j < jed - 1; j++)
-			{
-				if (marker[i][j] == 0) continue;
+			if (marker[i][j] == 0) continue;
 
-				double du_p1 = qv[i][j + 1] - qv[i][j    ] + SMALL;
-				double du_m1 = qv[i][j    ] - qv[i][j - 1] + SMALL;
-				double du_p3 = qv[i][j + 2] - qv[i][j + 1] + SMALL;
+			VDouble qVector_m1 = qField[i][j - 1];
+			VDouble qVector_c0 = qField[i][j];
+			VDouble qVector_p1 = qField[i][j + 1];
+			VDouble qVector_p2 = qField[i][j + 2];
+
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				double du_p1 = qVector_p1[iVar] - qVector_c0[iVar] + SMALL;
+				double du_m1 = qVector_c0[iVar] - qVector_m1[iVar] + SMALL;
+				double du_p3 = qVector_p2[iVar] - qVector_p1[iVar] + SMALL;
 
 				double ita_m1_p = du_p1 / du_m1;
 				double ita_p1_m = du_m1 / du_p1;
@@ -123,16 +132,15 @@ void QlQr_Solver::QlQr_MUSCL_Y()
 				double fai2 = Limiter_Function(ita_p1_m);
 				double fai3 = Limiter_Function(ita_p3_m);
 				double fai4 = Limiter_Function(ita_p1_p);
-				
-				qField1[iVar][i][j] = qv[i][j    ] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
-															    + (1 + muscl_k) * fai2 * du_p1);
 
-				qField2[iVar][i][j] = qv[i][j + 1] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
-																+ (1 + muscl_k) * fai4 * du_p1);
+				qField1[i][j][iVar] = qVector_c0[iVar] + 1.0 / 4.0 * ((1 - muscl_k) * fai1 * du_m1
+					+ (1 + muscl_k) * fai2 * du_p1);
+
+				qField2[i][j][iVar] = qVector_p1[iVar] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
+					+ (1 + muscl_k) * fai4 * du_p1);
 			}
 		}
 	}
-
 }
 
 void QlQr_Solver::QlQr_WCNS()

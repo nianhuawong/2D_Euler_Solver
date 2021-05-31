@@ -44,10 +44,10 @@ void Init_Global_Param()
 void Init_Flow()
 {
 	//流场初始化
-	Allocate_3D_Vector(qField,    num_of_prim_vars, total_points_x, total_points_y);
-	Allocate_3D_Vector(qField_N1, num_of_prim_vars, total_points_x, total_points_y);
-	Allocate_3D_Vector(qField_N2, num_of_prim_vars, total_points_x, total_points_y);
-	Allocate_3D_Vector(qField_N3, num_of_prim_vars, total_points_x, total_points_y);	
+	Allocate_3D_Vector(qField,	  total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(qField_N1, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(qField_N2, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(qField_N3, total_points_x, total_points_y, num_of_prim_vars);
 
 	//流场赋初值
 	vector< vector< int > >& marker = mesh->Get_Marker();
@@ -60,10 +60,10 @@ void Init_Flow()
 		{
 			if (marker[i][j] == 0) continue;
 
-			qField[IR][i][j] = 1.0;
-			qField[IU][i][j] = 3.0;
-			qField[IV][i][j] = 0.0;
-			qField[IP][i][j] = 0.71429;
+			qField[i][j][IR] = 1.0;
+			qField[i][j][IU] = 3.0;
+			qField[i][j][IV] = 0.0;
+			qField[i][j][IP] = 0.71429;
 		}
 	}
 }
@@ -78,10 +78,10 @@ void Compute_Boundary()
 	{
 		for (int j = jst; j < jed; j++)
 		{
-			qField[IR][i][j] = 1.0;
-			qField[IU][i][j] = 3.0;
-			qField[IV][i][j] = 0.0;
-			qField[IP][i][j] = 0.71429;
+			qField[i][j][IR] = 1.0;
+			qField[i][j][IU] = 3.0;
+			qField[i][j][IV] = 0.0;
+			qField[i][j][IP] = 0.71429;
 		}
 	}
 
@@ -90,10 +90,10 @@ void Compute_Boundary()
 	{
 		for (int j = jed; j < total_points_y; j++)
 		{
-			qField[IR][i][j] = qField[IR][i][j - 1];
-			qField[IU][i][j] = qField[IU][i][j - 1];
-			qField[IV][i][j] = qField[IV][i][j - 1];
-			qField[IP][i][j] = qField[IP][i][j - 1];
+			qField[i][j][IR] = qField[i][j - 1][IR];
+			qField[i][j][IU] = qField[i][j - 1][IU];
+			qField[i][j][IV] = qField[i][j - 1][IV];
+			qField[i][j][IP] = qField[i][j - 1][IP];
 		}
 	}
 
@@ -104,10 +104,10 @@ void Compute_Boundary()
 		{
 			if (marker[i - 1][j] == 0) continue;
 
-			qField[IR][i][j] = qField[IR][i - 1][j];
-			qField[IU][i][j] = qField[IU][i - 1][j];
-			qField[IV][i][j] = qField[IV][i - 1][j];
-			qField[IP][i][j] = qField[IP][i - 1][j];
+			qField[i][j][IR] = qField[i - 1][j][IR];
+			qField[i][j][IU] = qField[i - 1][j][IU];
+			qField[i][j][IV] = qField[i - 1][j][IV];
+			qField[i][j][IP] = qField[i - 1][j][IP];
 		}
 	}
 
@@ -116,10 +116,10 @@ void Compute_Boundary()
 	{
 		for (int j = jst - 1; j >= 0; j--)
 		{
-			qField[IR][i][j] = qField[IR][i][j + 1];
-			qField[IU][i][j] = 0.0;
-			qField[IV][i][j] = 0.0;
-			qField[IP][i][j] = qField[IP][i][j + 1];
+			qField[i][j][IR] = qField[i][j + 1][IR];
+			qField[i][j][IU] = 0.0; 
+			qField[i][j][IV] = 0.0; 
+			qField[i][j][IP] = qField[i][j + 1][IP];
 		}
 	}
 
@@ -128,10 +128,10 @@ void Compute_Boundary()
 	{
 		for (int j = jst + Jw1; j < jst + Jw2; j++)
 		{
-			qField[IR][i][j] = qField[IR][i - 1][j];
-			qField[IU][i][j] = 0.0;
-			qField[IV][i][j] = 0.0;
-			qField[IP][i][j] = qField[IP][i - 1][j];
+			qField[i][j][IR] = qField[i - 1][j][IR];
+			qField[i][j][IU] = 0.0;
+			qField[i][j][IV] = 0.0;
+			qField[i][j][IP] = qField[i - 1][j][IP];
 		}
 	}
 
@@ -141,10 +141,10 @@ void Compute_Boundary()
 		//for (int j = Jw2; j < num_ghost_point + Jw2; j++)
 		for (int j = jst + Jw2 - 1; j >= Jw2; j--)
 		{
-			qField[IR][i][j] = qField[IR][i][j + 1];
-			qField[IU][i][j] = 0.0;
-			qField[IV][i][j] = 0.0;
-			qField[IP][i][j] = qField[IP][i][j + 1];
+			qField[i][j][IR] = qField[i][j + 1][IR];
+			qField[i][j][IU] = 0.0;
+			qField[i][j][IV] = 0.0;
+			qField[i][j][IP] = qField[i][j + 1][IP];
 		}
 	}
 
@@ -153,10 +153,10 @@ void Compute_Boundary()
 	{
 		for (int j = jst + Jw1; j < jst + Jw1 + num_ghost_point; j++)
 		{
-			qField[IR][i][j] = qField[IR][i][j - 1];
-			qField[IU][i][j] = 0.0;
-			qField[IV][i][j] = 0.0;
-			qField[IP][i][j] = qField[IP][i][j - 1];
+			qField[i][j][IR] = qField[i][j - 1][IR];
+			qField[i][j][IU] = 0.0;
+			qField[i][j][IV] = 0.0;
+			qField[i][j][IP] = qField[i][j - 1][IP];
 		}
 	}
 

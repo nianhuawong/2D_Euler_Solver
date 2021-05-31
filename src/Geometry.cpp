@@ -34,11 +34,14 @@ void Generate_Mesh()
 	mesh = new Structured_Mesh(total_points_x, total_points_y);
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 	vector< vector< int > >& marker = mesh->Get_Marker();
-
+	mesh->Set_Mesh_Dimension (num_grid_point_x, num_grid_point_y);
+	mesh->Set_Num_Ghost_Point(num_ghost_point);
 	mesh->Set_Dxdy(dx, dy);
 
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
+	mesh->Set_Range(ist, ied, jst, jed);
+
 	for (int i = ist; i < ied; i++)
 	{
 		for (int j = jst; j < jed; j++)
@@ -62,14 +65,31 @@ void Set_Mesh_Dimension(int NI, int NJ)
 	num_grid_point_x = NI; num_grid_point_y = NJ;
 }
 
-Structured_Mesh::Structured_Mesh(int NI, int NJ)
+Structured_Mesh::Structured_Mesh(int NI_tot, int NJ_tot)
 {
 	this->dx = 0.0;
 	this->dy = 0.0;
-	this->NI = NI;
-	this->NJ = NJ;
-	Allocate_2D_Vector(grid_points, NI, NJ);
-	Allocate_2D_Vector(marker, NI, NJ);
+	this->NI = 0;
+	this->NJ = 0;
+	this->NI_tot = NI_tot;
+	this->NJ_tot = NJ_tot;
+
+	this->ist = 0;
+	this->ied = 0;
+	this->jst = 0;
+	this->jed = 0;
+	this->num_ghost_point = 0;
+
+	Allocate_2D_Vector(grid_points, NI_tot, NJ_tot);
+	Allocate_2D_Vector(marker,      NI_tot, NJ_tot);
+}
+
+void Structured_Mesh::Set_Range(int ist, int ied, int jst, int jed)
+{
+	this->ist = ist;
+	this->ied = ied;
+	this->jst = jst;
+	this->jed = jed;
 }
 
 Point::Point()

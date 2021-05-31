@@ -34,14 +34,14 @@ void Time_Marching_Solver::Time_Marching()
 
 void Update_Flowfield()
 {
-	if (solve_direction == 'x')
-	{
-		Update_Flowfield_X();
-	}
-	else if (solve_direction == 'y')
-	{
+	//if (solve_direction == 'x')
+	//{
+		//Update_Flowfield_X();
+	//}
+	//else if (solve_direction == 'y')
+	//{
 		Update_Flowfield_Y();
-	}
+	//}
 }
 void Update_Flowfield_X()
 {
