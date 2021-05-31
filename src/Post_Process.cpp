@@ -21,19 +21,21 @@ Residual::Residual()
 	res_L1.resize (num_of_prim_vars);
 	res_L2.resize (num_of_prim_vars);
 	res_Loo.resize(num_of_prim_vars);
+
+	Get_IJK_Region(ist, ied, jst, jed);
 }
 
 void Residual::Compute_Residual()
 {
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
 		int count = 0;
 		double res_max = -1e40;
 		vector< vector< double > >& qv = qField[iVar];
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int i = ist; i < ied; i++)
 		{
-			for (int j = 0; j < num_half_point_y; j++)
+			for (int j = jst; j < jed; j++)
 			{
 				if (marker[i][j] == 0) continue;
 				
@@ -58,16 +60,16 @@ void Residual::Compute_Residual()
 }
 void Residual::OutputResidual()
 {
-	bool flag = (current_step + 1) % residual_output_steps;//整除时flag=0,输出残差，非整除时flag=1，不输出
+	bool flag = current_step % residual_output_steps;//整除时flag=0,输出残差，非整除时flag=1，不输出
 	if (flag) return;
 
-	cout << setiosflags(ios::right);
+	cout << setiosflags(ios::left);
 	cout << setiosflags(ios::scientific);
 	cout << setprecision(5);
-	cout << "Iteration        rho_res_Loo      u_res_Loo     v_res_Loo    p_res_Loo" << endl;
-	cout << current_step + 1 << "    "
-		 << res_Loo[IR]		 << "    " << res_Loo[IU] << "    "
-		 << res_Loo[IV]		 << "    " << res_Loo[IP] << endl;
+	cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
+	cout << current_step + 1 << "\t      "
+		 << res_Loo[IR]		 << "\t" << res_Loo[IU] << "\t"
+		 << res_Loo[IV]		 << "\t" << res_Loo[IP] << endl;
 
 	if (res_Loo[IR] < converge_criterion &&
 		res_Loo[IU] < converge_criterion &&
@@ -90,11 +92,11 @@ bool Stop_by_Residual()
 
 void Output_Flowfield()
 {
-	bool flag = (current_step + 1) % flow_save_steps;//整除时flag=0,输出，非整除时flag=1，不输出
+	bool flag = current_step % flow_save_steps;//整除时flag=0,输出，非整除时flag=1，不输出
 	if (flag) return;
 
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 
 	cout << "dumping flowfield..." << endl;
 	fstream file;
@@ -109,9 +111,11 @@ void Output_Flowfield()
 	file << setiosflags(ios::scientific);
 	file << setprecision(8);
 
-	for (int i = 0; i < num_grid_point_x; i++)
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = 0; j < num_grid_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			double xcoord, ycoord;
 			grid_points[i][j].Get_Point_Coord(xcoord, ycoord);
@@ -119,12 +123,12 @@ void Output_Flowfield()
 			double rho = qField_N1[IR][i][j];
 			double u   = qField_N1[IU][i][j];
 			double v   = qField_N1[IV][i][j];
-			double E   = qField_N1[IP][i][j];
-			double p   = Energy_2_Pressure(E, rho, u, v);
+			double p   = qField_N1[IP][i][j];
 
 			file << xcoord << "    " << ycoord << "    " << rho << "    " << u << "    " 
 				 << v      << "    " << p << endl;
 		}
 	}
+	
 	file.close();
 }

@@ -14,7 +14,8 @@ public:
 public:
 	void Compute_Spatial_Derivative();
 protected:
-	
+	int ist, ied, jst, jed;
+
 	void Spatial_Derivative_X();
 	void Spatial_Derivative_Y();
 };

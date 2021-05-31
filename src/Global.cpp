@@ -173,10 +173,37 @@ void Set_Solve_Direction(char direction)
 	solve_direction = direction;
 }
 
-double Energy_2_Pressure(double E, double rho, double u, double v)
+void Primitive_To_Conservative( VDouble & primitive, VDouble &conservative )
 {
 	double gama = 1.4;
-	return (gama - 1) * (E - 0.5 * rho * (u * u + v * v));
+	double rho, u, v, p;
+	rho = primitive[IR];
+	u = primitive[IU];
+	v = primitive[IV];
+	p = primitive[IP];
+
+	conservative[IR] = rho;
+	conservative[IU] = rho * u;
+	conservative[IV] = rho * v;
+	conservative[IP] = p / (gama - 1) + 0.5 * rho * (u * u + v * v);
+}
+
+void Conservative_To_Primitive(VDouble& conservative, VDouble &primitive)
+{
+	double gama = 1.4;
+	double rho		= conservative[IR];
+	double rho_u	= conservative[IU];
+	double rho_v	= conservative[IV];
+	double E		= conservative[IP];
+
+	double u = rho_u / rho;
+	double v = rho_v / rho;
+	double p = (gama - 1) * (E - 0.5 * rho * (u * u + v * v));
+
+	primitive[IR] = rho;
+	primitive[IU] = u;
+	primitive[IV] = v;
+	primitive[IP] = p;
 }
 
 //计算点的标号范围

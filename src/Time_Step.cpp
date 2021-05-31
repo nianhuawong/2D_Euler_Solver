@@ -12,22 +12,25 @@ void Solve_Time_Step()
 
 Time_Step::Time_Step()
 {
-
+	Get_IJK_Region(ist, ied, jst, jed);
 }
 
 void Time_Step::Compute_Time_Step()
 {
 	double a_max = -1e40;
 	double gama  = 1.4;
-	for (int i = 0; i < num_half_point_x; i++)
+
+	VInt2D& marker = mesh->Get_Marker();
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
+			if (marker[i][j] == 0) continue;
+
 			double rho = qField[IR][i][j];
 			double u = qField[IU][i][j];
 			double v = qField[IV][i][j];
-			double E = qField[IP][i][j];
-			double p = Energy_2_Pressure(E, rho, u, v);
+			double p = qField[IP][i][j];
 
 			double a = gama * p / rho;
 

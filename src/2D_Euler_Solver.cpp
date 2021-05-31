@@ -27,6 +27,8 @@ void Simulation::Run()
 		//先计算x方向
 		Set_Solve_Direction('x');
 
+		Load_Q();
+
 		Time_Integration();
 
 		//再计算y方向

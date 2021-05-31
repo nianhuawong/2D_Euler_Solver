@@ -21,8 +21,6 @@ Time_Marching_Solver::Time_Marching_Solver()
 
 void Time_Marching_Solver::Time_Marching()
 {
-	Load_Q();
-
 	Solve_QlQr();
 
 	Solve_Flux();
@@ -36,14 +34,31 @@ void Time_Marching_Solver::Time_Marching()
 
 void Update_Flowfield()
 {
-	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+	VInt2D& marker = mesh->Get_Marker();
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+
+	VDouble qPrimitive(num_of_prim_vars);
+	VDouble qConservative(num_of_prim_vars);
+	
+	for (int j = jst; j < jed; j++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
+		for (int i = ist; i < ied; i++)
 		{
-			for (int i = 0; i < num_half_point_x; i++)
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
-				qField_N1[iVar][i][j] = qField[iVar][i][j] + time_step * rhs[iVar][i][j];
+				qPrimitive = { qField[IR][i][j],qField[IU][i][j],qField[IV][i][j],qField[IP][i][j] };
+				Primitive_To_Conservative(qPrimitive, qConservative);
+
+				qConservative[iVar]  += time_step * rhs[iVar][i][j];
 			}
+
+			Conservative_To_Primitive(qConservative, qPrimitive);
+			qField_N1[IR][i][j] = qPrimitive[IR];
+			qField_N1[IU][i][j] = qPrimitive[IU];
+			qField_N1[IV][i][j] = qPrimitive[IV];
+			qField_N1[IP][i][j] = qPrimitive[IP];
 		}
 	}
 

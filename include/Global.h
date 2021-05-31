@@ -81,4 +81,5 @@ void MatrixMultiply(vector< vector< T1 > >& a, vector< T2 >& b, vector< T3 >& c,
 	}
 }
 
-double Energy_2_Pressure(double E, double rho, double u, double v);
+void Primitive_To_Conservative(VDouble& primitive, VDouble& conservative);
+void Conservative_To_Primitive(VDouble& conservative, VDouble& primitive);

@@ -17,12 +17,8 @@ void Solve_Spatial_Derivative()
 
 Spatial_Derivative::Spatial_Derivative()
 {
-	rhs.resize(num_of_prim_vars);
-
-	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-	{
-		Allocate_2D_Vector(rhs[iVar], num_half_point_x, num_half_point_y);		
-	}
+	Get_IJK_Region(ist, ied, jst, jed);
+	Allocate_3D_Vector(rhs, num_of_prim_vars, num_half_point_x, num_half_point_y);
 }
 
 void Spatial_Derivative::Compute_Spatial_Derivative()
@@ -43,12 +39,14 @@ void Spatial_Derivative::Compute_Spatial_Derivative()
 
 void Spatial_Derivative::Spatial_Derivative_X()
 {
+	VInt2D& marker = mesh->Get_Marker();
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
+		for (int j = jst; j < jed - 1; j++)
 		{
-			for (int i = 0; i < num_half_point_x; i++)
+			for (int i = ist; i < ied - 1; i++)
 			{
+				if (marker[i][j] == 0) continue;
 				rhs[iVar][i][j] = -(fluxVector[i][j][iVar] - fluxVector[i - 1][j][iVar]) / dx;
 			}
 		}
@@ -57,13 +55,15 @@ void Spatial_Derivative::Spatial_Derivative_X()
 
 void Spatial_Derivative::Spatial_Derivative_Y()
 {
+	VInt2D& marker = mesh->Get_Marker();
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int i = ist; i < ied - 1; i++)
 		{
-			for (int j = 0; j < num_half_point_y; j++)
+			for (int j = jst; j < jed - 1; j++)
 			{
-				rhs[iVar][i][j] = -(fluxVector[i][j][iVar] - fluxVector[i - 1][j][iVar]) / dy;
+				if (marker[i][j] == 0) continue;
+				rhs[iVar][i][j] = -(fluxVector[i][j][iVar] - fluxVector[i][j - 1][iVar]) / dy;
 			}
 		}
 	}

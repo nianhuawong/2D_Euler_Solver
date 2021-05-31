@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Global.h"
 using namespace std;
 
 class Residual
@@ -8,10 +9,10 @@ public:
 	Residual();
 	~Residual() {}
 protected:
-	vector< double > res_L1;
-	vector< double > res_L2;
-	vector< double > res_Loo;
-
+	VDouble res_L1;
+	VDouble res_L2;
+	VDouble res_Loo;
+	int ist, ied, jst, jed;
 public:
 	void Compute_Residual();
 
