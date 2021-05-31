@@ -31,7 +31,10 @@ protected:
 	void EntropyFix(double& lamda1, double& lamda2, double& lamda3, double& lamda4);
 	void EntropyFix_Harten(double& lamda);
 
-	void Compute_Jacobian(VDouble2D& Jacobian, double u, double v, double c, double H,
+	void Compute_Jacobian  (VDouble2D& Jacobian, double u, double v, double c, double H);
+	void Compute_Jacobian_X(VDouble2D& Jacobian, double u, double v, double c, double H,
+		double lamda1, double lamda2, double lamda3, double lamda4);
+	void Compute_Jacobian_Y(VDouble2D& Jacobian, double u, double v, double c, double H,
 		double lamda1, double lamda2, double lamda3, double lamda4);
 };
 	

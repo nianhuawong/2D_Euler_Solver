@@ -172,14 +172,7 @@ void Flux_Solver::Roe_Scheme()
 			double H_roe = (H1 + H2 * D) / (1 + D);
 			double c_roe = sqrt((gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe)));
 
-			double lamda1 = u_roe;
-			double lamda2 = u_roe;
-			double lamda3 = u_roe - c_roe;
-			double lamda4 = u_roe + c_roe;
-
-			EntropyFix(lamda1, lamda2, lamda3, lamda4);	
-
-			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe, lamda1, lamda2, lamda3, lamda4);
+			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			
 			VDouble qPrimitive1 = { qField1[IR][i][j],qField1[IU][i][j],qField1[IV][i][j],qField1[IP][i][j] };
 			VDouble qPrimitive2 = { qField2[IR][i][j],qField2[IU][i][j],qField2[IV][i][j],qField2[IP][i][j] };
@@ -225,7 +218,33 @@ void Flux_Solver::EntropyFix_Harten(double &lamda)
 	lamda = abs(lamda) > eps ? abs(lamda) : ((lamda * lamda + eps * eps) / 2.0 / eps);
 }
 
-void Flux_Solver::Compute_Jacobian(VDouble2D& Jacobian, double u, double v, double a, double h,
+void Flux_Solver::Compute_Jacobian(VDouble2D& Jacobian, double u, double v, double a, double h)
+{
+	if (solve_direction == 'x')
+	{
+		double lamda1 = u;
+		double lamda2 = u;
+		double lamda3 = u - a;
+		double lamda4 = u + a;
+
+		EntropyFix(lamda1, lamda2, lamda3, lamda4);
+
+		Compute_Jacobian_X(Jacobian, u, v, a, h, lamda1, lamda2, lamda3, lamda4);
+	}
+	else if (solve_direction == 'y')
+	{
+		double lamda1 = v;
+		double lamda2 = v;
+		double lamda3 = v - a;
+		double lamda4 = v + a;
+
+		EntropyFix(lamda1, lamda2, lamda3, lamda4);
+
+		Compute_Jacobian_Y(Jacobian, u, v, a, h, lamda1, lamda2, lamda3, lamda4);
+	}	
+}
+
+void Flux_Solver::Compute_Jacobian_X(VDouble2D& Jacobian, double u, double v, double a, double h,
 	double lamda1, double lamda2, double lamda3, double lamda4)
 {
 	VDouble2D Lmdx = { {lamda1,0,0,0},{0,lamda2,0,0},{0,0,lamda3,0},{0,0,0,lamda4} };
@@ -248,5 +267,30 @@ void Flux_Solver::Compute_Jacobian(VDouble2D& Jacobian, double u, double v, doub
 
 	MatrixMultiply(Rx,   Lmdx, tmp1,     4, 4, 4);
 	MatrixMultiply(tmp1, Lx,   Jacobian, 4, 4, 4);
+}
+
+void Flux_Solver::Compute_Jacobian_Y(VDouble2D& Jacobian, double u, double v, double a, double h,
+	double lamda1, double lamda2, double lamda3, double lamda4)
+{
+	VDouble2D Lmdy = { {lamda1,0,0,0},{0,lamda2,0,0},{0,0,lamda3,0},{0,0,0,lamda4} };
+
+	VDouble2D Ry = { {0,						 1,     1,			1		  },
+					 {1,						 0,     u,			u  		  },
+					 {0,						 v,     v - a,		v + a,	  },
+					 {u,       (v * v - u * u) / 2,     h - a * v,  h + a * v } };
+
+	double b2 = (gama - 1) / a / a;
+	double b1 = b2 * (u * u + v * v) / 2.0;
+
+	VDouble2D Ly = { {         -b1 * u,		1 + b2 * u * u,               b2 * u * v,    -b2 * u	},
+					 {          1 - b1,		        b2 * u,				      b2 * v,	 -b2		},
+					 {(b1 + v / a) / 2,		   -b2 * u / 2,    -(b2 * v + 1 / a) / 2,     b2 / 2	},
+					 {(b1 - v / a) / 2,        -b2 * u / 2,    -(b2 * v - 1 / a) / 2,	  b2 / 2	} };
+
+	VDouble2D tmp1;
+	Allocate_2D_Vector(tmp1, 4, 4);
+
+	MatrixMultiply(Ry, Lmdy, tmp1, 4, 4, 4);
+	MatrixMultiply(tmp1, Ly, Jacobian, 4, 4, 4);
 }
 
