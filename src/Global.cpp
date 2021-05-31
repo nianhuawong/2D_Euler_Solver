@@ -20,7 +20,7 @@ void Init_Global_Param()
 {
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
 
-	max_num_of_steps = 10000;
+	max_num_of_steps = 115;
 
 	cfl_num   = 0.1;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
@@ -36,7 +36,7 @@ void Init_Global_Param()
 
 	solve_direction = 'x';
 
-	residual_output_steps = 10;		//残差输出间隔步数
+	residual_output_steps = 1;		//残差输出间隔步数
 	flow_save_steps		  = 100;	//流场输出间隔步数
 	converge_criterion	  = 1e-8;	//残差收敛标准
 }
@@ -66,6 +66,8 @@ void Init_Flow()
 			qField[i][j][IP] = 0.71429;
 		}
 	}
+
+	qField_N1 = qField;
 }
 
 void Compute_Boundary()
@@ -98,9 +100,9 @@ void Compute_Boundary()
 	}
 
 	//右边界：outflow
-	for (int i = ied; i < total_points_x; i++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int i = ied; i < total_points_x; i++)
 		{
 			if (marker[i - 1][j] == 0) continue;
 
@@ -124,9 +126,9 @@ void Compute_Boundary()
 	}
 
 	//左物面, no-slip wall
-	for (int i = ist + Iw; i < ist + Iw + num_ghost_point; i++)
+	for (int j = jst + Jw1; j < jst + Jw2; j++)
 	{
-		for (int j = jst + Jw1; j < jst + Jw2; j++)
+		for (int i = ist + Iw; i < ist + Iw + num_ghost_point; i++)
 		{
 			qField[i][j][IR] = qField[i - 1][j][IR];
 			qField[i][j][IU] = 0.0;
@@ -159,9 +161,6 @@ void Compute_Boundary()
 			qField[i][j][IP] = qField[i][j - 1][IP];
 		}
 	}
-
-	qField_N1 = qField;
-	//qField_N2 = qField;
 }
 
 void Load_Q()

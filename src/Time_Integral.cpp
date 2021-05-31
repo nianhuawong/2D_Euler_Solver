@@ -97,6 +97,10 @@ void Update_Flowfield_Y()
 
 			Conservative_To_Primitive(qConservative, qPrimitive);
 			qField_N1[i][j] = qPrimitive;
+			if (qPrimitive[IR] != qPrimitive[IR])
+			{
+				int kkk = 1;
+			}
 		}
 	}
 

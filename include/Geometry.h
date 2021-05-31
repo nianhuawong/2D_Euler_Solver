@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "Global.h"
 using namespace std;
 
 class Structured_Mesh;

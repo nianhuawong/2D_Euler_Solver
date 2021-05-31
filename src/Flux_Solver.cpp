@@ -148,6 +148,10 @@ void Flux_Solver::Roe_Scheme()
 	{
 		for (int i = ist; i < ied - 1; i++)
 		{
+			if ( i == 5 && j == 51 )
+			{
+				int kkk = 1;
+			}
 			if (marker[i][j] == 0) continue;
 
 			double rho1 = qField1[i][j][IR];
@@ -170,7 +174,8 @@ void Flux_Solver::Roe_Scheme()
 			double u_roe = (u1 + u2 * D) / (1 + D);
 			double v_roe = (v1 + v2 * D) / (1 + D);
 			double H_roe = (H1 + H2 * D) / (1 + D);
-			double c_roe = sqrt((gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe)));
+			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
+			double c_roe = sqrt(abs(c2_roe));
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			
@@ -201,7 +206,7 @@ void Flux_Solver::Roe_Scheme()
 
 double Flux_Solver::Enthalpy(double rho, double p, double gama)
 {
-	return  gama * p / rho / (gama - 1);
+	return  gama / (gama - 1) * ( p / rho );
 }
 
 void Flux_Solver::EntropyFix(double& lamda1, double& lamda2, double& lamda3, double& lamda4)

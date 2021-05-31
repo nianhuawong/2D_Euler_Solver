@@ -26,7 +26,7 @@ void Generate_Mesh()
 	//num_half_point_x = num_grid_point_x - 1;   //半点个数，即单元数，点数减1
 	//num_half_point_y = num_grid_point_y - 1;   //半点个数，即单元数，点数减1
 	num_half_point_x = total_points_x - 1;   //半点个数，即单元数，点数减1
-	num_half_point_y = total_points_x - 1;
+	num_half_point_y = total_points_y - 1;
 	
 	dx = hx / (num_grid_point_x - 1);
 	dy = hy / (num_grid_point_y - 1);

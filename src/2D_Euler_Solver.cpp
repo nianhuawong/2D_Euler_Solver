@@ -25,6 +25,11 @@ void Simulation::Run()
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
 	{
 		//先计算x方向
+		if (current_step == 115)
+		{
+			int kkk = 1;
+		}
+
 		Set_Solve_Direction('x');
 
 		Load_Q();
