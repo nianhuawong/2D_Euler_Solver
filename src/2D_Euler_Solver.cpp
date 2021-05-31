@@ -18,39 +18,19 @@ void Simulation::Run()
 
 	Generate_Mesh();
 
-	//Init_Flow();
-	Init_Flow_Double_Mach();
+	Init_Flow();
 
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
 	{
-		//先计算x方向
-		if (current_step == 115)
-		{
-			int kkk = 1;
-		}
-
 		Set_Solve_Direction('x');
-
 		Load_Q();
-
-		//Compute_Boundary();
-		Compute_Boundary_Double_Mach();
-
+		Compute_Boundary();
 		Time_Integration();
 
-		//再计算y方向
 		Set_Solve_Direction('y');
-
 		Time_Integration();
 
-		Compute_Residual();
-
-		Output_Flowfield();
-
-		//Load_Q();
-
-		//Compute_Boundary();
-		physical_time += time_step;
+		Post_Solve();
 
 		if (stop_by_residual || physical_time >= max_simu_time)
 		{

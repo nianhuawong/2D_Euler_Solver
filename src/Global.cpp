@@ -23,7 +23,7 @@ void Init_Global_Param()
 
 	max_num_of_steps = 10000;
 
-	cfl_num   = 0.5;
+	cfl_num   = 0.6;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
 	physical_time     = 0.0;
 	max_simu_time	  = 0.2;
@@ -45,6 +45,12 @@ void Init_Global_Param()
 }
 
 void Init_Flow()
+{
+	//Init_Flow_Blunt_Body();
+	Init_Flow_Double_Mach();
+}
+
+void Init_Flow_Blunt_Body()
 {
 	//流场初始化
 	Allocate_3D_Vector(qField,	  total_points_x, total_points_y, num_of_prim_vars);
@@ -113,7 +119,13 @@ void Init_Flow_Double_Mach()
 	qField_N1 = qField;
 }
 
-void Compute_Boundary()
+void Compute_Boundary() 
+{
+	//Compute_Boundary_Blunt_Body();
+	Compute_Boundary_Double_Mach();
+}
+
+void Compute_Boundary_Blunt_Body()
 {
 	VInt2D& marker = mesh->Get_Marker();
 	int ist, ied, jst, jed;

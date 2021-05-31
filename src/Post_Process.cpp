@@ -105,7 +105,7 @@ void Output_Flowfield()
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 	VInt2D& marker = mesh->Get_Marker();
 
-	cout << "dumping flowfield..." << endl;
+	cout << "dumping flowfield..."  << "\tIter = " << current_step << "\tphysical_time =" << physical_time << endl;
 	
 	fstream file;
 	file.open(tec_file_name, ios_base::out);
@@ -141,4 +141,13 @@ void Output_Flowfield()
 	}
 	
 	file.close();
+}
+
+void Post_Solve()
+{
+	Compute_Residual();
+
+	Output_Flowfield();
+
+	physical_time += time_step;
 }
