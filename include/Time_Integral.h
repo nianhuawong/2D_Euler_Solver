@@ -14,3 +14,5 @@ protected:
 };
 
 void Update_Flowfield();
+void Update_Flowfield_X();
+void Update_Flowfield_Y();
