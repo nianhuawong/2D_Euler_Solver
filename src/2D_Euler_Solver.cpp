@@ -32,7 +32,7 @@ void Simulation::Run()
 
 		Post_Solve();
 
-		if (stop_by_residual || physical_time >= max_simu_time)
+		if (Need_Stop_Iteration())
 		{
 			break;
 		}

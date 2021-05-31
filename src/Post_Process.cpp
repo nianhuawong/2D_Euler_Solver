@@ -99,8 +99,9 @@ bool Stop_by_Residual()
 
 void Output_Flowfield()
 {
-	bool flag = current_step % flow_save_steps;//整除时flag=0,输出，非整除时flag=1，不输出
-	if (flag) return;
+	bool flag0 = current_step % flow_save_steps;//整除时flag=0,输出，非整除时flag=1，不输出
+	bool flag1 = Need_Stop_Iteration();			//退出迭代后,最后需要输出流场
+	if (flag0 && flag1==0) return;
 
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 	VInt2D& marker = mesh->Get_Marker();

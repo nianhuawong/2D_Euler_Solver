@@ -11,6 +11,6 @@ include_directories("./include")
 set(MY_WORKING_DIR ./)
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (2D_Euler_Solver "src/2D_Euler_Solver.cpp" "include/2D_Euler_Solver.h" "src/QlQr_Solver.cpp" "include/Global.h" "include/Flux_Solver.h" "src/Flux_Solver.cpp" "src/Global.cpp" "src/Geometry.cpp" "include/Geometry.h" "src/Spatial_Derivative.cpp" "include/Spatial_Derivative.h" "include/Time_Integral.h" "src/Time_Integral.cpp" "src/Post_Process.cpp" "include/Post_Process.h" "include/Time_Step.h" "src/Time_Step.cpp")
+add_executable (2D_Euler_Solver "src/2D_Euler_Solver.cpp" "include/2D_Euler_Solver.h" "src/QlQr_Solver.cpp" "include/Global.h" "include/Flux_Solver.h" "src/Flux_Solver.cpp" "src/Global.cpp" "src/Geometry.cpp" "include/Geometry.h" "src/Spatial_Derivative.cpp" "include/Spatial_Derivative.h" "include/Time_Integral.h" "src/Time_Integral.cpp" "src/Post_Process.cpp" "include/Post_Process.h" "include/Time_Step.h" "src/Time_Step.cpp" "src/Compute_Boundary.cpp" "src/Init_Flow.cpp")
 
 # TODO: 如有需要，请添加测试并安装目标。
