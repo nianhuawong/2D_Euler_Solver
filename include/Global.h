@@ -12,7 +12,7 @@ using namespace std;
 
 extern int num_of_prim_vars;
 extern int current_step, max_num_of_steps;
-extern double cfl_num, time_step;
+extern double cfl_num, time_step, physical_time, max_simu_time;
 extern int method_of_half_q;
 extern int method_of_limiter;
 extern int method_of_flux;

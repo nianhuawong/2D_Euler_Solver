@@ -5,7 +5,7 @@
 
 int num_of_prim_vars;
 int current_step, max_num_of_steps;
-double cfl_num, time_step;
+double cfl_num, time_step, physical_time, max_simu_time;
 int method_of_half_q;
 int method_of_limiter;
 int method_of_flux;
@@ -23,17 +23,18 @@ void Init_Global_Param()
 
 	max_num_of_steps = 10000;
 
-	cfl_num   = 0.1;
+	cfl_num   = 0.5;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
-
+	physical_time     = 0.0;
+	max_simu_time	  = 0.2;
 	method_of_half_q  = 1;		//1-MUSCL,		2-WENO,		3-WCNS
 	muscl_k			  = 0.0;	//0.0-二阶迎风偏置，		1/3-二阶迎风偏置
 	method_of_limiter = 1;		//1-vanleer,	2-minmod,	3-superbee	
 	method_of_flux    = 1;		//1-Roe,		2-WENO,		3-WCNS
 	entropy_fix_coeff = 0.01;	//Roe格式熵修正系数epsilon
 
-	num_grid_point_x = 101;
-	num_grid_point_y = 51;
+	num_grid_point_x = 241;
+	num_grid_point_y = 61;
 
 	solve_direction  = 'x';
 
@@ -213,14 +214,14 @@ void Compute_Boundary_Double_Mach()
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 
-	double physical_time = current_step * time_step;
 	double ssw = 10.0 / sin(PI / 3);
 	double xsw = 1.0 / 6 + 1.0 / tan(PI / 3) + ssw * physical_time;
 
 	//左边界：inflow
-	for (int i = 0; i < ist; i++)
+	//for (int i = 0; i < ist; i++)
+	for (int i = ist; i <= ist; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			qField[i][j][IR] =  8.0;
 			qField[i][j][IU] =  8.25 * cos(PI / 6);
@@ -229,14 +230,15 @@ void Compute_Boundary_Double_Mach()
 		}
 	}
 
-	//上边界：symmetry
-	for (int i = ist; i < ied; i++)
+	//上边界
+	//for (int j = jed; j < total_points_y; j++)
+	for (int j = jed - 1; j <= jed - 1; j++)
 	{
-		for (int j = jed; j < total_points_y; j++)
+		for (int i = ist; i < ied; i++)
 		{
 			double x_node, y_node;
 			grid_points[i][j].Get_Point_Coord(x_node, y_node);
-			if (x_node <= xsw)
+			if (x_node >= 0 && x_node <= xsw)
 			{
 				qField[i][j][IR] =  8.0;
 				qField[i][j][IU] =  8.25 * cos(PI / 6);
@@ -256,7 +258,8 @@ void Compute_Boundary_Double_Mach()
 	//右边界：outflow
 	for (int j = jst; j < jed; j++)
 	{
-		for (int i = ied; i < total_points_x; i++)
+		//for (int i = ied; i < total_points_x; i++)
+		for (int i = ied - 1; i <= ied - 1; i++)
 		{
 			qField[i][j][IR] = qField[i - 1][j][IR];
 			qField[i][j][IU] = qField[i - 1][j][IU];
@@ -268,11 +271,12 @@ void Compute_Boundary_Double_Mach()
 	//下边界
 	for (int i = ist; i < ied; i++)
 	{
-		for (int j = jst - 1; j >= 0; j--)
+		//for (int j = jst - 1; j >= 0; j--)
+		for (int j = jst; j >= jst; j--)
 		{
 			double x_node, y_node;
 			grid_points[i][j].Get_Point_Coord(x_node, y_node);
-			if (x_node <= 1.0/6)
+			if (x_node >= 0 && x_node <= 1.0 / 6)
 			{
 				qField[i][j][IR] = 8.0;
 				qField[i][j][IU] = 8.25 * cos(PI / 6);
@@ -280,11 +284,11 @@ void Compute_Boundary_Double_Mach()
 				qField[i][j][IP] = 116.5;
 			}
 			else if (x_node > 1.0 / 6 && x_node <= 4)
-			{
-				qField[i][j][IR] = qField[i][j - 1][IR];
-				qField[i][j][IU] = qField[i][j - 1][IU];
+			{				
+				qField[i][j][IR] = qField[i][j + 1][IR];
+				qField[i][j][IU] = qField[i][j + 1][IU];
 				qField[i][j][IV] = 0.0;
-				qField[i][j][IP] = qField[i][j - 1][IP];
+				qField[i][j][IP] = qField[i][j + 1][IP];
 			}
 		}
 	}

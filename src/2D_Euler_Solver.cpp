@@ -20,7 +20,6 @@ void Simulation::Run()
 
 	//Init_Flow();
 	Init_Flow_Double_Mach();
-	//Compute_Boundary();
 
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
 	{
@@ -51,8 +50,9 @@ void Simulation::Run()
 		//Load_Q();
 
 		//Compute_Boundary();
+		physical_time += time_step;
 
-		if (stop_by_residual)
+		if (stop_by_residual || physical_time >= max_simu_time)
 		{
 			break;
 		}

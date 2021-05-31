@@ -43,9 +43,12 @@ void Generate_Mesh()
 	Get_IJK_Region(ist, ied, jst, jed);
 	mesh->Set_Range(ist, ied, jst, jed);
 
-	for (int i = ist; i < ied; i++)
+	//for (int i = ist; i < ied; i++)
+	//{
+	//	for (int j = jst; j < jed; j++)
+	for (int i = 0; i < total_points_x; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = 0; j < total_points_y; j++)
 		{
 			double x_node = (i - ist) * dx;
 			double y_node = (j - jst) * dy;
