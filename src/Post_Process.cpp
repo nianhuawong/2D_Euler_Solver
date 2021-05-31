@@ -61,13 +61,19 @@ void Residual::Compute_Residual()
 
 void Residual::OutputResidual()
 {
-	bool flag = current_step % residual_output_steps;//整除时flag=0,输出残差，非整除时flag=1，不输出
-	if (flag) return;
+	bool flag1 = current_step % residual_output_steps;//整除时flag=0,输出残差，非整除时flag=1，不输出
+	if (flag1) return;
 
 	cout << setiosflags(ios::left);
 	cout << setiosflags(ios::scientific);
 	cout << setprecision(5);
-	cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
+
+	bool flag2 = current_step % (10*residual_output_steps);
+	if (!flag2)
+	{
+		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
+	}
+	
 	cout << current_step + 1 << "\t      "
 		 << res_Loo[IR]		 << "\t" << res_Loo[IU] << "\t"
 		 << res_Loo[IV]		 << "\t" << res_Loo[IP] << endl;
