@@ -64,7 +64,7 @@ void QlQr_Solver::QlQr_MUSCL()
 void QlQr_Solver::QlQr_MUSCL_X()
 {
 	//在x方向进行插值
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 	for (int j = jst; j < jed - 1; j++)
 	{
 		for (int i = ist; i < ied - 1; i++)
@@ -105,7 +105,7 @@ void QlQr_Solver::QlQr_MUSCL_X()
 void QlQr_Solver::QlQr_MUSCL_Y()
 {
 	//在y方向进行插值
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 	for (int i = ist; i < ied - 1; i++)
 	{
 		for (int j = jst; j < jed - 1; j++)

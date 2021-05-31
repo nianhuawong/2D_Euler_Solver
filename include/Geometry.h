@@ -39,11 +39,11 @@ protected:
 	int num_ghost_point;
 	double dx, dy;
 	vector< vector< Point > > grid_points;
-	vector< vector< int > > marker;
+	VInt2D marker;
 
 public:
 	vector< vector< Point > >& Get_Grid_Points() { return grid_points; }
-	vector< vector< int > >& Get_Marker() { return marker; }
+	VInt2D& Get_Marker() { return marker; }
 	void Set_Mesh_Dimension(int NI, int NJ) { this->NI = NI; this->NJ = NJ; }
 	void Set_Dxdy(double dx, double dy) { this->dx = dx; this->dy = dy; }
 	void Set_Range(int ist, int ied, int jst, int jed);

@@ -46,11 +46,11 @@ void Init_Flow()
 	//流场初始化
 	Allocate_3D_Vector(qField,	  total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(qField_N1, total_points_x, total_points_y, num_of_prim_vars);
-	Allocate_3D_Vector(qField_N2, total_points_x, total_points_y, num_of_prim_vars);
-	Allocate_3D_Vector(qField_N3, total_points_x, total_points_y, num_of_prim_vars);
+	//Allocate_3D_Vector(qField_N2, total_points_x, total_points_y, num_of_prim_vars);
+	//Allocate_3D_Vector(qField_N3, total_points_x, total_points_y, num_of_prim_vars);
 
 	//流场赋初值
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
@@ -70,7 +70,7 @@ void Init_Flow()
 
 void Compute_Boundary()
 {
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 	//左边界：超声速入口

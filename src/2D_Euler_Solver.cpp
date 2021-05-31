@@ -20,7 +20,7 @@ void Simulation::Run()
 
 	Init_Flow();
 
-	Compute_Boundary();
+	//Compute_Boundary();
 
 	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
 	{
@@ -28,6 +28,8 @@ void Simulation::Run()
 		Set_Solve_Direction('x');
 
 		Load_Q();
+
+		Compute_Boundary();
 
 		Time_Integration();
 
@@ -40,9 +42,9 @@ void Simulation::Run()
 
 		Output_Flowfield();
 
-		Load_Q();
+		//Load_Q();
 
-		Compute_Boundary();
+		//Compute_Boundary();
 
 		if (stop_by_residual)
 		{

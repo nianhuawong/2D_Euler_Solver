@@ -33,7 +33,7 @@ void Generate_Mesh()
 
 	mesh = new Structured_Mesh(total_points_x, total_points_y);
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
-	vector< vector< int > >& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker();
 	mesh->Set_Mesh_Dimension (num_grid_point_x, num_grid_point_y);
 	mesh->Set_Num_Ghost_Point(num_ghost_point);
 	mesh->Set_Dxdy(dx, dy);
