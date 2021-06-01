@@ -25,6 +25,9 @@ protected:
 	void QlQr_MUSCL_X();
 	void QlQr_MUSCL_Y();
 
+	void Boundary_QlQr_MUSCL_X();
+	void Boundary_QlQr_MUSCL_Y();
+
 	void QlQr_WCNS();
 	void QlQr_WCNS_X();
 	void QlQr_WCNS_Y();

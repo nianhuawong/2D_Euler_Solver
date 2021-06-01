@@ -382,9 +382,12 @@ void Flux_Solver::Flux_LR_Roe()
 void Flux_Solver::Flux_LR_Roe_X()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -408,9 +411,12 @@ void Flux_Solver::Flux_LR_Roe_X()
 void Flux_Solver::Flux_LR_Roe_Y()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied - 1; i++)
+	//for (int i = ist; i < ied - 1; i++)
+	//{
+	//	for (int j = jst; j < jed - 1; j++)
+	for (int i = 0; i < num_half_point_x; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = 0; j < num_half_point_y; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -678,9 +684,12 @@ void Flux_Solver::Inviscid_Flux_G(VDouble& fluxVector, double rho, double u, dou
 void Flux_Solver::Roe_Scheme()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 

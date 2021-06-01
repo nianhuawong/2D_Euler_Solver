@@ -56,9 +56,13 @@ void Spatial_Derivative::Spatial_Derivative_X()
 {
 	VInt2D& marker = mesh->Get_Marker();
 
-	for (int j = jst; j < jed - 1; j++)
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	//	{
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 1; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -76,9 +80,13 @@ void Spatial_Derivative::Spatial_Derivative_Y()
 {
 	VInt2D& marker = mesh->Get_Marker();
 
-	for (int i = ist; i < ied - 1; i++)
+	//for (int i = ist; i < ied - 1; i++)
+	//{
+	//	for (int j = jst; j < jed - 1; j++)
+	//	{
+	for (int j = 1; j < num_half_point_y; j++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 

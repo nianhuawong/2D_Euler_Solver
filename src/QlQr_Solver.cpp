@@ -49,10 +49,13 @@ void QlQr_Solver::QlQr_MUSCL()
 {
 	if (solve_direction == 'x')
 	{
+		this->Boundary_QlQr_MUSCL_X();
 		this->QlQr_MUSCL_X();
+		
 	}
 	else if (solve_direction == 'y')
 	{
+		this->Boundary_QlQr_MUSCL_Y();
 		this->QlQr_MUSCL_Y();
 	}
 	else
@@ -101,6 +104,40 @@ void QlQr_Solver::QlQr_MUSCL_X()
 				//{
 				//	int kkk = 1;
 				//}
+			}
+		}
+	}
+}
+
+void QlQr_Solver::Boundary_QlQr_MUSCL_X()
+{
+	VInt2D& marker = mesh->Get_Marker();
+	for (int i = 0; i < num_half_point_x; i++)
+	{
+		for (int j = 0; j < num_half_point_y; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				qField1[i][j][iVar] = qField[i    ][j][iVar];
+				qField2[i][j][iVar] = qField[i + 1][j][iVar];
+			}
+		}
+	}
+}
+
+void QlQr_Solver::Boundary_QlQr_MUSCL_Y()
+{
+	VInt2D& marker = mesh->Get_Marker();
+	for (int i = 0; i < num_half_point_x; i++)
+	{
+		for (int j = 0; j < num_half_point_y; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				qField1[i][j][iVar] = qField[i][j    ][iVar];
+				qField2[i][j][iVar] = qField[i][j + 1][iVar];
 			}
 		}
 	}
