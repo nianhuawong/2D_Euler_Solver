@@ -151,6 +151,4 @@ void Post_Solve()
 	Compute_Residual();
 
 	Output_Flowfield();
-
-	physical_time += time_step;
 }

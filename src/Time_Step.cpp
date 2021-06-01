@@ -46,6 +46,10 @@ void Time_Step::Compute_Time_Step()
 	{
 		time_step = cfl_num * dy / a_max;
 	}
+
+	time_step = 2e-4;
+
+	physical_time += time_step;
 }
 
 

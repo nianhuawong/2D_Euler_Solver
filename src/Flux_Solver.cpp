@@ -37,14 +37,18 @@ void Flux_Solver::Solve_Flux()
 		Roe_Scheme();
 	}
 	else if (method_of_flux == 2)
-	{
-		//WENO+Steger-Warming
+	{	
 		Flux_LR_Steger_Warming();
 		Steger_Warming_Scheme();	//二阶Steger_Warming
+	}
+	else if (method_of_flux == 3)
+	{
+		//WENO+Steger-Warming
+		Flux_LR_Steger_Warming(); 
 		//WENO通量插值如下：
 
 	}
-	else if (method_of_flux == 3)
+	else if (method_of_flux == 4)
 	{
 		//WCNS+Roe
 	}

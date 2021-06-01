@@ -21,10 +21,6 @@ Time_Marching_Solver::Time_Marching_Solver()
 
 void Time_Marching_Solver::Time_Marching()
 {
-	//准备开始写3阶TVD RK方法
-
-	Solve_Time_Step();
-
 	for (int iStage = 0; iStage < num_of_RK_stages; iStage++)
 	{
 		Load_Q();

@@ -22,6 +22,8 @@ void Simulation::Run()
 
 	for (current_step = 1; current_step <= max_num_of_steps; ++current_step)
 	{
+		Solve_Time_Step();
+
 		Compute_Boundary();
 
 		Set_Solve_Direction('x');
@@ -41,19 +43,4 @@ void Simulation::Run()
 	}
 
 	Output_Flowfield();	
-}
-
-void Test()
-{
-	vector < vector< double > > A = { {1,2,3,0.5},{3,2,1,1.2},{1,3,2,2.1} };
-	//vector < vector< double > > B = { {2,3,4},{3,4,2},{4,2,3},{2,4,7} };
-	//vector < vector< double > > B = { {2,3},{3,4},{4,2},{2,4} };
-
-	//vector < vector< double > > C;
-	//Allocate_2D_Vector(C,3,2);
-	//MatrixMultiply(A,B,C,3,4,2);
-
-	vector< double > B = { 2, 3, 9, 12 };
-	vector< double > C(3);
-	MatrixMultiply(A, B, C, 3, 4);
 }
