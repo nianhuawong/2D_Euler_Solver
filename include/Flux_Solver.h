@@ -17,17 +17,25 @@ protected:
 
 public:
 	void Solve_Flux();
+protected:
 	void Flux_LR_Roe();
 	void Flux_LR_Roe_X();
 	void Flux_LR_Roe_Y();
+	void Roe_Scheme();
+
 	void Flux_LR_Steger_Warming();
+	void Flux_LR_Steger_Warming_X();
+	void Flux_LR_Steger_Warming_Y();
+	void Steger_Warming_Scheme();
 
 protected:
 	void Inviscid_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p);
 	void Inviscid_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p);
-	void Roe_Scheme();
 
-	double Enthalpy(double rho, double p, double gama);
+	void Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd);
+	void Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu);
+
+	double Enthalpy(double rho, double u, double v, double p, double gama);
 	void EntropyFix(double& lamda1, double& lamda2, double& lamda3, double& lamda4);
 	void EntropyFix_Harten(double& lamda);
 

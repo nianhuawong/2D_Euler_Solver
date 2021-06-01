@@ -39,6 +39,10 @@ void Flux_Solver::Solve_Flux()
 	else if (method_of_flux == 2)
 	{
 		//WENO+Steger-Warming
+		Flux_LR_Steger_Warming();
+		Steger_Warming_Scheme();	//二阶Steger_Warming
+		//WENO通量插值如下：
+
 	}
 	else if (method_of_flux == 3)
 	{
@@ -48,8 +52,8 @@ void Flux_Solver::Solve_Flux()
 	{
 		cout << "flux计算方法选择错误，请检查！" << endl;
 	}
-
 }
+
 void Flux_Solver::Flux_LR_Roe()
 {
 	if (solve_direction == 'x')
@@ -120,7 +124,129 @@ void Flux_Solver::Flux_LR_Roe_Y()
 
 void Flux_Solver::Flux_LR_Steger_Warming()
 {
+	if (solve_direction == 'x')
+	{
+		this->Flux_LR_Steger_Warming_X();
+	}
+	else if (solve_direction == 'y')
+	{
+		this->Flux_LR_Steger_Warming_Y();
+	}
+	else
+	{
+		cout << "出错，请检查！" << endl;
+	}
+}
 
+void Flux_Solver::Steger_Warming_Scheme()
+{
+	VInt2D& marker = mesh->Get_Marker();
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+
+			fluxVector[i][j][IR] = fluxVector1[i][j][IR] + fluxVector2[i][j][IR];
+			fluxVector[i][j][IU] = fluxVector1[i][j][IU] + fluxVector2[i][j][IU];
+			fluxVector[i][j][IV] = fluxVector1[i][j][IV] + fluxVector2[i][j][IV];
+			fluxVector[i][j][IP] = fluxVector1[i][j][IP] + fluxVector2[i][j][IP];
+		}
+	}
+}
+
+void Flux_Solver::Flux_LR_Steger_Warming_X()
+{
+	double eps = 1e-4;
+	VInt2D& marker = mesh->Get_Marker();
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+
+			double rho = qField[i][j][IR];
+			double u = qField[i][j][IU];
+			double v = qField[i][j][IV];
+			double p = qField[i][j][IP];
+			double a = sqrt(gama * p / rho);
+
+			double lmd1 = u;
+			double lmd3 = u - a;
+			double lmd4 = u + a;
+
+			VDouble lmd_p(3);//lamda+
+			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
+
+			VDouble lmd_m(3);//lamda-
+			lmd_p[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
+
+			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_p);
+			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_m);
+		}
+	}
+}
+
+void Flux_Solver::Flux_LR_Steger_Warming_Y()
+{
+	double eps = 1e-4;
+	VInt2D& marker = mesh->Get_Marker();
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+
+			double rho = qField[i][j][IR];
+			double u = qField[i][j][IU];
+			double v = qField[i][j][IV];
+			double p = qField[i][j][IP];
+			double a = sqrt(gama * p / rho);
+
+			double mu1 = v;
+			double mu3 = v - a;
+			double mu4 = v + a;
+
+			VDouble mu_p(3);//mu+
+			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
+			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
+			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
+
+			VDouble mu_m(3);//mu-
+			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
+			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
+			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
+
+			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_p);
+			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_m);
+		}
+	}
+}
+
+void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd)
+{
+	double a = sqrt(gama * p / rho);
+	double h = Enthalpy(rho, u, v, p, gama);
+
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * lmd[0] + lmd[2] + lmd[3]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * lmd[0] + (u - a) * lmd[2] + (u + a) * lmd[3]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] + v * lmd[2] + v * lmd[3]);
+	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * lmd[0] + (h - a * u) * lmd[2] + (h + a * u) * lmd[3]);
+}	
+
+void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu)
+{
+	double a = sqrt(gama * p / rho);
+	double h = Enthalpy(rho, u, v, p, gama);
+
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * mu[0] + mu[2] + mu[3]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] + u * mu[2] + u * mu[3]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * mu[0] + (v - a) * mu[2] + (v + a) * mu[3]);
+	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * mu[0] + (h - a * v) * mu[2] + (h + a * v) * mu[3]);
 }
 
 void Flux_Solver::Inviscid_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p)
@@ -148,25 +274,19 @@ void Flux_Solver::Roe_Scheme()
 	{
 		for (int i = ist; i < ied - 1; i++)
 		{
-			if ( i == 5 && j == 51 )
-			{
-				int kkk = 1;
-			}
 			if (marker[i][j] == 0) continue;
 
 			double rho1 = qField1[i][j][IR];
 			double u1   = qField1[i][j][IU];
 			double v1	= qField1[i][j][IV];
 			double p1   = qField1[i][j][IP];
-			double He1  = Enthalpy(rho1, p1, gama);
-			double H1   = He1 + 0.5 * (u1 * u1 + v1 * v1);
+			double H1  = Enthalpy(rho1, u1, v1, p1, gama);
 
 			double rho2 = qField2[i][j][IR];
 			double u2   = qField2[i][j][IU];
 			double v2   = qField2[i][j][IV];
 			double p2   = qField2[i][j][IP];
-			double He2  = Enthalpy(rho2, p2, gama);
-			double H2   = He2 + 0.5 * (u2 * u2 + v2 * v2);
+			double H2  = Enthalpy(rho2, u2, v2, p2, gama);
 
 			double D = sqrt(rho2 / rho1);
 
@@ -204,9 +324,10 @@ void Flux_Solver::Roe_Scheme()
 	}
 }
 
-double Flux_Solver::Enthalpy(double rho, double p, double gama)
+double Flux_Solver::Enthalpy(double rho, double u, double v, double p, double gama)
 {
-	return  gama / (gama - 1) * ( p / rho );
+	double E = p / (gama - 1) + 0.5 * rho * (u * u + v * v);
+	return (E + p) / rho;
 }
 
 void Flux_Solver::EntropyFix(double& lamda1, double& lamda2, double& lamda3, double& lamda4)
