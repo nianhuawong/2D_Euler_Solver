@@ -20,10 +20,10 @@ void Simulation::Run()
 
 	Init_Flow();
 
-	for (current_step = 0; current_step < max_num_of_steps; ++current_step)
+	for (current_step = 1; current_step <= max_num_of_steps; ++current_step)
 	{
-		Set_Solve_Direction('x');
 		Load_Q();
+		Set_Solve_Direction('x');
 		Compute_Boundary();
 		Time_Integration();
 

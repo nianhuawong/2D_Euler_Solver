@@ -26,9 +26,9 @@ void Init_Global_Param()
 	cfl_num   = 0.6;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
 	physical_time     = 0.0;
-	max_simu_time	  = 0.2;
+	max_simu_time	  = 0.1;
 	method_of_half_q  = 1;		//1-MUSCL,		2-WENO,		3-WCNS
-	muscl_k			  = 0.0;	//0.0-二阶迎风偏置，		1/3-二阶迎风偏置
+	muscl_k			  = 1.0/3;	//0.0-二阶迎风偏置，		1/3-二阶迎风偏置
 	method_of_limiter = 1;		//1-vanleer,	2-minmod,	3-superbee	
 	method_of_flux    = 1;		//1-Roe,		2-WENO,		3-WCNS
 	entropy_fix_coeff = 0.01;	//Roe格式熵修正系数epsilon

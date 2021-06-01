@@ -61,22 +61,23 @@ void Residual::Compute_Residual()
 
 void Residual::OutputResidual()
 {
-	bool flag1 = current_step % residual_output_steps;//整除时flag=0,输出残差，非整除时flag=1，不输出
+	bool flag1 = current_step % residual_output_steps && current_step != 1;//整除时flag=0,输出残差，非整除时flag=1，不输出
 	if (flag1) return;
 
 	cout << setiosflags(ios::left);
 	cout << setiosflags(ios::scientific);
 	cout << setprecision(5);
 
-	bool flag2 = current_step % (10*residual_output_steps);
-	if (!flag2)
+	bool flag2 =  current_step == 1;
+	//bool flag2 = current_step % (11 * residual_output_steps) && current_step != 1;
+	if (flag2)
 	{
 		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
 	}
 	
-	cout << current_step + 1 << "\t      "
-		 << res_Loo[IR]		 << "\t" << res_Loo[IU] << "\t"
-		 << res_Loo[IV]		 << "\t" << res_Loo[IP] << endl;
+	cout << current_step	<< "\t        "
+		 << res_Loo[IR]		<< "\t" << res_Loo[IU] << "\t"
+		 << res_Loo[IV]		<< "\t" << res_Loo[IP] << endl;
 
 	if (res_Loo[IR] < converge_criterion &&
 		res_Loo[IU] < converge_criterion &&
@@ -106,7 +107,11 @@ void Output_Flowfield()
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 	VInt2D& marker = mesh->Get_Marker();
 
-	cout << "dumping flowfield..."  << "\tIter = " << current_step << "\tphysical_time =" << physical_time << endl;
+	cout << "dumping flowfield..."  << "\tIter = " << current_step << "\tphysical_time =" << physical_time << endl << endl;
+	if (flag1 == 0)
+	{
+		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
+	}
 	
 	fstream file;
 	file.open(tec_file_name, ios_base::out);
