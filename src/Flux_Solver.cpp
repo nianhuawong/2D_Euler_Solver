@@ -439,26 +439,44 @@ void Flux_Solver::Flux_LR_Roe_Y()
 
 void Flux_Solver::Flux_LR_Steger_Warming()
 {
-	if (solve_direction == 'x')
+	if (method_of_half_q == 1)		//MUSCL插值之后计算半节点通量
 	{
-		this->Flux_LR_Steger_Warming_X();
+		if (solve_direction == 'x')
+		{
+			this->Flux_LR_Steger_Warming_Interp_X();
+		}
+		else if (solve_direction == 'y')
+		{
+			this->Flux_LR_Steger_Warming_Interp_Y();
+		}
 	}
-	else if (solve_direction == 'y')
+	else if (method_of_half_q == 2)	//不插值，直接计算整数节点通量
 	{
-		this->Flux_LR_Steger_Warming_Y();
-	}
-	else
-	{
-		cout << "出错，请检查！" << endl;
+		if (solve_direction == 'x')
+		{
+			this->Flux_LR_Steger_Warming_X();
+		}
+		else if (solve_direction == 'y')
+		{
+			this->Flux_LR_Steger_Warming_Y();
+		}
+		else
+		{
+			cout << "出错，请检查！" << endl;
+		}
 	}
 }
 
 void Flux_Solver::Steger_Warming_Scheme()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	//	{
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -474,9 +492,13 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	//	{
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -511,9 +533,13 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	//	{
+	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -544,112 +570,117 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 	}
 }
 
-//void Flux_Solver::Flux_LR_Steger_Warming_X()
-//{
-//	double eps = 1e-4;
-//	VInt2D& marker = mesh->Get_Marker();
-//	for (int j = jst; j < jed - 1; j++)
-//	{
-//		for (int i = ist; i < ied - 1; i++)
-//		{
-//			if (marker[i][j] == 0) continue;
-//
-//			double rho = qField1[i][j][IR];
-//			double u   = qField1[i][j][IU];
-//			double v   = qField1[i][j][IV];
-//			double p   = qField1[i][j][IP];
-//			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
-//
-//			double lmd1 = u;
-//			double lmd3 = u - a;
-//			double lmd4 = u + a;
-//
-//			VDouble lmd_m(3);//lamda-
-//			lmd_m[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
-//			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
-//			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
-//
-//			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
-//
-//			rho = qField2[i][j][IR];
-//			u   = qField2[i][j][IU];
-//			v   = qField2[i][j][IV];
-//			p   = qField2[i][j][IP];
-//			a   = sqrt(abs(gama * p / rho));//声速取绝对值
-//
-//			lmd1 = u;
-//			lmd3 = u - a;
-//			lmd4 = u + a;
-//
-//			VDouble lmd_p(3);//lamda+
-//			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
-//			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
-//			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
-//
-//			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_p);
-//		}
-//	}
-//}
+void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
+{
+	double eps = 1e-4;
+	VInt2D& marker = mesh->Get_Marker();
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	//	{
+	for (int j = 0; j < num_half_point_y; j++)
+	{
+		for (int i = 0; i < num_half_point_x; i++)
+		{
+			if (marker[i][j] == 0) continue;
 
-//void Flux_Solver::Flux_LR_Steger_Warming_Y()
-//{
-//	double eps = 1e-4;
-//	VInt2D& marker = mesh->Get_Marker();
-//	for (int j = jst; j < jed - 1; j++)
-//	{
-//		for (int i = ist; i < ied - 1; i++)
-//		{
-//			if (marker[i][j] == 0) continue;
-//			if (i == 61 && (j == 58||j==60))
-//			{
-//				int kkk = 1;
-//			}
-//			double rho = qField1[i][j][IR];
-//			double u   = qField1[i][j][IU];
-//			double v   = qField1[i][j][IV];
-//			double p   = qField1[i][j][IP];
-//			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
-//
-//			double mu1 = v;
-//			double mu3 = v - a;
-//			double mu4 = v + a;
-//
-//			VDouble mu_m(3);//mu-
-//			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
-//			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
-//			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
-//
-//			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
-//
-//			rho = qField2[i][j][IR];
-//			u   = qField2[i][j][IU];
-//			v   = qField2[i][j][IV];
-//			p   = qField2[i][j][IP];
-//			a   = sqrt(abs(gama * p / rho));//声速取绝对值
-//
-//			mu1 = v;
-//			mu3 = v - a;
-//			mu4 = v + a;
-//
-//			VDouble mu_p(3);//mu+
-//			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
-//			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
-//			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
-//
-//			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_p);
-//		}
-//	}
-//}
+			double rho = qField1[i][j][IR];
+			double u   = qField1[i][j][IU];
+			double v   = qField1[i][j][IV];
+			double p   = qField1[i][j][IP];
+			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			double lmd1 = u;
+			double lmd3 = u - a;
+			double lmd4 = u + a;
+
+			VDouble lmd_m(3);//lamda-
+			lmd_m[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
+
+			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
+
+			rho = qField2[i][j][IR];
+			u   = qField2[i][j][IU];
+			v   = qField2[i][j][IV];
+			p   = qField2[i][j][IP];
+			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			lmd1 = u;
+			lmd3 = u - a;
+			lmd4 = u + a;
+
+			VDouble lmd_p(3);//lamda+
+			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
+
+			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_p);
+		}
+	}
+}
+
+void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
+{
+	double eps = 1e-4;
+	VInt2D& marker = mesh->Get_Marker();
+	//for (int j = jst; j < jed - 1; j++)
+	//{
+	//	for (int i = ist; i < ied - 1; i++)
+	//	{
+	for (int j = 0; j < num_half_point_y; j++)
+	{
+		for (int i = 0; i < num_half_point_x; i++)
+		{
+			if (marker[i][j] == 0) continue;
+
+			double rho = qField1[i][j][IR];
+			double u   = qField1[i][j][IU];
+			double v   = qField1[i][j][IV];
+			double p   = qField1[i][j][IP];
+			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			double mu1 = v;
+			double mu3 = v - a;
+			double mu4 = v + a;
+
+			VDouble mu_m(3);//mu-
+			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
+			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
+			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
+
+			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
+
+			rho = qField2[i][j][IR];
+			u   = qField2[i][j][IU];
+			v   = qField2[i][j][IV];
+			p   = qField2[i][j][IP];
+			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			mu1 = v;
+			mu3 = v - a;
+			mu4 = v + a;
+
+			VDouble mu_p(3);//mu+
+			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
+			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
+			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
+
+			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_p);
+		}
+	}
+}
 
 void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd)
 {
 	double a = sqrt(abs(gama * p / rho));//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
-	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * lmd[0] + lmd[1] + lmd[2]);
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  lmd[0] +			 lmd[1] +			lmd[2]);
 	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * lmd[0] + (u - a) * lmd[1] + (u + a) * lmd[2]);
-	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] + v * lmd[1] + v * lmd[2]);
-	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * lmd[0] + (h - a * u) * lmd[1] + (h + a * u) * lmd[2]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] +		 v * lmd[1] +		v * lmd[2]);
+	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) *  lmd[0] + (h - a * u) * lmd[1] + (h + a * u) * lmd[2]);
 }	
 
 void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu)
@@ -657,8 +688,8 @@ void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, doubl
 	double a = sqrt(abs(gama * p / rho));	//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
-	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * mu[0] + mu[1] + mu[2]);
-	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] + u * mu[1] + u * mu[2]);
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  mu[0] +			mu[1] +			  mu[2]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] +		u * mu[1] +		  u * mu[2]);
 	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * mu[0] + (v - a) * mu[1] + (v + a) * mu[2]);
 	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * mu[0] + (h - a * v) * mu[1] + (h + a * v) * mu[2]);
 }

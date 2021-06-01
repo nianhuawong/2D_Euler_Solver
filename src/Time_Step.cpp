@@ -32,22 +32,15 @@ void Time_Step::Compute_Time_Step()
 			double v   = qField[i][j][IV];
 			double p   = qField[i][j][IP];
 
-			double a = gama * p / rho;
+			double a = sqrt(abs(gama * p / rho));
 
-			a_max = a > a_max ? a : a_max;
+			a_max = max(a, a_max);
 		}
 	}
 
-	if (solve_direction == 'x')
-	{
-		time_step = cfl_num * dx / a_max;
-	}
-	else if (solve_direction == 'y')
-	{
-		time_step = cfl_num * dy / a_max;
-	}
-
-	time_step = 2e-4;
+	double ts1 = cfl_num * dx / a_max;
+	double ts2 = cfl_num * dy / a_max;
+	time_step = min(ts1, ts2);
 
 	physical_time += time_step;
 }

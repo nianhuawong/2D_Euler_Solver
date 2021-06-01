@@ -397,7 +397,26 @@ void QlQr_Solver::QlQr_WCNS_Y()
 
 double QlQr_Solver::Limiter_Function( double ita )
 {
-	return vanleer_limiter(ita, 1.0);
+	if (method_of_limiter == 0)			// nolim
+	{
+		return 1.0;
+	}
+	else if (method_of_limiter == 1)	//vanleer
+	{
+		return vanleer_limiter(ita, 1.0);
+	}
+	else if (method_of_limiter == 2)	//minmod
+	{
+		return minmod_limiter(ita, 1.0);
+	}
+	else if (method_of_limiter == 3)	//superbee
+	{
+		return superbee_limiter(ita, 1.0);
+	}
+	else if (method_of_limiter == 4)	//1st-order
+	{
+		return 0.0;
+	}
 }
 
 //ÏÞÖÆÆ÷º¯Êý

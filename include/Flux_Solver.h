@@ -26,6 +26,8 @@ protected:
 	void Flux_LR_Steger_Warming();
 	void Flux_LR_Steger_Warming_X();
 	void Flux_LR_Steger_Warming_Y();
+	void Flux_LR_Steger_Warming_Interp_X();
+	void Flux_LR_Steger_Warming_Interp_Y();
 	void Steger_Warming_Scheme();
 
 	void WENO_Scheme();
