@@ -22,93 +22,67 @@ Time_Marching_Solver::Time_Marching_Solver()
 void Time_Marching_Solver::Time_Marching()
 {
 	//准备开始写3阶TVD RK方法
-	//
-	Solve_QlQr();
-
-	Solve_Flux();
-
-	Solve_Spatial_Derivative();
-	//
 
 	Solve_Time_Step();
 
-	Update_Flowfield();
+	for (int iStage = 0; iStage < num_of_RK_stages; iStage++)
+	{
+		Load_Q();
+
+		Solve_QlQr();
+
+		Solve_Flux();
+
+		Solve_Spatial_Derivative();
+
+		Update_Flowfield(iStage);
+	}	
 }
 
-void Update_Flowfield()
+void Update_Flowfield(int iStage)
 {
-	//if (solve_direction == 'x')
-	//{
-		//Update_Flowfield_X();
-	//}
-	//else if (solve_direction == 'y')
-	//{
-		Update_Flowfield_Y();
-	//}
-}
-void Update_Flowfield_X()
-{
+	double RK_Coeff_a = RK_Coeff[iStage][0];
+	double RK_Coeff_b = RK_Coeff[iStage][1];
+	double RK_Coeff_c = RK_Coeff[iStage][2];
+
 	VInt2D& marker = mesh->Get_Marker();
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 
-	VDouble qPrimitive(num_of_prim_vars);
-	VDouble qConservative(num_of_prim_vars);
-	VDouble rhsVector(num_of_prim_vars);
+	VDouble rhsVector	  (num_of_prim_vars);
+	VDouble qPrimitive0   (num_of_prim_vars);
+	VDouble qPrimitive1   (num_of_prim_vars);
+	VDouble qConservative0(num_of_prim_vars);
+	VDouble qConservative1(num_of_prim_vars);
+	
 	for (int j = jst; j < jed; j++)
 	{
 		for (int i = ist; i < ied; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
-			qPrimitive = qField[i][j];
-			rhsVector = rhs[i][j];
-			Primitive_To_Conservative(qPrimitive, qConservative);
+			rhsVector = rhs[i][j];			//rhs(q0),用上一步的q计算得到的rhs
+
+			qPrimitive0 = qField_N0[i][j];	//RK公式里第一项,q0
+			Primitive_To_Conservative(qPrimitive0, qConservative0);
+
+			qPrimitive1 = qField_N1[i][j];	//RK公式里第二项，q0、q1、q2，也即上一stage的q值
+			Primitive_To_Conservative(qPrimitive1, qConservative1);
+			
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
-				qConservative[iVar] += time_step * rhsVector[iVar];
-			}
+				qConservative1[iVar] = RK_Coeff_a * qConservative0[iVar] + RK_Coeff_b * qConservative1[iVar] + RK_Coeff_c * time_step * rhsVector[iVar];
+			} 
 
-			Conservative_To_Primitive(qConservative, qPrimitive);
-			qField_N1[i][j] = qPrimitive;
+			Conservative_To_Primitive(qConservative1, qPrimitive1);
+			//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
+			qField_N1[i][j] = qPrimitive1;	
 		}
 	}
 }
 
-void Update_Flowfield_Y()
+void Set_Field()
 {
-	VInt2D& marker = mesh->Get_Marker();
-	int ist, ied, jst, jed;
-	Get_IJK_Region(ist, ied, jst, jed);
-
-	VDouble qPrimitive   (num_of_prim_vars);
-	VDouble qConservative(num_of_prim_vars);
-	VDouble rhsVector    (num_of_prim_vars);
-	for (int j = jst; j < jed; j++)
-	{
-		for (int i = ist; i < ied; i++)
-		{
-			if (marker[i][j] == 0) continue;
-
-			qPrimitive = qField_N1[i][j];
-			rhsVector  = rhs[i][j];
-			Primitive_To_Conservative(qPrimitive, qConservative);
-			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-			{
-				qConservative[iVar] += time_step * rhsVector[iVar];
-			}
-
-			Conservative_To_Primitive(qConservative, qPrimitive);
-			qField_N1[i][j] = qPrimitive;
-			if (qPrimitive[IR] != qPrimitive[IR])
-			{
-				int kkk = 1;
-			}
-		}
-	}
-
-	//qField_N2[iVar][i][j] = 3.0 / 4.0 * qField[iVar][i][j] + 1.0 / 4.0 * qField_N1[iVar][i][j] + 1.0 / 4.0 * time_step * rhs1[iNode];
-
-	//qField_N3[iVar][i][j] = 1.0 / 3.0 * qField[iVar][i][j] + 2.0 / 3.0 * qField_N2[iVar][i][j] + 2.0 / 3.0 * time_step * rhs2[iNode];
-
+	//多步RK推进完成之后，流场变量更新在qField_N1中，要重新返回qField，以便下一步时间步迭代
+	qField = qField_N1;
 }

@@ -15,9 +15,9 @@ void Solve_QlQr()
 VDouble3D qField;
 VDouble3D qField1;
 VDouble3D qField2;
+VDouble3D qField_N0;
 VDouble3D qField_N1;
-VDouble3D qField_N2;
-VDouble3D qField_N3;
+
 QlQr_Solver::QlQr_Solver()
 {
 	Get_IJK_Region(ist, ied, jst, jed);

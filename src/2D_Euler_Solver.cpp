@@ -22,9 +22,9 @@ void Simulation::Run()
 
 	for (current_step = 1; current_step <= max_num_of_steps; ++current_step)
 	{
-		Load_Q();
-		Set_Solve_Direction('x');
 		Compute_Boundary();
+
+		Set_Solve_Direction('x');
 		Time_Integration();
 
 		Set_Solve_Direction('y');
@@ -36,6 +36,8 @@ void Simulation::Run()
 		{
 			break;
 		}
+
+		Set_Field();
 	}
 
 	Output_Flowfield();	

@@ -16,6 +16,8 @@ int residual_output_steps;
 int flow_save_steps;
 double converge_criterion;
 string tec_file_name;
+int num_of_RK_stages;
+VDouble2D RK_Coeff;
 
 void Init_Global_Param()
 {
@@ -26,7 +28,7 @@ void Init_Global_Param()
 	cfl_num   = 0.6;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
 	physical_time     = 0.0;
-	max_simu_time	  = 0.1;
+	max_simu_time	  = 0.2;
 	method_of_half_q  = 1;		//1-MUSCL,		2-WENO,		3-WCNS
 	muscl_k			  = 1.0/3;	//0.0-二阶迎风偏置，		1/3-二阶迎风偏置
 	method_of_limiter = 1;		//1-vanleer,	2-minmod,	3-superbee	
@@ -42,6 +44,9 @@ void Init_Global_Param()
 	flow_save_steps		  = 200;	//流场输出间隔步数
 	converge_criterion	  = 1e-8;	//残差收敛标准
 	tec_file_name		  = "../../flow.plt";
+	
+	num_of_RK_stages	= 3;
+	RK_Coeff			= { {1.0, 0.0, 1.0},{3.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0},{1.0 / 3.0, 2.0 / 3.0, 2.0 / 3.0} };
 }
 
 void Load_Q()
@@ -52,6 +57,19 @@ void Load_Q()
 void Set_Solve_Direction(char direction)
 {
 	solve_direction = direction;
+	if (direction=='x')
+	{		
+		qField_N0 = qField;		//RK公式里第一项，当前时间步Q
+		qField_N1 = qField;		//RK公式里第二项，下一stage的Q
+	}
+	else if(direction == 'y')
+	{
+		//最关键的点：y方向计算的qField和x方向计算的qField是相同的！！这是算子分裂法的关键。
+		//也正因为如此，在计算y方向时，无需重新计算边界条件
+		qField	  = qField_N0;		//将qField还原为计算x方向之前的Q值，y方向还是用原来的qField来计算rhs
+		qField_N0 = qField_N1;		//RK公式里第一项，是x方向多个stage推进完后，求出来的Q值
+		qField_N1 = qField;			//qField和qField_N1是RK推进中的关键变量，仍然设为计算x方向之前的Q值
+	}
 }
 
 void Primitive_To_Conservative( VDouble & primitive, VDouble &conservative )

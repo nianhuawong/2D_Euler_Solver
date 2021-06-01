@@ -12,9 +12,8 @@ void Init_Flow_Blunt_Body()
 {
 	//流场初始化
 	Allocate_3D_Vector(qField, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(qField_N0, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(qField_N1, total_points_x, total_points_y, num_of_prim_vars);
-	//Allocate_3D_Vector(qField_N2, total_points_x, total_points_y, num_of_prim_vars);
-	//Allocate_3D_Vector(qField_N3, total_points_x, total_points_y, num_of_prim_vars);
 
 	//流场赋初值
 	VInt2D& marker = mesh->Get_Marker();
@@ -33,8 +32,6 @@ void Init_Flow_Blunt_Body()
 			qField[i][j][IP] = 0.71429;
 		}
 	}
-
-	qField_N1 = qField;
 }
 
 void Init_Flow_Double_Mach()
@@ -73,6 +70,4 @@ void Init_Flow_Double_Mach()
 			}
 		}
 	}
-
-	qField_N1 = qField;
 }

@@ -6,9 +6,9 @@ using namespace std;
 extern VDouble3D qField;
 extern VDouble3D qField1;
 extern VDouble3D qField2;
+extern VDouble3D qField_N0;
 extern VDouble3D qField_N1;
-extern VDouble3D qField_N2;
-extern VDouble3D qField_N3;
+
 class QlQr_Solver
 {
 public:

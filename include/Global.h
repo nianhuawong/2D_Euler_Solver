@@ -10,6 +10,14 @@ using namespace std;
 #define SMALL 1E-40
 #define PI 3.141592653589793238
 
+typedef vector < int      > VInt;
+typedef vector < VInt     > VInt2D;
+typedef vector < VInt2D   > VInt3D;
+
+typedef vector < double      > VDouble;
+typedef vector < VDouble     > VDouble2D;
+typedef vector < VDouble2D   > VDouble3D;
+
 extern int num_of_prim_vars;
 extern int current_step, max_num_of_steps;
 extern double cfl_num, time_step, physical_time, max_simu_time;
@@ -24,14 +32,8 @@ extern int flow_save_steps;
 extern double converge_criterion;
 extern bool stop_by_residual;
 extern string tec_file_name;
-
-typedef vector < int      > VInt;
-typedef vector < VInt     > VInt2D;
-typedef vector < VInt2D   > VInt3D;
-
-typedef vector < double      > VDouble;
-typedef vector < VDouble     > VDouble2D;
-typedef vector < VDouble2D   > VDouble3D;
+extern int num_of_RK_stages;
+extern VDouble2D RK_Coeff;
 
 template < typename T >
 void Allocate_2D_Vector(vector< vector< T > >& array, int dim1, int dim2)
