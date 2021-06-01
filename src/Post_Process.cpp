@@ -61,20 +61,17 @@ void Residual::Compute_Residual()
 
 void Residual::OutputResidual()
 {
-	bool flag1 = current_step % residual_output_steps && current_step != 1;//整除时flag=0,输出残差，非整除时flag=1，不输出
-	if (flag1) return;
+	bool flag1 = current_step % residual_output_steps;//flag1=0,整除时输出残差；flag1=1，非整除时不输出
+	bool flag2 = current_step == 1;					  //flag2=0,中间步不输出，  flag2=1，首步输出
+	if (flag1 && flag2 == 0) return;
 
-	cout << setiosflags(ios::left);
-	cout << setiosflags(ios::scientific);
-	cout << setprecision(5);
-
-	bool flag2 =  current_step == 1;
-	//bool flag2 = current_step % (11 * residual_output_steps) && current_step != 1;
 	if (flag2)
 	{
 		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
 	}
-	
+	cout << setiosflags(ios::left);
+	cout << setiosflags(ios::scientific);
+	cout << setprecision(5);
 	cout << current_step	<< "\t        "
 		 << res_Loo[IR]		<< "\t" << res_Loo[IU] << "\t"
 		 << res_Loo[IV]		<< "\t" << res_Loo[IP] << endl;
@@ -100,15 +97,12 @@ bool Stop_by_Residual()
 
 void Output_Flowfield()
 {
-	bool flag0 = current_step % flow_save_steps;//整除时flag=0,输出，非整除时flag=1，不输出
-	bool flag1 = Need_Stop_Iteration();			//退出迭代后,最后需要输出流场
+	bool flag0 = current_step % flow_save_steps;//flag0=0,整除时，输出；		  flag0=1，非整除时，不输出
+	bool flag1 = Need_Stop_Iteration();			//flag1=1,退出迭代，需要输出流场；flag1=0,中间步，不输出
 	if (flag0 && flag1==0) return;
 
-	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
-	VInt2D& marker = mesh->Get_Marker();
-
 	cout << "dumping flowfield..."  << "\tIter = " << current_step << "\tphysical_time =" << physical_time << endl << endl;
-	if (flag1 == 0)
+	if (flag1 == 0) //flag1=0,中间步，输出抬头
 	{
 		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
 	}
@@ -127,6 +121,9 @@ void Output_Flowfield()
 
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
+
+	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
+	VInt2D& marker = mesh->Get_Marker();
 	for (int j = jst; j < jed; j++)
 	{
 		for (int i = ist; i < ied; i++)
