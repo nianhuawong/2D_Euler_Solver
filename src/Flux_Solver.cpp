@@ -9,11 +9,11 @@ VDouble3D fluxVector;
 
 void Solve_Flux()
 {
-	auto* fluxVector = new Flux_Solver();
+	auto* fluxSolver = new Flux_Solver();
 
-	fluxVector->Solve_Flux();
+	fluxSolver->Solve_Flux();
 
-	delete fluxVector;
+	delete fluxSolver;
 }
 
 Flux_Solver::Flux_Solver()
@@ -169,28 +169,39 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField[i][j][IR];
-			double u = qField[i][j][IU];
-			double v = qField[i][j][IV];
-			double p = qField[i][j][IP];
-			double a = sqrt(gama * p / rho);
+			double rho = qField1[i][j][IR];
+			double u   = qField1[i][j][IU];
+			double v   = qField1[i][j][IV];
+			double p   = qField1[i][j][IP];
+			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
 
 			double lmd1 = u;
 			double lmd3 = u - a;
 			double lmd4 = u + a;
+
+			VDouble lmd_m(3);//lamda-
+			lmd_m[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
+
+			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
+
+			rho = qField2[i][j][IR];
+			u   = qField2[i][j][IU];
+			v   = qField2[i][j][IV];
+			p   = qField2[i][j][IP];
+			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			lmd1 = u;
+			lmd3 = u - a;
+			lmd4 = u + a;
 
 			VDouble lmd_p(3);//lamda+
 			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
 			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
 			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
 
-			VDouble lmd_m(3);//lamda-
-			lmd_p[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
-			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
-			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
-
-			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_p);
-			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_m);
+			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_p);
 		}
 	}
 }
@@ -204,53 +215,67 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 		for (int i = ist; i < ied - 1; i++)
 		{
 			if (marker[i][j] == 0) continue;
-
-			double rho = qField[i][j][IR];
-			double u = qField[i][j][IU];
-			double v = qField[i][j][IV];
-			double p = qField[i][j][IP];
-			double a = sqrt(gama * p / rho);
+			if (i == 61 && (j == 58||j==60))
+			{
+				int kkk = 1;
+			}
+			double rho = qField1[i][j][IR];
+			double u   = qField1[i][j][IU];
+			double v   = qField1[i][j][IV];
+			double p   = qField1[i][j][IP];
+			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
 
 			double mu1 = v;
 			double mu3 = v - a;
 			double mu4 = v + a;
-
-			VDouble mu_p(3);//mu+
-			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
-			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
-			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
 
 			VDouble mu_m(3);//mu-
 			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
 			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
 			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
 
-			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_p);
-			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_m);
+			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
+
+			rho = qField2[i][j][IR];
+			u   = qField2[i][j][IU];
+			v   = qField2[i][j][IV];
+			p   = qField2[i][j][IP];
+			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			mu1 = v;
+			mu3 = v - a;
+			mu4 = v + a;
+
+			VDouble mu_p(3);//mu+
+			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
+			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
+			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
+
+			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_p);
 		}
 	}
 }
 
 void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd)
 {
-	double a = sqrt(gama * p / rho);
+	double a = sqrt(abs(gama * p / rho));//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
-	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * lmd[0] + lmd[2] + lmd[3]);
-	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * lmd[0] + (u - a) * lmd[2] + (u + a) * lmd[3]);
-	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] + v * lmd[2] + v * lmd[3]);
-	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * lmd[0] + (h - a * u) * lmd[2] + (h + a * u) * lmd[3]);
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * lmd[0] + lmd[1] + lmd[2]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * lmd[0] + (u - a) * lmd[1] + (u + a) * lmd[2]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] + v * lmd[1] + v * lmd[2]);
+	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * lmd[0] + (h - a * u) * lmd[1] + (h + a * u) * lmd[2]);
 }	
 
 void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu)
 {
-	double a = sqrt(gama * p / rho);
+	double a = sqrt(abs(gama * p / rho));	//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
-	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * mu[0] + mu[2] + mu[3]);
-	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] + u * mu[2] + u * mu[3]);
-	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * mu[0] + (v - a) * mu[2] + (v + a) * mu[3]);
-	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * mu[0] + (h - a * v) * mu[2] + (h + a * v) * mu[3]);
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) * mu[0] + mu[1] + mu[2]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] + u * mu[1] + u * mu[2]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * mu[0] + (v - a) * mu[1] + (v + a) * mu[2]);
+	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * mu[0] + (h - a * v) * mu[1] + (h + a * v) * mu[2]);
 }
 
 void Flux_Solver::Inviscid_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p)
@@ -299,7 +324,7 @@ void Flux_Solver::Roe_Scheme()
 			double v_roe = (v1 + v2 * D) / (1 + D);
 			double H_roe = (H1 + H2 * D) / (1 + D);
 			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
-			double c_roe = sqrt(abs(c2_roe));
+			double c_roe = sqrt(abs(c2_roe));//声速取绝对值
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			

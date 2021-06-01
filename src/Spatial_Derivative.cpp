@@ -47,7 +47,7 @@ void Spatial_Derivative::Spatial_Derivative_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			VDouble rhsVector = rhs[i][j];
+			VDouble rhsVector(num_of_prim_vars);
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
 				rhsVector[iVar] = -(fluxVector[i][j][iVar] - fluxVector[i - 1][j][iVar]) / dx;
@@ -67,7 +67,7 @@ void Spatial_Derivative::Spatial_Derivative_Y()
 		{
 			if (marker[i][j] == 0) continue;
 
-			VDouble rhsVector = rhs[i][j];
+			VDouble rhsVector(num_of_prim_vars);
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
 				rhsVector[iVar] = -(fluxVector[i][j][iVar] - fluxVector[i][j - 1][iVar]) / dy;

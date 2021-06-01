@@ -29,7 +29,7 @@ void Init_Global_Param()
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
 	physical_time     = 0.0;
 	max_simu_time	  = 0.2;
-	method_of_half_q  = 2;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
+	method_of_half_q  = 1;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
 	muscl_k			  = 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
 	method_of_limiter = 1;		//1-vanleer,  2-minmod,		    3-superbee	
 	method_of_flux    = 2;		//1-Roe,	  2-Steger Warming  3-WENO,		  4-WCNS
@@ -118,4 +118,18 @@ void Get_IJK_Region(int& ist, int& ied, int& jst, int& jed)
 bool Need_Stop_Iteration()
 {
 	return stop_by_residual || physical_time >= max_simu_time || current_step == max_num_of_steps;
+}
+
+bool IsNaN(VDouble& data)
+{
+	bool flag = 0;
+	for (int i = 0; i < data.size(); i++)
+	{
+		if (data[i] != data[i])
+		{
+			flag = 1;
+			break;
+		}
+	}
+	return flag;
 }

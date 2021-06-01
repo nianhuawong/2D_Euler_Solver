@@ -97,6 +97,10 @@ void QlQr_Solver::QlQr_MUSCL_X()
 
 				qField2[i][j][iVar] = qVector_p1[iVar] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
 																	+ (1 + muscl_k) * fai4 * du_p1);
+				//if (IsNaN(qField1[i][j]) || IsNaN(qField2[i][j]))
+				//{
+				//	int kkk = 1;
+				//}
 			}
 		}
 	}

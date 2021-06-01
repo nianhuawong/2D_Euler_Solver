@@ -73,6 +73,11 @@ void Update_Flowfield(int iStage)
 			Conservative_To_Primitive(qConservative1, qPrimitive1);
 			//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 			qField_N1[i][j] = qPrimitive1;	
+
+			if ( IsNaN(qPrimitive1) )
+			{
+				int kkk = 1;
+			}
 		}
 	}
 }

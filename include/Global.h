@@ -89,3 +89,4 @@ void MatrixMultiply(vector< vector< T1 > >& a, vector< T2 >& b, vector< T3 >& c,
 void Primitive_To_Conservative(VDouble& primitive, VDouble& conservative);
 void Conservative_To_Primitive(VDouble& conservative, VDouble& primitive);
 bool Need_Stop_Iteration();
+bool IsNaN(VDouble& data);
