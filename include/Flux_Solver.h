@@ -28,6 +28,10 @@ protected:
 	void Flux_LR_Steger_Warming_Y();
 	void Steger_Warming_Scheme();
 
+	void WENO_Scheme();
+	void WENO_Scheme_X();
+	void WENO_Scheme_Y();
+
 protected:
 	void Inviscid_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p);
 	void Inviscid_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p);

@@ -43,10 +43,12 @@ void Flux_Solver::Solve_Flux()
 	}
 	else if (method_of_flux == 3)
 	{
-		//WENO+Steger-Warming
+		//整数节点通量计算：Steger-Warming方法
 		Flux_LR_Steger_Warming(); 
-		//WENO通量插值如下：
-
+		//半节点左右通量插值：WENO方法
+		WENO_Scheme();
+		//半节点通量值：Steger_Warming进行正负通量相加
+		Steger_Warming_Scheme();
 	}
 	else if (method_of_flux == 4)
 	{
@@ -55,6 +57,302 @@ void Flux_Solver::Solve_Flux()
 	else
 	{
 		cout << "flux计算方法选择错误，请检查！" << endl;
+	}
+}
+
+void Flux_Solver::WENO_Scheme()
+{
+	if (solve_direction == 'x')
+	{
+		this->WENO_Scheme_X();
+	}
+	else if (solve_direction == 'y')
+	{
+		this->WENO_Scheme_Y();
+	}
+	else
+	{
+		cout << "出错，请检查！" << endl;
+	}
+}
+
+void Flux_Solver::WENO_Scheme_X()
+{
+	//q(j+1/2)-
+	VDouble3D q11, q21, q31;
+	Allocate_3D_Vector(q11, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q21, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	VInt2D& marker = mesh->Get_Marker();
+	for (int j = jst; j < jed - 1; j++)
+	{
+		//for (int i = ist; i < ied - 1; i++)
+		for (int i = ist; i < ied - 2; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				q11[i][j][iVar] = -1.0 / 6.0 * fluxVector1[i - 1][j][iVar] + 5.0 / 6.0 * fluxVector1[i    ][j][iVar] + 1.0 / 3.0 * fluxVector1[i + 1][j][iVar];
+				q21[i][j][iVar] =  1.0 / 3.0 * fluxVector1[i    ][j][iVar] + 5.0 / 6.0 * fluxVector1[i + 1][j][iVar] - 1.0 / 6.0 * fluxVector1[i + 2][j][iVar];
+				q31[i][j][iVar] = 11.0 / 6.0 * fluxVector1[i + 1][j][iVar] - 7.0 / 6.0 * fluxVector1[i + 2][j][iVar] + 1.0 / 3.0 * fluxVector1[i + 3][j][iVar];
+			}
+		}
+	}
+
+	//q(j+1/2)+
+	VDouble3D q12, q22, q32;
+	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				q12[i][j][iVar] =  1.0 / 3.0 * fluxVector2[i - 2][j][iVar] - 7.0 / 6.0 * fluxVector2[i - 1][j][iVar] + 11.0 / 6.0 * fluxVector2[i    ][j][iVar];
+				q22[i][j][iVar] = -1.0 / 6.0 * fluxVector2[i - 1][j][iVar] + 5.0 / 6.0 * fluxVector2[i    ][j][iVar] +  1.0 / 3.0 * fluxVector2[i + 1][j][iVar];
+				q32[i][j][iVar] =  1.0 / 3.0 * fluxVector2[i    ][j][iVar] + 5.0 / 6.0 * fluxVector2[i + 1][j][iVar] -  1.0 / 6.0 * fluxVector2[i + 2][j][iVar];
+			}
+		}
+	}
+
+	//IS(j+1/2)-
+	VDouble3D IS11, IS21, IS31;
+	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	for (int j = jst; j < jed - 1; j++)
+	{
+		//for (int i = ist; i < ied - 1; i++)
+		for (int i = ist; i < ied - 2; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				IS11[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector1[i - 1][j][iVar] - 2.0 * fluxVector1[i    ][j][iVar] +       fluxVector1[i + 1][j][iVar]), 2)
+								   + 1.0 / 4.0 * pow((fluxVector1[i - 1][j][iVar] - 4.0 * fluxVector1[i    ][j][iVar] + 3.0 * fluxVector1[i + 1][j][iVar]), 2);
+
+				IS21[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector1[i    ][j][iVar] - 2.0 * fluxVector1[i + 1][j][iVar] +       fluxVector1[i + 2][j][iVar]), 2)
+								   + 1.0 / 4.0 * pow((fluxVector1[i    ][j][iVar] -       fluxVector1[i + 2][j][iVar])									  , 2);
+
+				IS31[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector1[i + 1][j][iVar] - 2.0 * fluxVector1[i + 2][j][iVar] +		  fluxVector1[i + 3][j][iVar]), 2)
+								   + 1.0 / 4.0 * pow((fluxVector1[i + 3][j][iVar] - 4.0 * fluxVector1[i + 2][j][iVar] + 3.0 * fluxVector1[i + 1][j][iVar]), 2);
+
+			}
+		}
+	}
+
+	//IS(j+1/2)+
+	VDouble3D IS12, IS22, IS32;
+	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				IS12[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector2[i - 2][j][iVar] - 2.0 * fluxVector2[i - 1][j][iVar] +       fluxVector2[i    ][j][iVar]), 2)
+								 +  1.0 / 4.0  * pow((fluxVector2[i - 2][j][iVar] - 4.0 * fluxVector2[i - 1][j][iVar] + 3.0 * fluxVector2[i    ][j][iVar]), 2);
+
+				IS22[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector2[i - 1][j][iVar] - 2.0 * fluxVector2[i    ][j][iVar] +       fluxVector2[i + 1][j][iVar]), 2)
+								 +  1.0 / 4.0  * pow((fluxVector2[i - 1][j][iVar] -       fluxVector2[i + 1][j][iVar])									  , 2);
+
+				IS32[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector2[i    ][j][iVar] - 2.0 * fluxVector2[i + 1][j][iVar] +       fluxVector2[i + 2][j][iVar]), 2)
+								 +  1.0 / 4.0  * pow((fluxVector2[i + 2][j][iVar] - 4.0 * fluxVector2[i + 1][j][iVar] + 3.0 * fluxVector2[i    ][j][iVar]), 2);
+			}
+		}
+	}
+
+	double C11 = 3.0 / 10.0, C21 = 3.0 / 5.0, C31 = 1.0 / 10.0;
+	double C12 = 1.0 / 10.0, C22 = 3.0 / 5.0, C32 = 3.0 / 10.0;
+	double eps = 1e-6;
+
+	//j+1/2(-)处的通量
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				double a1 = C11 / pow((eps + IS11[i][j][iVar]), 2);
+				double a2 = C21 / pow((eps + IS21[i][j][iVar]), 2);
+				double a3 = C31 / pow((eps + IS31[i][j][iVar]), 2);
+
+				double w1 = a1 / (a1 + a2 + a3);
+				double w2 = a2 / (a1 + a2 + a3);
+				double w3 = a3 / (a1 + a2 + a3);
+
+				fluxVector1[i][j][iVar] = w1 * q11[i][j][iVar] + w2 * q21[i][j][iVar] + w3 * q31[i][j][iVar];
+			}
+		}
+	}
+
+	//j+1/2(+)处的通量
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				double a1 = C12 / pow((eps + IS12[i][j][iVar]), 2);
+				double a2 = C22 / pow((eps + IS22[i][j][iVar]), 2);
+				double a3 = C32 / pow((eps + IS32[i][j][iVar]), 2);
+
+				double w1 = a1 / (a1 + a2 + a3);
+				double w2 = a2 / (a1 + a2 + a3);
+				double w3 = a3 / (a1 + a2 + a3);
+
+				fluxVector2[i][j][iVar] = w1 * q12[i][j][iVar] + w2 * q22[i][j][iVar] + w3 * q32[i][j][iVar];
+			}
+		}
+	}
+}
+
+void Flux_Solver::WENO_Scheme_Y()
+{
+	//q(j+1/2)-
+	VDouble3D q11, q21, q31;
+	Allocate_3D_Vector(q11, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q21, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	VInt2D& marker = mesh->Get_Marker();
+	for (int i = ist; i < ied - 1; i++)
+	{
+		//for (int j = jst; j < jed - 1; j++)
+		for (int j = jst; j < jed - 2; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				q11[i][j][iVar] = -1.0 / 6.0 * fluxVector1[i][j - 1][iVar] + 5.0 / 6.0 * fluxVector1[i][j    ][iVar] + 1.0 / 3.0 * fluxVector1[i][j + 1][iVar];
+				q21[i][j][iVar] =  1.0 / 3.0 * fluxVector1[i][j    ][iVar] + 5.0 / 6.0 * fluxVector1[i][j + 1][iVar] - 1.0 / 6.0 * fluxVector1[i][j + 2][iVar];
+				q31[i][j][iVar] = 11.0 / 6.0 * fluxVector1[i][j + 1][iVar] - 7.0 / 6.0 * fluxVector1[i][j + 2][iVar] + 1.0 / 3.0 * fluxVector1[i][j + 3][iVar];
+			}
+		}
+	}
+
+	//q(j+1/2)+
+	VDouble3D q12, q22, q32;
+	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	for (int i = ist; i < ied - 1; i++)
+	{
+		for (int j = jst; j < jed - 1; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				q12[i][j][iVar] =  1.0 / 3.0 * fluxVector2[i][j - 2][iVar] - 7.0 / 6.0 * fluxVector2[i][j - 1][iVar] + 11.0 / 6.0 * fluxVector2[i][j    ][iVar];
+				q22[i][j][iVar] = -1.0 / 6.0 * fluxVector2[i][j - 1][iVar] + 5.0 / 6.0 * fluxVector2[i][j    ][iVar] +  1.0 / 3.0 * fluxVector2[i][j + 1][iVar];
+				q32[i][j][iVar] =  1.0 / 3.0 * fluxVector2[i][j    ][iVar] + 5.0 / 6.0 * fluxVector2[i][j + 1][iVar] -  1.0 / 6.0 * fluxVector2[i][j + 2][iVar];
+			}
+		}
+	}
+
+	//IS(j+1/2)-
+	VDouble3D IS11, IS21, IS31;
+	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	for (int i = ist; i < ied - 1; i++)
+	{
+		//for (int j = jst; j < jed - 1; j++)
+		for (int j = jst; j < jed - 2; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				IS11[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector1[i][j - 1][iVar] - 2.0 * fluxVector1[i][j    ][iVar] +       fluxVector1[i][j + 1][iVar]), 2)
+								   + 1.0 / 4.0 * pow((fluxVector1[i][j - 1][iVar] - 4.0 * fluxVector1[i][j    ][iVar] + 3.0 * fluxVector1[i][j + 1][iVar]), 2);
+
+				IS21[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector1[i][j    ][iVar] - 2.0 * fluxVector1[i][j + 1][iVar] +       fluxVector1[i][j + 2][iVar]), 2)
+								   + 1.0 / 4.0 * pow((fluxVector1[i][j    ][iVar] -       fluxVector1[i][j + 2][iVar])									  , 2);
+
+				IS31[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector1[i][j + 1][iVar] - 2.0 * fluxVector1[i][j + 2][iVar] +		  fluxVector1[i][j + 3][iVar]), 2)
+								   + 1.0 / 4.0 * pow((fluxVector1[i][j + 3][iVar] - 4.0 * fluxVector1[i][j + 2][iVar] + 3.0 * fluxVector1[i][j + 1][iVar]), 2);
+
+			}
+		}
+	}
+
+	//IS(j+1/2)+
+	VDouble3D IS12, IS22, IS32;
+	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	for (int i = ist; i < ied - 1; i++)
+	{
+		for (int j = jst; j < jed - 1; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				IS12[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector2[i][j - 2][iVar] - 2.0 * fluxVector2[i][j - 1][iVar] +       fluxVector2[i][j    ][iVar]), 2)
+								 +  1.0 / 4.0  * pow((fluxVector2[i][j - 2][iVar] - 4.0 * fluxVector2[i][j - 1][iVar] + 3.0 * fluxVector2[i][j    ][iVar]), 2);
+
+				IS22[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector2[i][j - 1][iVar] - 2.0 * fluxVector2[i][j    ][iVar] +       fluxVector2[i][j + 1][iVar]), 2)
+								 +  1.0 / 4.0  * pow((fluxVector2[i][j - 1][iVar] -       fluxVector2[i][j + 1][iVar])									  , 2);
+
+				IS32[i][j][iVar] = 13.0 / 12.0 * pow((fluxVector2[i][j    ][iVar] - 2.0 * fluxVector2[i][j + 1][iVar] +       fluxVector2[i][j + 2][iVar]), 2)
+								 +  1.0 / 4.0  * pow((fluxVector2[i][j + 2][iVar] - 4.0 * fluxVector2[i][j + 1][iVar] + 3.0 * fluxVector2[i][j    ][iVar]), 2);
+			}
+		}
+	}
+
+	double C11 = 3.0 / 10.0, C21 = 3.0 / 5.0, C31 = 1.0 / 10.0;
+	double C12 = 1.0 / 10.0, C22 = 3.0 / 5.0, C32 = 3.0 / 10.0;
+	double eps = 1e-6;
+
+	//j+1/2(-)处的通量
+	for (int i = ist; i < ied - 1; i++)
+	{
+		for (int j = jst; j < jed - 1; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				double a1 = C11 / pow((eps + IS11[i][j][iVar]), 2);
+				double a2 = C21 / pow((eps + IS21[i][j][iVar]), 2);
+				double a3 = C31 / pow((eps + IS31[i][j][iVar]), 2);
+
+				double w1 = a1 / (a1 + a2 + a3);
+				double w2 = a2 / (a1 + a2 + a3);
+				double w3 = a3 / (a1 + a2 + a3);
+
+				fluxVector1[i][j][iVar] = w1 * q11[i][j][iVar] + w2 * q21[i][j][iVar] + w3 * q31[i][j][iVar];
+			}
+		}
+	}
+
+	//j+1/2(+)处的通量
+	for (int i = ist; i < ied - 1; i++)
+	{
+		for (int j = jst; j < jed - 1; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				double a1 = C12 / pow((eps + IS12[i][j][iVar]), 2);
+				double a2 = C22 / pow((eps + IS22[i][j][iVar]), 2);
+				double a3 = C32 / pow((eps + IS32[i][j][iVar]), 2);
+
+				double w1 = a1 / (a1 + a2 + a3);
+				double w2 = a2 / (a1 + a2 + a3);
+				double w3 = a3 / (a1 + a2 + a3);
+
+				fluxVector2[i][j][iVar] = w1 * q12[i][j][iVar] + w2 * q22[i][j][iVar] + w3 * q32[i][j][iVar];
+			}
+		}
 	}
 }
 
@@ -169,11 +467,11 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField1[i][j][IR];
-			double u   = qField1[i][j][IU];
-			double v   = qField1[i][j][IV];
-			double p   = qField1[i][j][IP];
-			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+			double rho = qField[i][j][IR];
+			double u = qField[i][j][IU];
+			double v = qField[i][j][IV];
+			double p = qField[i][j][IP];
+			double a = sqrt(abs(gama * p / rho));
 
 			double lmd1 = u;
 			double lmd3 = u - a;
@@ -185,16 +483,6 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
 
 			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
-
-			rho = qField2[i][j][IR];
-			u   = qField2[i][j][IU];
-			v   = qField2[i][j][IV];
-			p   = qField2[i][j][IP];
-			a   = sqrt(abs(gama * p / rho));//声速取绝对值
-
-			lmd1 = u;
-			lmd3 = u - a;
-			lmd4 = u + a;
 
 			VDouble lmd_p(3);//lamda+
 			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
@@ -215,15 +503,12 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 		for (int i = ist; i < ied - 1; i++)
 		{
 			if (marker[i][j] == 0) continue;
-			if (i == 61 && (j == 58||j==60))
-			{
-				int kkk = 1;
-			}
-			double rho = qField1[i][j][IR];
-			double u   = qField1[i][j][IU];
-			double v   = qField1[i][j][IV];
-			double p   = qField1[i][j][IP];
-			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+
+			double rho = qField[i][j][IR];
+			double u = qField[i][j][IU];
+			double v = qField[i][j][IV];
+			double p = qField[i][j][IP];
+			double a = sqrt(abs(gama * p / rho));
 
 			double mu1 = v;
 			double mu3 = v - a;
@@ -236,16 +521,6 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 
 			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
 
-			rho = qField2[i][j][IR];
-			u   = qField2[i][j][IU];
-			v   = qField2[i][j][IV];
-			p   = qField2[i][j][IP];
-			a   = sqrt(abs(gama * p / rho));//声速取绝对值
-
-			mu1 = v;
-			mu3 = v - a;
-			mu4 = v + a;
-
 			VDouble mu_p(3);//mu+
 			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
 			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
@@ -255,6 +530,103 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 		}
 	}
 }
+
+//void Flux_Solver::Flux_LR_Steger_Warming_X()
+//{
+//	double eps = 1e-4;
+//	VInt2D& marker = mesh->Get_Marker();
+//	for (int j = jst; j < jed - 1; j++)
+//	{
+//		for (int i = ist; i < ied - 1; i++)
+//		{
+//			if (marker[i][j] == 0) continue;
+//
+//			double rho = qField1[i][j][IR];
+//			double u   = qField1[i][j][IU];
+//			double v   = qField1[i][j][IV];
+//			double p   = qField1[i][j][IP];
+//			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+//
+//			double lmd1 = u;
+//			double lmd3 = u - a;
+//			double lmd4 = u + a;
+//
+//			VDouble lmd_m(3);//lamda-
+//			lmd_m[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
+//			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
+//			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
+//
+//			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
+//
+//			rho = qField2[i][j][IR];
+//			u   = qField2[i][j][IU];
+//			v   = qField2[i][j][IV];
+//			p   = qField2[i][j][IP];
+//			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+//
+//			lmd1 = u;
+//			lmd3 = u - a;
+//			lmd4 = u + a;
+//
+//			VDouble lmd_p(3);//lamda+
+//			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
+//			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
+//			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
+//
+//			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_p);
+//		}
+//	}
+//}
+
+//void Flux_Solver::Flux_LR_Steger_Warming_Y()
+//{
+//	double eps = 1e-4;
+//	VInt2D& marker = mesh->Get_Marker();
+//	for (int j = jst; j < jed - 1; j++)
+//	{
+//		for (int i = ist; i < ied - 1; i++)
+//		{
+//			if (marker[i][j] == 0) continue;
+//			if (i == 61 && (j == 58||j==60))
+//			{
+//				int kkk = 1;
+//			}
+//			double rho = qField1[i][j][IR];
+//			double u   = qField1[i][j][IU];
+//			double v   = qField1[i][j][IV];
+//			double p   = qField1[i][j][IP];
+//			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+//
+//			double mu1 = v;
+//			double mu3 = v - a;
+//			double mu4 = v + a;
+//
+//			VDouble mu_m(3);//mu-
+//			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
+//			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
+//			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
+//
+//			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
+//
+//			rho = qField2[i][j][IR];
+//			u   = qField2[i][j][IU];
+//			v   = qField2[i][j][IV];
+//			p   = qField2[i][j][IP];
+//			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+//
+//			mu1 = v;
+//			mu3 = v - a;
+//			mu4 = v + a;
+//
+//			VDouble mu_p(3);//mu+
+//			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
+//			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
+//			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
+//
+//			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_p);
+//		}
+//	}
+//}
 
 void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd)
 {
