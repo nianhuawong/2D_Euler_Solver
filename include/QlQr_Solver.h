@@ -20,11 +20,14 @@ public:
 	void Solve_QlQr();
 protected:
 	double Limiter_Function(double ita);
-	void QlQr_MUSCL();
-	void QlQr_WCNS();
 
+	void QlQr_MUSCL();
 	void QlQr_MUSCL_X();
 	void QlQr_MUSCL_Y();
+
+	void QlQr_WCNS();
+	void QlQr_WCNS_X();
+	void QlQr_WCNS_Y();
 
 protected:
 

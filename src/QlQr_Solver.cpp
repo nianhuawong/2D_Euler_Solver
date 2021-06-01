@@ -149,8 +149,214 @@ void QlQr_Solver::QlQr_MUSCL_Y()
 
 void QlQr_Solver::QlQr_WCNS()
 {
-
+	if (solve_direction == 'x')
+	{
+		this->QlQr_WCNS_X();
+	}
+	else if (solve_direction == 'y')
+	{
+		this->QlQr_WCNS_Y();
+	}
 }
+
+void QlQr_Solver::QlQr_WCNS_X()
+{
+	//计算Lagrange插值系数
+	VDouble3D g1, g2, g3;
+	Allocate_3D_Vector(g1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(g2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(g3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	VDouble3D s1, s2, s3;
+	Allocate_3D_Vector(s1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(s2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(s3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	double ds = dx;
+
+	VInt2D& marker = mesh->Get_Marker();
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				g1[i][j][iVar] = (		 qField[i - 2][j][iVar] - 4.0 * qField[i - 1][j][iVar] + 3.0 *	qField[i    ][j][iVar]) / 2.0 / ds;
+				g2[i][j][iVar] = (		 qField[i + 1][j][iVar] -		qField[i - 1][j][iVar]								  ) / 2.0 / ds;
+				g3[i][j][iVar] = (-3.0 * qField[i    ][j][iVar] + 4.0 * qField[i + 1][j][iVar] -		qField[i + 2][j][iVar]) / 2.0 / ds;
+
+				s1[i][j][iVar] = (		 qField[i - 2][j][iVar] - 2.0 * qField[i - 1][j][iVar] +		qField[i    ][j][iVar]) / ds / ds;
+				s2[i][j][iVar] = (		 qField[i - 1][j][iVar] - 2.0 * qField[i    ][j][iVar] +		qField[i + 1][j][iVar]) / ds / ds;
+				s3[i][j][iVar] = (		 qField[i    ][j][iVar] - 2.0 * qField[i + 1][j][iVar] +		qField[i + 2][j][iVar]) / ds / ds;
+			}
+		}
+	}
+	//计算光滑因子
+	VDouble3D IS1, IS2, IS3;
+	Allocate_3D_Vector(IS1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				IS1[i][j][iVar] = pow((ds * g1[i][j][iVar]), 2) + pow((ds * ds * s1[i][j][iVar]), 2);
+				IS2[i][j][iVar] = pow((ds * g2[i][j][iVar]), 2) + pow((ds * ds * s2[i][j][iVar]), 2);
+				IS3[i][j][iVar] = pow((ds * g3[i][j][iVar]), 2) + pow((ds * ds * s3[i][j][iVar]), 2);
+			}
+		}
+	}
+
+	double C11 = 1.0 / 16.0, C21 = 10.0 / 16.0, C31 = 5.0 / 16.0;
+	double C12 = 5.0 / 16.0, C22 = 10.0 / 16.0, C32 = 1.0 / 16.0;
+	double eps = 1e-6;
+
+	//j+1/2处的变量左右值和通量
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				//j+1/2处的左右值，可以由3个模板插值得到3个值
+				double qField_Left1 = qField[i][j][iVar] + ds * g1[i][j][iVar] / 2.0 + ds * ds * s1[i][j][iVar] / 8.0;
+				double qField_Left2 = qField[i][j][iVar] + ds * g2[i][j][iVar] / 2.0 + ds * ds * s2[i][j][iVar] / 8.0;
+				double qField_Left3 = qField[i][j][iVar] + ds * g3[i][j][iVar] / 2.0 + ds * ds * s3[i][j][iVar] / 8.0;
+
+				double qField_Right1 = qField[i + 1][j][iVar] - ds * g1[i + 1][j][iVar] / 2.0 + ds * ds * s1[i + 1][j][iVar] / 8.0;
+				double qField_Right2 = qField[i + 1][j][iVar] - ds * g2[i + 1][j][iVar] / 2.0 + ds * ds * s2[i + 1][j][iVar] / 8.0;
+				double qField_Right3 = qField[i + 1][j][iVar] - ds * g3[i + 1][j][iVar] / 2.0 + ds * ds * s3[i + 1][j][iVar] / 8.0;
+
+				//取非线性加权，左右值分别取不同的权值
+				double a1 = C11 / pow((eps + IS1[i][j][iVar]), 2);
+				double a2 = C21 / pow((eps + IS2[i][j][iVar]), 2);
+				double a3 = C31 / pow((eps + IS3[i][j][iVar]), 2);
+
+				double w1 = a1 / (a1 + a2 + a3);
+				double w2 = a2 / (a1 + a2 + a3);
+				double w3 = a3 / (a1 + a2 + a3);
+
+				qField1[i][j][iVar] = w1 * qField_Left1 + w2 * qField_Left2 + w3 * qField_Left3;
+
+				//取非线性加权，左右值分别取不同的权值
+				a1 = C12 / pow((eps + IS1[i][j][iVar]), 2);
+				a2 = C22 / pow((eps + IS2[i][j][iVar]), 2);
+				a3 = C32 / pow((eps + IS3[i][j][iVar]), 2);
+
+				w1 = a1 / (a1 + a2 + a3);
+				w2 = a2 / (a1 + a2 + a3);
+				w3 = a3 / (a1 + a2 + a3);
+				qField2[i][j][iVar] = w1 * qField_Right1 + w2 * qField_Right2 + w3 * qField_Right3;
+			}
+		}
+	}
+}
+
+void QlQr_Solver::QlQr_WCNS_Y()
+{
+	//计算Lagrange插值系数
+	VDouble3D g1, g2, g3;
+	Allocate_3D_Vector(g1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(g2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(g3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	VDouble3D s1, s2, s3;
+	Allocate_3D_Vector(s1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(s2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(s3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	double ds = dy;
+
+	VInt2D& marker = mesh->Get_Marker();
+	for (int i = ist; i < ied - 1; i++)
+	{
+		for (int j = jst; j < jed - 1; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				g1[i][j][iVar] = (		 qField[i][j - 2][iVar] - 4.0 * qField[i][j - 1][iVar] + 3.0 *	qField[i][j    ][iVar]) / 2.0 / ds;
+				g2[i][j][iVar] = (		 qField[i][j + 1][iVar] -		qField[i][j - 1][iVar]								  ) / 2.0 / ds;
+				g3[i][j][iVar] = (-3.0 * qField[i][j    ][iVar] + 4.0 * qField[i][j + 1][iVar] -		qField[i][j + 2][iVar]) / 2.0 / ds;
+
+				s1[i][j][iVar] = (		 qField[i][j - 2][iVar] - 2.0 * qField[i][j - 1][iVar] +		qField[i][j    ][iVar]) / ds / ds;
+				s2[i][j][iVar] = (		 qField[i][j - 1][iVar] - 2.0 * qField[i][j    ][iVar] +		qField[i][j + 1][iVar]) / ds / ds;
+				s3[i][j][iVar] = (		 qField[i][j    ][iVar] - 2.0 * qField[i][j + 1][iVar] +		qField[i][j + 2][iVar]) / ds / ds;
+			}
+		}
+	}
+	//计算光滑因子
+	VDouble3D IS1, IS2, IS3;
+	Allocate_3D_Vector(IS1, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+
+	for (int i = ist; i < ied - 1; i++)
+	{
+		for (int j = jst; j < jed - 1; j++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				IS1[i][j][iVar] = pow((ds * g1[i][j][iVar]), 2) + pow((ds * ds * s1[i][j][iVar]), 2);
+				IS2[i][j][iVar] = pow((ds * g2[i][j][iVar]), 2) + pow((ds * ds * s2[i][j][iVar]), 2);
+				IS3[i][j][iVar] = pow((ds * g3[i][j][iVar]), 2) + pow((ds * ds * s3[i][j][iVar]), 2);
+			}
+		}
+	}
+
+	double C11 = 1.0 / 16.0, C21 = 10.0 / 16.0, C31 = 5.0 / 16.0;
+	double C12 = 5.0 / 16.0, C22 = 10.0 / 16.0, C32 = 1.0 / 16.0;
+	double eps = 1e-6;
+
+	//j+1/2处的变量左右值和通量
+	for (int j = jst; j < jed - 1; j++)
+	{
+		for (int i = ist; i < ied - 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				//j+1/2处的左右值，可以由3个模板插值得到3个值
+				double qField_Left1 = qField[i][j][iVar] + ds * g1[i][j][iVar] / 2.0 + ds * ds * s1[i][j][iVar] / 8.0;
+				double qField_Left2 = qField[i][j][iVar] + ds * g2[i][j][iVar] / 2.0 + ds * ds * s2[i][j][iVar] / 8.0;
+				double qField_Left3 = qField[i][j][iVar] + ds * g3[i][j][iVar] / 2.0 + ds * ds * s3[i][j][iVar] / 8.0;
+
+				double qField_Right1 = qField[i][j + 1][iVar] - ds * g1[i][j + 1][iVar] / 2.0 + ds * ds * s1[i][j + 1][iVar] / 8.0;
+				double qField_Right2 = qField[i][j + 1][iVar] - ds * g2[i][j + 1][iVar] / 2.0 + ds * ds * s2[i][j + 1][iVar] / 8.0;
+				double qField_Right3 = qField[i][j + 1][iVar] - ds * g3[i][j + 1][iVar] / 2.0 + ds * ds * s3[i][j + 1][iVar] / 8.0;
+
+				//取非线性加权，左右值分别取不同的权值
+				double a1 = C11 / pow((eps + IS1[i][j][iVar]), 2);
+				double a2 = C21 / pow((eps + IS2[i][j][iVar]), 2);
+				double a3 = C31 / pow((eps + IS3[i][j][iVar]), 2);
+
+				double w1 = a1 / (a1 + a2 + a3);
+				double w2 = a2 / (a1 + a2 + a3);
+				double w3 = a3 / (a1 + a2 + a3);
+
+				qField1[i][j][iVar] = w1 * qField_Left1 + w2 * qField_Left2 + w3 * qField_Left3;
+
+				//取非线性加权，左右值分别取不同的权值
+				a1 = C12 / pow((eps + IS1[i][j][iVar]), 2);
+				a2 = C22 / pow((eps + IS2[i][j][iVar]), 2);
+				a3 = C32 / pow((eps + IS3[i][j][iVar]), 2);
+
+				w1 = a1 / (a1 + a2 + a3);
+				w2 = a2 / (a1 + a2 + a3);
+				w3 = a3 / (a1 + a2 + a3);
+				qField2[i][j][iVar] = w1 * qField_Right1 + w2 * qField_Right2 + w3 * qField_Right3;
+			}
+		}
+	}
+}
+
 
 double QlQr_Solver::Limiter_Function( double ita )
 {

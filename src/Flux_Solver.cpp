@@ -45,14 +45,21 @@ void Flux_Solver::Solve_Flux()
 	{
 		//整数节点通量计算：Steger-Warming方法
 		Flux_LR_Steger_Warming(); 
+
 		//半节点左右通量插值：WENO方法
-		WENO_Scheme();
+		WENO_Scheme();	
+
 		//半节点通量值：Steger_Warming进行正负通量相加
 		Steger_Warming_Scheme();
 	}
 	else if (method_of_flux == 4)
 	{
-		//WCNS+Roe
+		//WCNS原始变量插值已经做完；
+		//计算半节点左右通量
+		Flux_LR_Roe();	
+		
+		//Roe计算半节点通量
+		Roe_Scheme();	
 	}
 	else
 	{
