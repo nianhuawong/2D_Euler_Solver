@@ -113,9 +113,8 @@ void Compute_Boundary_Double_Mach()
 	double xsw = 1.0 / 6 + 1.0 / tan(PI / 3) + ssw * physical_time;
 
 	//左边界：inflow
-	//for (int i = 0; i < ist; i++)
-	//for (int i = ist; i <= ist; i++)
-	for (int i = 0; i <= ist; i++)
+	for (int i = 0; i < ist; i++)
+	//for (int i = 0; i <= ist; i++)
 	{
 		for (int j = jst; j <= jed; j++)
 		{
@@ -127,9 +126,8 @@ void Compute_Boundary_Double_Mach()
 	}
 
 	//上边界
-	//for (int j = jed; j < total_points_y; j++)
-	//for (int j = jed - 1; j <= jed - 1; j++)
-	for (int j = jed - 1; j < total_points_y; j++)
+	for (int j = jed; j < total_points_y; j++)
+	//for (int j = jed - 1; j < total_points_y; j++)
 	{
 		for (int i = ist; i < ied; i++)
 		{
@@ -155,9 +153,8 @@ void Compute_Boundary_Double_Mach()
 	//右边界：outflow
 	for (int j = jst; j < jed; j++)
 	{
-		//for (int i = ied; i < total_points_x; i++)
-		//for (int i = ied - 1; i <= ied - 1; i++)
-		for (int i = ied - 1; i < total_points_x; i++)
+		for (int i = ied; i < total_points_x; i++)
+		//for (int i = ied - 1; i < total_points_x; i++)
 		{
 			qField[i][j][IR] = qField[i - 1][j][IR];
 			qField[i][j][IU] = qField[i - 1][j][IU];
@@ -169,9 +166,8 @@ void Compute_Boundary_Double_Mach()
 	//下边界
 	for (int i = ist; i < ied; i++)
 	{
-		//for (int j = jst - 1; j >= 0; j--)
-		//for (int j = jst; j >= jst; j--)
-		for (int j = jst; j >= 0; j--)
+		for (int j = jst - 1; j >= 0; j--)
+		//for (int j = jst; j >= 0; j--)
 		{
 			double x_node, y_node;
 			grid_points[i][j].Get_Point_Coord(x_node, y_node);
