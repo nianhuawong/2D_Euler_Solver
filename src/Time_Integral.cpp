@@ -45,18 +45,27 @@ void Update_Flowfield(int iStage)
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 
-	VDouble rhsVector	  (num_of_prim_vars);
-	VDouble qPrimitive0   (num_of_prim_vars);
-	VDouble qPrimitive1   (num_of_prim_vars);
+#ifndef _OPENMP
+	VDouble rhsVector(num_of_prim_vars);
+	VDouble qPrimitive0(num_of_prim_vars);
+	VDouble qPrimitive1(num_of_prim_vars);
 	VDouble qConservative0(num_of_prim_vars);
 	VDouble qConservative1(num_of_prim_vars);
+#endif // !_OPENMP
 
-//#ifdef _OPENMP
-//#pragma omp parallel for
-//#endif	
-	for (int j = jst; j < jed; j++)
+#ifdef _OPENMP
+#pragma omp parallel
 	{
-		for (int i = ist; i < ied; i++)
+		VDouble rhsVector(num_of_prim_vars);
+		VDouble qPrimitive0(num_of_prim_vars);
+		VDouble qPrimitive1(num_of_prim_vars);
+		VDouble qConservative0(num_of_prim_vars);
+		VDouble qConservative1(num_of_prim_vars);
+#pragma omp  for
+#endif	
+	for (int i = ist; i < ied; i++)
+	{
+		for (int j = jst; j < jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -80,12 +89,16 @@ void Update_Flowfield(int iStage)
 
 			//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 			qField_N1[i][j] = qPrimitive1;	
-			if ( IsNaN(qPrimitive1) )
-			{
-				int kkk = 1;
-			}
+			//if ( IsNaN(qPrimitive1) )
+			//{
+			//	int kkk = 1;
+			//}
 		}
 	}
+#ifdef _OPENMP
+	}
+#endif // _OPENMP
+
 }
 
 void Set_Field()

@@ -45,6 +45,9 @@ void Generate_Mesh()
 	//for (int i = ist; i < ied; i++)
 	//{
 	//	for (int j = jst; j < jed; j++)
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = 0; i < total_points_x; i++)
 	{
 		for (int j = 0; j < total_points_y; j++)

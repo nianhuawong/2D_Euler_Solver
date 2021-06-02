@@ -386,12 +386,12 @@ void Flux_Solver::Flux_LR_Roe_X()
 	//for (int j = jst; j < jed - 1; j++)
 	//{
 	//	for (int i = ist; i < ied - 1; i++)
-//#ifdef _OPENMP
-//#pragma omp parallel for
-//#endif
-	for (int j = 0; j < num_half_point_y; j++)
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (int i = 0; i < num_half_point_x; i++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int j = 0; j < num_half_point_y; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -418,9 +418,9 @@ void Flux_Solver::Flux_LR_Roe_Y()
 	//for (int i = ist; i < ied - 1; i++)
 	//{
 	//	for (int j = jst; j < jed - 1; j++)
-//#ifdef _OPENMP
-//#pragma omp parallel for
-//#endif
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = 0; i < num_half_point_x; i++)
 	{
 		for (int j = 0; j < num_half_point_y; j++)
@@ -721,12 +721,21 @@ void Flux_Solver::Inviscid_Flux_G(VDouble& fluxVector, double rho, double u, dou
 
 void Flux_Solver::Roe_Scheme()
 {
+#ifndef _OPENMP
+	VDouble2D Jacobian_A;
+	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+#endif
+
 	VInt2D& marker = mesh->Get_Marker();
 	//for (int j = jst; j < jed - 1; j++)
 	//{
 	//	for (int i = ist; i < ied - 1; i++)
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel
+	{
+		VDouble2D Jacobian_A;
+		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+#pragma omp for 	
 #endif
 	for (int i = 0; i < num_half_point_x; i++)
 	{
@@ -753,10 +762,7 @@ void Flux_Solver::Roe_Scheme()
 			double v_roe = (v1 + v2 * D) / (1 + D);
 			double H_roe = (H1 + H2 * D) / (1 + D);
 			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
-			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值
-			
-			VDouble2D Jacobian_A;
-			Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值			
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			
@@ -783,6 +789,10 @@ void Flux_Solver::Roe_Scheme()
 			fluxVector[i][j][IP] = 0.5 * (fluxVector1[i][j][IP] + fluxVector2[i][j][IP] - flux_add[IP]);
 		}
 	}
+#ifdef _OPENMP
+	}
+#endif // _OPENMP
+
 }
 
 double Flux_Solver::Enthalpy(double rho, double u, double v, double p, double gama)

@@ -22,6 +22,9 @@ void Time_Step::Compute_Time_Step()
 	double gama  = 1.4;
 
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for shared( a_max )
+#endif
 	for (int i = ist; i < ied; i++)
 	{
 		for (int j = jst; j < jed; j++)
@@ -34,8 +37,15 @@ void Time_Step::Compute_Time_Step()
 			double p   = qField[i][j][IP];
 
 			double a = sqrt(fabs(gama * p / rho));
-
+			//a_max = max(a, a_max);
+#ifdef _OPENMP
+#pragma omp critical
+			{
+				a_max = max(a, a_max);
+			}
+#else
 			a_max = max(a, a_max);
+#endif // _OPENMP	
 		}
 	}
 

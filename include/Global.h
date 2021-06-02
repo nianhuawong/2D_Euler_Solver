@@ -92,3 +92,6 @@ void Primitive_To_Conservative(VDouble& primitive, VDouble& conservative);
 void Conservative_To_Primitive(VDouble& conservative, VDouble& primitive);
 bool Need_Stop_Iteration();
 bool IsNaN(VDouble& data);
+
+clock_t Get_Current_Time();
+double GetClockTicksPerSecond();
