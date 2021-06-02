@@ -5,3 +5,5 @@
 /.vs
 /out/build/x64-Debug
 /Jacobian.m
+/build
+/out

@@ -9,7 +9,6 @@
 
 int main(int argc, char ** argv )
 {
-	void InitializeOpenMP(char** argv);
 #ifdef _OPENMP
 	InitializeOpenMP(argv);
 #endif

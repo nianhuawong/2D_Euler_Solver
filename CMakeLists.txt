@@ -19,7 +19,7 @@ project ("2D_Euler_Solver")
 #message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 #endif()
 
-set(CMAKE_CXX_FLAGS    -openmp)
+#set(CMAKE_CXX_FLAGS    -openmp)
 #set(OMP_NUM_THREADS   4)
 
 #包含目录

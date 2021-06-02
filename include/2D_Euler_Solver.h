@@ -10,6 +10,8 @@ public:
 	void Run();
 };
 
+void InitializeOpenMP(char** argv);
+
 void Init_Global_Param();
 void Generate_Mesh();
 void Init_Flow();

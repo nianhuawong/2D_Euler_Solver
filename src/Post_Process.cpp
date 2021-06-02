@@ -107,7 +107,7 @@ void Output_Flowfield()
 		 << "\tphysical_time = "    << physical_time
 		 << "\ttime_elapsed  = "	<< static_cast<double>(nowTime - lastTime) / GetClockTicksPerSecond()
 		 << " seconds"  << endl << endl;
-	lastTime = nowTime;
+	//lastTime = nowTime;
 
 	if (flag1 == 0) //flag1=0,中间步，输出抬头
 	{
