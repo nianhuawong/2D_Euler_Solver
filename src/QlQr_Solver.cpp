@@ -1,11 +1,12 @@
 #include <iostream>
+#include <cmath>
 #include "QlQr_Solver.h"
 #include "Geometry.h"
 #include "2D_Euler_Solver.h"
 
 void Solve_QlQr()
 {
-	auto * half_node_q = new QlQr_Solver();
+	QlQr_Solver* half_node_q = new QlQr_Solver();
 
 	half_node_q->Solve_QlQr();
 
@@ -435,7 +436,7 @@ double minmod_limiter(double a, double b)
 
 double vanleer_limiter(double a, double)
 {
-	return (a + abs(a)) / (1.0 + abs(a));
+	return (a + fabs(a)) / (1.0 + fabs(a));
 }
 
 double superbee_limiter(double a, double)

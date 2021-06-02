@@ -8,7 +8,7 @@
 VDouble3D rhs;
 void Solve_Spatial_Derivative()
 {
-	auto* spatial_derivative = new Spatial_Derivative();
+	Spatial_Derivative* spatial_derivative = new Spatial_Derivative();
 
 	spatial_derivative->Compute_Spatial_Derivative();
 

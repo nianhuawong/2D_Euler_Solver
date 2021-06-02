@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "Global.h"
 #include "QlQr_Solver.h"
 #include "Flux_Solver.h"
@@ -9,7 +10,7 @@ VDouble3D fluxVector;
 
 void Solve_Flux()
 {
-	auto* fluxSolver = new Flux_Solver();
+	Flux_Solver* fluxSolver = new Flux_Solver();
 
 	fluxSolver->Solve_Flux();
 
@@ -506,7 +507,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 			double u = qField[i][j][IU];
 			double v = qField[i][j][IV];
 			double p = qField[i][j][IP];
-			double a = sqrt(abs(gama * p / rho));
+			double a = sqrt(fabs(gama * p / rho));
 
 			double lmd1 = u;
 			double lmd3 = u - a;
@@ -547,7 +548,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 			double u = qField[i][j][IU];
 			double v = qField[i][j][IV];
 			double p = qField[i][j][IP];
-			double a = sqrt(abs(gama * p / rho));
+			double a = sqrt(fabs(gama * p / rho));
 
 			double mu1 = v;
 			double mu3 = v - a;
@@ -588,7 +589,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
 			double p   = qField1[i][j][IP];
-			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+			double a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			double lmd1 = u;
 			double lmd3 = u - a;
@@ -605,7 +606,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 			u   = qField2[i][j][IU];
 			v   = qField2[i][j][IV];
 			p   = qField2[i][j][IP];
-			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+			a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			lmd1 = u;
 			lmd3 = u - a;
@@ -639,7 +640,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
 			double p   = qField1[i][j][IP];
-			double a   = sqrt(abs(gama * p / rho));//声速取绝对值
+			double a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			double mu1 = v;
 			double mu3 = v - a;
@@ -656,7 +657,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 			u   = qField2[i][j][IU];
 			v   = qField2[i][j][IV];
 			p   = qField2[i][j][IP];
-			a   = sqrt(abs(gama * p / rho));//声速取绝对值
+			a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			mu1 = v;
 			mu3 = v - a;
@@ -674,7 +675,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 
 void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd)
 {
-	double a = sqrt(abs(gama * p / rho));//声速取绝对值
+	double a = sqrt(fabs(gama * p / rho));//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
 	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  lmd[0] +			 lmd[1] +			lmd[2]);
@@ -685,7 +686,7 @@ void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, doubl
 
 void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu)
 {
-	double a = sqrt(abs(gama * p / rho));	//声速取绝对值
+	double a = sqrt(fabs(gama * p / rho));	//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
 	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  mu[0] +			mu[1] +			  mu[2]);
@@ -743,7 +744,7 @@ void Flux_Solver::Roe_Scheme()
 			double v_roe = (v1 + v2 * D) / (1 + D);
 			double H_roe = (H1 + H2 * D) / (1 + D);
 			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
-			double c_roe = sqrt(abs(c2_roe));//声速取绝对值
+			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			
@@ -789,7 +790,7 @@ void Flux_Solver::EntropyFix(double& lamda1, double& lamda2, double& lamda3, dou
 void Flux_Solver::EntropyFix_Harten(double &lamda)
 {
 	double eps = entropy_fix_coeff;
-	lamda = abs(lamda) > eps ? abs(lamda) : ((lamda * lamda + eps * eps) / 2.0 / eps);
+	lamda = fabs(lamda) > eps ? fabs(lamda) : ((lamda * lamda + eps * eps) / 2.0 / eps);
 }
 
 void Flux_Solver::Compute_Jacobian(VDouble2D& Jacobian, double u, double v, double a, double h)

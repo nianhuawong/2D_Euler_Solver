@@ -1,3 +1,4 @@
+#include <cmath>
 #include "Time_Step.h"
 #include "Geometry.h"
 #include "Global.h"
@@ -5,7 +6,7 @@
 
 void Solve_Time_Step()
 {
-	auto* time_step_solver = new Time_Step();
+	Time_Step* time_step_solver = new Time_Step();
 	time_step_solver->Compute_Time_Step();
 	delete time_step_solver;
 }
@@ -32,7 +33,7 @@ void Time_Step::Compute_Time_Step()
 			double v   = qField[i][j][IV];
 			double p   = qField[i][j][IP];
 
-			double a = sqrt(abs(gama * p / rho));
+			double a = sqrt(fabs(gama * p / rho));
 
 			a_max = max(a, a_max);
 		}

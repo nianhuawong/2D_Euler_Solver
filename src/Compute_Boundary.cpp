@@ -1,3 +1,4 @@
+#include <cmath>
 #include "2D_Euler_Solver.h"
 #include "Geometry.h"
 #include "QlQr_Solver.h"

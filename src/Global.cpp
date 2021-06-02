@@ -31,12 +31,12 @@ void Init_Global_Param()
 	max_simu_time	  = 0.2;
 	method_of_half_q  = 1;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
 	muscl_k			  = 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
-	method_of_limiter = 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee	4-1st;
+	method_of_limiter = 2;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee	4-1st;
 	method_of_flux    = 1;		//1-Roe,	  2-Steger Warming  3-WENO,		  4-WCNS
 	entropy_fix_coeff = 0.01;	//Roe格式熵修正系数epsilon
 
-	num_grid_point_x = 241;
-	num_grid_point_y = 61;
+	num_grid_point_x = 1921;
+	num_grid_point_y = 481;
 
 	solve_direction  = 'x';
 

@@ -1,15 +1,17 @@
-#include "Post_Process.h"
 #include <fstream>
 #include <iostream>
+#include <cmath>
+#include "Post_Process.h"
 #include "Global.h"
 #include "QlQr_Solver.h"
 #include "Geometry.h"
 #include <iomanip>
+#include "Spatial_Derivative.h"
 
 bool stop_by_residual = 0;
 void Compute_Residual()
 {
-	auto* residual_solver = new Residual();
+	Residual* residual_solver = new Residual();
 
 	residual_solver->Compute_Residual();
 
@@ -39,14 +41,13 @@ void Residual::Compute_Residual()
 			{
 				if (marker[i][j] == 0) continue;
 				
-				double res1 = abs( qField_N1[i][j][iVar] - qField[i][j] [iVar]);
-
+				double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j] [iVar]);
+				//double res1 = fabs(rhs[i][j][iVar]);
 				double res2 = res1 * res1;
+				res_max = max(res1, res_max);
 
-				res_max = res1 > res_max ? res1 : res_max;
-
-				res_L1[iVar] += res1;
-				res_L2[iVar] += res2;
+				res_L1 [iVar] += res1;
+				res_L2 [iVar] += res2;
 				res_Loo[iVar] = res_max;
 
 				count++;
@@ -67,14 +68,14 @@ void Residual::OutputResidual()
 
 	if (flag2)
 	{
-		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;
+		cout << "Iteration\trho_res_L2\tu_res_L2\tv_res_L2\tp_res_L2" << endl;
 	}
 	cout << setiosflags(ios::left);
 	cout << setiosflags(ios::scientific);
 	cout << setprecision(5);
 	cout << current_step	<< "\t        "
-		 << res_Loo[IR]		<< "\t" << res_Loo[IU] << "\t"
-		 << res_Loo[IV]		<< "\t" << res_Loo[IP] << endl;
+		 << res_L2[IR]		<< "\t" << res_L2[IU] << "\t"
+		 << res_L2[IV]		<< "\t" << res_L2[IP] << endl;
 
 	if (res_Loo[IR] < converge_criterion &&
 		res_Loo[IU] < converge_criterion &&

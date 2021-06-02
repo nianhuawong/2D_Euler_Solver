@@ -9,7 +9,7 @@
 
 void Time_Integration()
 {
-	auto* time_marching = new Time_Marching_Solver();
+	Time_Marching_Solver* time_marching = new Time_Marching_Solver();
 	time_marching->Time_Marching();
 	delete time_marching;
 }
@@ -71,9 +71,12 @@ void Update_Flowfield(int iStage)
 			} 
 
 			Conservative_To_Primitive(qConservative1, qPrimitive1);
+			
+			//qPrimitive1[IP] = fabs(qPrimitive1[IP]);	//保证压力不出负
+			//qPrimitive1[IP] = min(qPrimitive1[IP], 5.0* qPrimitive0[IP]);
+
 			//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 			qField_N1[i][j] = qPrimitive1;	
-
 			if ( IsNaN(qPrimitive1) )
 			{
 				int kkk = 1;
