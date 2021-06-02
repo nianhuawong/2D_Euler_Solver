@@ -102,7 +102,13 @@ void Output_Flowfield()
 	bool flag1 = Need_Stop_Iteration();			//flag1=1,退出迭代，需要输出流场；flag1=0,中间步，不输出
 	if (flag0 && flag1==0) return;
 
-	cout << "dumping flowfield..."  << "\tIter = " << current_step << "\tphysical_time =" << physical_time << endl << endl;
+	nowTime = clock(); 
+	cout << "dumping flowfield..."  << "\tIter = "   << current_step 
+		 << "\tphysical_time = "    << physical_time
+		 << "\ttime_elapsed  = "	<< static_cast<double>(nowTime - lastTime) / CLOCKS_PER_SEC 
+		 << " seconds"  << endl << endl;
+	lastTime = nowTime;
+
 	if (flag1 == 0) //flag1=0,中间步，输出抬头
 	{
 		cout << "Iteration\trho_res_Loo\tu_res_Loo\tv_res_Loo\tp_res_Loo" << endl;

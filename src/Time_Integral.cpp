@@ -50,7 +50,10 @@ void Update_Flowfield(int iStage)
 	VDouble qPrimitive1   (num_of_prim_vars);
 	VDouble qConservative0(num_of_prim_vars);
 	VDouble qConservative1(num_of_prim_vars);
-	
+
+//#ifdef _OPENMP
+//#pragma omp parallel for
+//#endif	
 	for (int j = jst; j < jed; j++)
 	{
 		for (int i = ist; i < ied; i++)

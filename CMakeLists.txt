@@ -5,10 +5,10 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("2D_Euler_Solver")
 
-set(CMAKE_CXX_COMPILER  g++)
+#set(CMAKE_CXX_COMPILER  g++)
 
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#include(CheckCXXCompilerFlag)
+#CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 #CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 
 #if(COMPILER_SUPPORTS_CXX11)
@@ -18,6 +18,9 @@ CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 #else()
 #message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 #endif()
+
+set(CMAKE_CXX_FLAGS    -openmp)
+#set(OMP_NUM_THREADS   4)
 
 #包含目录
 include_directories("./include")

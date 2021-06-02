@@ -26,8 +26,8 @@ Flux_Solver::Flux_Solver()
 	Allocate_3D_Vector(fluxVector,  num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(fluxVector1, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(fluxVector2, num_half_point_x, num_half_point_y, num_of_prim_vars);
-
-	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+	
+	//Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 }
 
 void Flux_Solver::Solve_Flux()
@@ -386,6 +386,9 @@ void Flux_Solver::Flux_LR_Roe_X()
 	//for (int j = jst; j < jed - 1; j++)
 	//{
 	//	for (int i = ist; i < ied - 1; i++)
+//#ifdef _OPENMP
+//#pragma omp parallel for
+//#endif
 	for (int j = 0; j < num_half_point_y; j++)
 	{
 		for (int i = 0; i < num_half_point_x; i++)
@@ -415,6 +418,9 @@ void Flux_Solver::Flux_LR_Roe_Y()
 	//for (int i = ist; i < ied - 1; i++)
 	//{
 	//	for (int j = jst; j < jed - 1; j++)
+//#ifdef _OPENMP
+//#pragma omp parallel for
+//#endif
 	for (int i = 0; i < num_half_point_x; i++)
 	{
 		for (int j = 0; j < num_half_point_y; j++)
@@ -719,9 +725,12 @@ void Flux_Solver::Roe_Scheme()
 	//for (int j = jst; j < jed - 1; j++)
 	//{
 	//	for (int i = ist; i < ied - 1; i++)
-	for (int j = 0; j < num_half_point_y; j++)
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (int i = 0; i < num_half_point_x; i++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int j = 0; j < num_half_point_y; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -745,6 +754,9 @@ void Flux_Solver::Roe_Scheme()
 			double H_roe = (H1 + H2 * D) / (1 + D);
 			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
 			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值
+			
+			VDouble2D Jacobian_A;
+			Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 
 			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
 			

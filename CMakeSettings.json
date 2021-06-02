@@ -8,8 +8,7 @@
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": ""
+      "buildCommandArgs": ""
     },
     {
       "name": "x64-Release",
@@ -19,7 +18,6 @@
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
-      "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ]
     },
     {

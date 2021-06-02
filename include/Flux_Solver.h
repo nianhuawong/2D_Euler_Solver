@@ -13,7 +13,7 @@ protected:
 	int ist, ied, jst, jed;
 	VDouble3D fluxVector1;
 	VDouble3D fluxVector2;
-	VDouble2D Jacobian_A;
+	//VDouble2D Jacobian_A;
 
 public:
 	void Solve_Flux();

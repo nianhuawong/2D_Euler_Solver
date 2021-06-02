@@ -1,8 +1,18 @@
 ﻿#include "2D_Euler_Solver.h"
 #include "Global.h"
 
+#ifdef _OPENMP
+#include <iostream>
+#include <omp.h>
+#include <cstdlib>
+#endif
+
 int main(int argc, char ** argv )
 {
+	void InitializeOpenMP(char** argv);
+#ifdef _OPENMP
+	InitializeOpenMP(argv);
+#endif
 	Simulation * two_dim_Euler_Solver = new Simulation();
 
 	two_dim_Euler_Solver->Run();
@@ -49,3 +59,34 @@ void Simulation::Run()
 
 	Output_Flowfield();	
 }
+
+#ifdef _OPENMP
+void InitializeOpenMP(char** argv)
+{
+	int num_threads = 1;//无命令行参数，默认为单线程
+	if (argv[1] != NULL)
+	{
+		num_threads = atoi(argv[1]);
+	}
+
+#ifdef WIN32	
+	omp_set_num_threads(num_threads);
+#else	
+	int omp_num_threads = omp_get_num_threads();//环境变量OMP_NUM_THREADS
+	if (omp_num_threads != num_threads && argv[1] != NULL)
+	{
+		cout << "同时存在环境变量和命令行参数，以命令行线程数为准！" << endl;
+		omp_set_num_threads(num_threads);
+	}
+#endif
+#pragma omp parallel 
+	{
+		if (omp_get_thread_num() == 0)
+		{
+			cout << "OpenMP线程级并行已开启，线程总数为: num_of_threads =" 
+				 << omp_get_num_threads() << endl;
+		}
+		//cout << "Hello world from open mp thread " << omp_get_thread_num() << endl;
+	}
+}
+#endif

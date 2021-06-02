@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <ctime>
 using namespace std;
 
 #define IR 0
@@ -34,6 +35,7 @@ extern bool stop_by_residual;
 extern string tec_file_name;
 extern int num_of_RK_stages;
 extern VDouble2D RK_Coeff;
+extern clock_t lastTime, nowTime;
 
 template < typename T >
 void Allocate_2D_Vector(vector< vector< T > >& array, int dim1, int dim2)

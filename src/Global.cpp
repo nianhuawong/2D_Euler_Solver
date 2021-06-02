@@ -18,12 +18,15 @@ double converge_criterion;
 string tec_file_name;
 int num_of_RK_stages;
 VDouble2D RK_Coeff;
+clock_t lastTime, nowTime;
 
 void Init_Global_Param()
 {
+	lastTime = clock(); nowTime = lastTime;
+
 	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
 
-	max_num_of_steps = 10000;
+	max_num_of_steps = 100;
 
 	cfl_num   = 0.3;
 	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
@@ -35,8 +38,8 @@ void Init_Global_Param()
 	method_of_flux    = 1;		//1-Roe,	  2-Steger Warming  3-WENO,		  4-WCNS
 	entropy_fix_coeff = 0.01;	//Roe格式熵修正系数epsilon
 
-	num_grid_point_x = 1921;
-	num_grid_point_y = 481;
+	num_grid_point_x = 241;
+	num_grid_point_y = 61;
 
 	solve_direction  = 'x';
 
