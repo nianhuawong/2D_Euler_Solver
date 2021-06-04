@@ -12,6 +12,7 @@ protected:
 	VDouble res_L1;
 	VDouble res_L2;
 	VDouble res_Loo;
+	VInt2D max_index;
 	int ist, ied, jst, jed;
 public:
 	void Compute_Residual();

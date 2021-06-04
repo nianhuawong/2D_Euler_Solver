@@ -23,6 +23,7 @@ Residual::Residual()
 	res_L1.resize (num_of_prim_vars);
 	res_L2.resize (num_of_prim_vars);
 	res_Loo.resize(num_of_prim_vars);
+	Allocate_2D_Vector(max_index, num_of_prim_vars, 2);
 
 	Get_IJK_Region(ist, ied, jst, jed);
 }
@@ -41,10 +42,17 @@ void Residual::Compute_Residual()
 			{
 				if (marker[i][j] == 0) continue;
 				
-				double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j] [iVar]);
+				double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j][iVar]);
 				//double res1 = fabs(rhs[i][j][iVar]);
 				double res2 = res1 * res1;
-				res_max = max(res1, res_max);
+
+				if (res1 > res_max)
+				{
+					res_max = res1;
+					max_index[iVar][0] = i;
+					max_index[iVar][1] = j;
+				}
+				//res_max = max(res1, res_max);
 
 				res_L1 [iVar] += res1;
 				res_L2 [iVar] += res2;
