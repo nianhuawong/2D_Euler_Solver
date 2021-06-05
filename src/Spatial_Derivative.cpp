@@ -118,6 +118,9 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = ist + 1; i <= ied - 1; i++)	//i=0, 1, 2，ied, ied+1, ied+2没有算
@@ -169,6 +172,9 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 	
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = jst + 1; j <= jed - 1; j++)//j=0, 1, 2，jed, jed+1, jed+2没有算

@@ -295,6 +295,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 	double ds = dx;
 
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)//i=0,1,ied+1,ied+2没有值
 	{
 		for (int j = jst; j <= jed; j++)
@@ -317,7 +320,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 	Allocate_3D_Vector(IS1, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS2, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS3, total_points_x, total_points_y, num_of_prim_vars);
-
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)//i=0,1,ied+1,ied+2没有值
 	{
 		for (int j = jst; j <= jed; j++)
@@ -337,6 +342,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 	double eps = 1e-6;
 
 	//j+1/2处的变量左右值
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied - 1; i++)//从内场点开始，虚拟点的ql和qr在后面用边界格式计算
 	{
 		for (int j = jst; j <= jed; j++)
@@ -394,6 +402,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	double ds = dy;
 
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = jst; j <= jed; j++)//j=0,1,jed+1,jed+2没有值
@@ -416,7 +427,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	Allocate_3D_Vector(IS1, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS2, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS3, total_points_x, total_points_y, num_of_prim_vars);
-
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = jst; j <= jed; j++)//j=0,1,jed+1,jed+2没有值
@@ -436,6 +449,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	double eps = 1e-6;
 
 	//j+1/2处的变量左右值和通量
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = jst; j <= jed - 1; j++)//j=0,1,jed,jed+1没有值,后续由边界格式计算
@@ -476,7 +492,6 @@ void QlQr_Solver::QlQr_WCNS_Y()
 		}
 	}
 }
-
 
 double QlQr_Solver::Limiter_Function( double ita )
 {
