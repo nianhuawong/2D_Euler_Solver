@@ -219,7 +219,7 @@ void QlQr_Solver::QlQr_WCNS()
 }
 void QlQr_Solver::Boundary_QlQr_WCNS_X()
 {
-	for (int j = jst; j <= jed; j++)
+	for (int j = jst; j <= jed; j++)//确定i=0,1,ied,ied+1的值
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
@@ -250,7 +250,7 @@ void QlQr_Solver::Boundary_QlQr_WCNS_X()
 
 void QlQr_Solver::Boundary_QlQr_WCNS_Y()
 {
-	for (int i = ist; i <= ied; i++)
+	for (int i = ist; i <= ied; i++)//确定j=0,1,jed,jed+1的值
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
@@ -295,7 +295,7 @@ void QlQr_Solver::QlQr_WCNS_X()
 	double ds = dx;
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i <= ied; i++)
+	for (int i = ist; i <= ied; i++)//i=0,1,ied+1,ied+2没有值
 	{
 		for (int j = jst; j <= jed; j++)
 		{
@@ -318,7 +318,7 @@ void QlQr_Solver::QlQr_WCNS_X()
 	Allocate_3D_Vector(IS2, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS3, total_points_x, total_points_y, num_of_prim_vars);
 
-	for (int i = ist; i <= ied; i++)
+	for (int i = ist; i <= ied; i++)//i=0,1,ied+1,ied+2没有值
 	{
 		for (int j = jst; j <= jed; j++)
 		{
@@ -382,21 +382,21 @@ void QlQr_Solver::QlQr_WCNS_Y()
 {
 	//计算Lagrange插值系数
 	VDouble3D g1, g2, g3;
-	Allocate_3D_Vector(g1, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(g2, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(g3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(g1, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(g2, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(g3, total_points_x, total_points_y, num_of_prim_vars);
 
 	VDouble3D s1, s2, s3;
-	Allocate_3D_Vector(s1, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(s2, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(s3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(s1, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(s2, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(s3, total_points_x, total_points_y, num_of_prim_vars);
 
 	double ds = dy;
 
 	VInt2D& marker = mesh->Get_Marker();
 	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j <= jed; j++)
+		for (int j = jst; j <= jed; j++)//j=0,1,jed+1,jed+2没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -413,13 +413,13 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	}
 	//计算光滑因子
 	VDouble3D IS1, IS2, IS3;
-	Allocate_3D_Vector(IS1, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(IS2, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(IS3, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS1, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS2, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(IS3, total_points_x, total_points_y, num_of_prim_vars);
 
 	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j <= jed; j++)
+		for (int j = jst; j <= jed; j++)//j=0,1,jed+1,jed+2没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -438,7 +438,7 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	//j+1/2处的变量左右值和通量
 	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j <= jed - 1; j++)
+		for (int j = jst; j <= jed - 1; j++)//j=0,1,jed,jed+1没有值,后续由边界格式计算
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)

@@ -120,7 +120,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 	VInt2D& marker = mesh->Get_Marker();
 	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = ist + 1; i <= ied - 1; i++)	//i=0, 1, 2，ied, ied+1没有算
+		for (int i = ist + 1; i <= ied - 1; i++)	//i=0, 1, 2，ied, ied+1, ied+2没有算
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -141,8 +141,8 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 			}
 		}
 	}
-	//边界处导数i=1, 2，ied, ied+1
-	for (int j = jst; j < jed; j++)
+	//边界处导数i=1, 2，ied, ied+1.
+	for (int j = jst; j <= jed; j++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
@@ -171,7 +171,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 	VInt2D& marker = mesh->Get_Marker();
 	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst + 1; j <= jed - 1; j++)
+		for (int j = jst + 1; j <= jed - 1; j++)//j=0, 1, 2，jed, jed+1, jed+2没有算
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -188,7 +188,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 		}
 	}
 	//边界处导数j=1, 2，jed, jed+1
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
