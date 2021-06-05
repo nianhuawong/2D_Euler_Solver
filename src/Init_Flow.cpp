@@ -62,7 +62,7 @@ void Init_Flow_Double_Mach()
 				qField[i][j][IV] = -8.25 * sin(PI / 6);
 				qField[i][j][IP] = 116.5;
 			}
-			else //if (x_node > (1.0 / 6.0 + y_node / tan(PI / 3)))
+			else if (x_node > (1.0 / 6.0 + y_node / tan(PI / 3)))
 			{
 				qField[i][j][IR] = 1.4;
 				qField[i][j][IU] = 0.0;
