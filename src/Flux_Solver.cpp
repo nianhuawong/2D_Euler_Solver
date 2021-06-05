@@ -210,10 +210,24 @@ void Flux_Solver::WENO_Scheme_X()
 			}
 		}
 	}
-//
-// 	   i=0,1,ied,ied+1处的通量值
-// 	   
-// 
+
+	//i=0,1,ied,ied+1处的通量值
+	for (int j = jst; j <= jed; j++)
+	{
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		{
+			fluxVector1[0][j][iVar] = fluxVector1[2][j][iVar];
+			fluxVector1[1][j][iVar] = fluxVector1[2][j][iVar];
+			fluxVector1[ied    ][j][iVar] = fluxVector1[ied - 1][j][iVar];
+			fluxVector1[ied + 1][j][iVar] = fluxVector1[ied - 1][j][iVar];
+
+			fluxVector2[0][j][iVar] = fluxVector2[2][j][iVar];
+			fluxVector2[1][j][iVar] = fluxVector2[2][j][iVar];
+			fluxVector2[ied    ][j][iVar] = fluxVector2[ied - 1][j][iVar];
+			fluxVector2[ied + 1][j][iVar] = fluxVector2[ied - 1][j][iVar];
+		}
+	}
+
 	//半节点通量值：Steger_Warming进行正负通量相加
 	for (int j = jst; j <= jed; j++)
 	{
@@ -365,9 +379,23 @@ void Flux_Solver::WENO_Scheme_Y()
 		}
 	}
 
-	// 	   i=0,1,ied,ied+1处的通量值
-	// 	   
-	// 
+	//j=0,1,jed,jed+1处的通量值
+	for (int i = ist; i <= ied; i++)
+	{
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		{
+			fluxVector1[i][0      ][iVar] = fluxVector1[i][2	  ][iVar];
+			fluxVector1[i][1      ][iVar] = fluxVector1[i][2	  ][iVar];
+			fluxVector1[i][jed    ][iVar] = fluxVector1[i][jed - 1][iVar];
+			fluxVector1[i][jed + 1][iVar] = fluxVector1[i][jed - 1][iVar];
+
+			fluxVector2[i][0	  ][iVar] = fluxVector2[i][2	  ][iVar];
+			fluxVector2[i][1	  ][iVar] = fluxVector2[i][2	  ][iVar];
+			fluxVector2[i][jed    ][iVar] = fluxVector2[i][jed - 1][iVar];
+			fluxVector2[i][jed + 1][iVar] = fluxVector2[i][jed - 1][iVar];
+		}
+	}
+
 	//半节点通量值：Steger_Warming进行正负通量相加
 	for (int j = jst; j <= jed; j++)
 	{
