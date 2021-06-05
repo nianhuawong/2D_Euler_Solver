@@ -18,17 +18,15 @@ protected:
 public:
 	void Solve_Flux();
 protected:
-	void Flux_LR_Roe();
-	void Flux_LR_Roe_X();
-	void Flux_LR_Roe_Y();
 	void Roe_Scheme();
+	void Roe_Scheme_X();
+	void Roe_Scheme_Y();
 
-	void Flux_LR_Steger_Warming();
-	void Flux_LR_Steger_Warming_X();
-	void Flux_LR_Steger_Warming_Y();
-	void Flux_LR_Steger_Warming_Interp_X();
-	void Flux_LR_Steger_Warming_Interp_Y();
 	void Steger_Warming_Scheme();
+	void Steger_Warming_Scheme_X();
+	void Steger_Warming_Scheme_Y();
+	void Steger_Warming_Scheme_Interp_X();
+	void Steger_Warming_Scheme_Interp_Y();
 
 	void WENO_Scheme();
 	void WENO_Scheme_X();

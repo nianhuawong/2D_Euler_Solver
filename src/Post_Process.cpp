@@ -36,9 +36,9 @@ void Residual::Compute_Residual()
 		int count = 0;
 		double res_max = -1e40;
 		
-		for (int i = ist; i < ied; i++)
+		for (int i = ist; i <= ied; i++)
 		{
-			for (int j = jst; j < jed; j++)
+			for (int j = jst; j <= jed; j++)
 			{
 				if (marker[i][j] == 0) continue;
 				
@@ -139,9 +139,9 @@ void Output_Flowfield()
 
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = ist; i < ied; i++)
+		for (int i = ist; i <= ied; i++)
 		{
 			//if (marker[i][j] == 0) continue;
 

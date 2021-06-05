@@ -68,19 +68,19 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_X()
 {
 	//VInt2D& marker = mesh->Get_Marker();
 
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			qField1[0][j][iVar] = qField[0][j][iVar];
+			qField1[0][j][iVar] = qField[0][j][iVar]; //虚拟点i=0, ied + 1的值还没有
 			qField2[0][j][iVar] = qField[1][j][iVar];
-			qField1[1][j][iVar] = qField[1][j][iVar];
-			qField2[1][j][iVar] = qField[2][j][iVar];
+			//qField1[1][j][iVar] = qField[1][j][iVar];
+			//qField2[1][j][iVar] = qField[2][j][iVar];
 
-			qField1[ied - 1][j][iVar] = qField[ied - 1][j][iVar];
-			qField2[ied - 1][j][iVar] = qField[ied    ][j][iVar];
-			qField1[ied    ][j][iVar] = qField[ied    ][j][iVar];
-			qField2[ied    ][j][iVar] = qField[ied + 1][j][iVar];
+			//qField1[ied][j][iVar] = qField[ied - 1][j][iVar];
+			//qField2[ied][j][iVar] = qField[ied    ][j][iVar];
+			qField1[ied + 1][j][iVar] = qField[ied + 1][j][iVar];
+			qField2[ied + 1][j][iVar] = qField[ied + 2][j][iVar];
 		}
 	}
 }
@@ -101,19 +101,19 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_Y()
 	//	}
 	//}
 
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)//虚拟点j=0, jed + 1的值还没有
 		{
 			qField1[i][0][iVar] = qField[i][0][iVar];
 			qField2[i][0][iVar] = qField[i][1][iVar];
-			qField1[i][1][iVar] = qField[i][1][iVar];
-			qField2[i][1][iVar] = qField[i][2][iVar];
+			//qField1[i][1][iVar] = qField[i][1][iVar];
+			//qField2[i][1][iVar] = qField[i][2][iVar];
 
-			qField1[i][jed - 1][iVar] = qField[i][jed - 1][iVar];
-			qField2[i][jed - 1][iVar] = qField[i][jed    ][iVar];
-			qField1[i][jed    ][iVar] = qField[i][jed    ][iVar];
-			qField2[i][jed    ][iVar] = qField[i][jed + 1][iVar];
+			//qField1[i][jed - 1][iVar] = qField[i][jed - 1][iVar];
+			//qField2[i][jed - 1][iVar] = qField[i][jed    ][iVar];
+			qField1[i][jed + 1][iVar] = qField[i][jed + 1][iVar];
+			qField2[i][jed + 1][iVar] = qField[i][jed + 2][iVar];
 		}
 	}
 }
@@ -125,9 +125,9 @@ void QlQr_Solver::QlQr_MUSCL_X()
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = 1; i <= ied; i++)  //虚拟点i=0, ied + 1的值还没有
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			if ( (i==16 &&j==2) )//|| ((i==60||i == 61) && j == 62))
@@ -176,9 +176,9 @@ void QlQr_Solver::QlQr_MUSCL_Y()
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = 1; j <= jed; j++) //虚拟点j=0, jed + 1的值还没有
 		{
 			if (marker[i][j] == 0) continue;
 			if ((i == 16 && j == 2))//|| ((i==60||i == 61) && j == 62))
@@ -231,7 +231,7 @@ void QlQr_Solver::QlQr_WCNS()
 }
 void QlQr_Solver::Boundary_QlQr_WCNS_X()
 {
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
@@ -243,25 +243,26 @@ void QlQr_Solver::Boundary_QlQr_WCNS_X()
 											 - 70  * qField[3][j][iVar] + 28  * qField[4][j][iVar] 
 											 - 5   * qField[5][j][iVar]);
 
-			qField1[ied    ][j][iVar] = 1.0 / 128 * (315 * qField[ied    ][j][iVar] - 420 * qField[ied - 1][j][iVar]
-											       + 378 * qField[ied - 2][j][iVar] - 180 * qField[ied - 3][j][iVar] 
-											       + 35  * qField[ied - 4][j][iVar]);
+			qField1[ied + 1][j][iVar] = 1.0 / 128 * (315 * qField[ied + 1][j][iVar] - 420 * qField[ied    ][j][iVar]
+											       + 378 * qField[ied - 1][j][iVar] - 180 * qField[ied - 2][j][iVar] 
+											       + 35  * qField[ied - 3][j][iVar]);
 
-			qField1[ied - 1][j][iVar] = 1.0 / 128 * (35 * qField[ied    ][j][iVar] + 140 * qField[ied - 1][j][iVar]
-											       - 70 * qField[ied - 2][j][iVar] + 28  * qField[ied - 3][j][iVar] 
-											       - 5  * qField[ied - 4][j][iVar]);
+			qField1[ied    ][j][iVar] = 1.0 / 128 * (35 * qField[ied + 1][j][iVar] + 140 * qField[ied    ][j][iVar]
+											       - 70 * qField[ied - 1][j][iVar] + 28  * qField[ied - 2][j][iVar] 
+											       - 5  * qField[ied - 3][j][iVar]);
 
 			qField2[0][j][iVar] = qField1[0][j][iVar];
 			qField2[1][j][iVar] = qField1[1][j][iVar];
-			qField2[ied - 1][j][iVar] = qField1[ied - 1][j][iVar];
+
 			qField2[ied    ][j][iVar] = qField1[ied    ][j][iVar];
+			qField2[ied + 1][j][iVar] = qField1[ied + 1][j][iVar];
 		}
 	}
 }
 
 void QlQr_Solver::Boundary_QlQr_WCNS_Y()
 {
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
@@ -273,18 +274,19 @@ void QlQr_Solver::Boundary_QlQr_WCNS_Y()
 											 - 70  * qField[i][3][iVar] + 28  * qField[i][4][iVar] 
 											 - 5   * qField[i][5][iVar]);
 
-			qField1[i][jed    ][iVar] = 1.0 / 128 * (315 * qField[i][jed    ][iVar] - 420 * qField[i][jed - 1][iVar]
-											       + 378 * qField[i][jed - 2][iVar] - 180 * qField[i][jed - 3][iVar] 
-											       + 35  * qField[i][jed - 4][iVar]);
+			qField1[i][jed + 1][iVar] = 1.0 / 128 * (315 * qField[i][jed + 1][iVar] - 420 * qField[i][jed    ][iVar]
+											       + 378 * qField[i][jed - 1][iVar] - 180 * qField[i][jed - 2][iVar] 
+											       + 35  * qField[i][jed - 3][iVar]);
 
-			qField1[i][jed - 1][iVar] = 1.0 / 128 * (35 * qField[i][jed    ][iVar] + 140 * qField[i][jed - 1][iVar]
-											       - 70 * qField[i][jed - 2][iVar] + 28  * qField[i][jed - 3][iVar] 
-											       - 5  * qField[i][jed - 4][iVar]);
+			qField1[i][jed    ][iVar] = 1.0 / 128 * (35 * qField[i][jed + 1][iVar] + 140 * qField[i][jed    ][iVar]
+											       - 70 * qField[i][jed - 1][iVar] + 28  * qField[i][jed - 2][iVar] 
+											       - 5  * qField[i][jed - 3][iVar]);
 
 			qField2[i][0][iVar] = qField1[i][0][iVar];
 			qField2[i][1][iVar] = qField1[i][1][iVar];
-			qField2[i][jed - 1][iVar] = qField1[i][jed - 1][iVar];
-			qField2[i][jed - 1][iVar] = qField1[i][jed - 1][iVar];
+
+			qField2[i][jed    ][iVar] = qField1[i][jed    ][iVar];
+			qField2[i][jed + 1][iVar] = qField1[i][jed + 1][iVar];
 		}
 	}
 }
@@ -305,9 +307,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 	double ds = dx;
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -328,9 +330,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 	Allocate_3D_Vector(IS2, total_points_x, total_points_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS3, total_points_x, total_points_y, num_of_prim_vars);
 
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -347,9 +349,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 	double eps = 1e-6;
 
 	//j+1/2处的变量左右值
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i <= ied - 1; i++)//从内场点开始，虚拟点的ql和qr在后面用边界格式计算
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -404,9 +406,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	double ds = dy;
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -427,9 +429,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	Allocate_3D_Vector(IS2, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS3, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -446,9 +448,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 	double eps = 1e-6;
 
 	//j+1/2处的变量左右值和通量
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = jst; j <= jed - 1; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)

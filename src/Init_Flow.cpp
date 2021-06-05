@@ -48,9 +48,9 @@ void Init_Flow_Double_Mach()
 	double gama = 1.4;
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			double x_node, y_node;
 

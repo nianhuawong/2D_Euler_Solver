@@ -38,7 +38,7 @@ void Simulation::Run()
 
 		Solve_Time_Step();
 
-		//Compute_Boundary();
+		Compute_Boundary();
 
 		Set_Solve_Direction('x');
 		Time_Integration();

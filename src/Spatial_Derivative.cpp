@@ -127,9 +127,9 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = ist + 1; i < ied - 1; i++)
+		for (int i = ist + 1; i <= ied - 1; i++)	//i=0, 1, 2，ied, ied+1没有算
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -150,7 +150,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 			}
 		}
 	}
-	//边界处导数
+	//边界处导数i=1, 2，ied, ied+1
 	for (int j = jst; j < jed; j++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -160,14 +160,14 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 							   + 1.0/24 * fluxVector[4][j][iVar]) / ds;
 
 			rhs[2][j][iVar] = (- 1.0/24 * fluxVector[0][j][iVar] -  9.0/8  * fluxVector[1][j][iVar]
-							   + 9.0/8	* fluxVector[2][j][iVar] -  1.0/24 * fluxVector[4][j][iVar]) / ds;
+							   + 9.0/8	* fluxVector[2][j][iVar] -  1.0/24 * fluxVector[3][j][iVar]) / ds;
 
-			rhs[ied - 1][j][iVar] = (- 1.0/24 * fluxVector[ied    ][j][iVar] -  9.0/8  * fluxVector[ied - 1][j][iVar]
-									 + 9.0/8  * fluxVector[ied - 2][j][iVar] -  1.0/24 * fluxVector[ied - 3][j][iVar]) / ds;
+			rhs[ied    ][j][iVar] = (- 1.0/24 * fluxVector[ied + 1][j][iVar] -  9.0/8  * fluxVector[ied    ][j][iVar]
+									 + 9.0/8  * fluxVector[ied - 1][j][iVar] -  1.0/24 * fluxVector[ied - 2][j][iVar]) / ds;
 
-			rhs[ied    ][j][iVar] = (-11.0/12 * fluxVector[ied    ][j][iVar] + 17.0/24 * fluxVector[ied - 1][j][iVar]
-									 + 3.0/8  * fluxVector[ied - 2][j][iVar] -  5.0/24 * fluxVector[ied - 3][j][iVar]
-									 + 1.0/24 * fluxVector[ied - 4][j][iVar]) / ds;
+			rhs[ied + 1][j][iVar] = (-11.0/12 * fluxVector[ied + 1][j][iVar] + 17.0/24 * fluxVector[ied    ][j][iVar]
+									 + 3.0/8  * fluxVector[ied - 1][j][iVar] -  5.0/24 * fluxVector[ied - 2][j][iVar]
+									 + 1.0/24 * fluxVector[ied - 3][j][iVar]) / ds;
 		}
 	}
 }
@@ -178,9 +178,9 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 	
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst + 1; j < jed - 1; j++)
+		for (int j = jst + 1; j <= jed - 1; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -196,7 +196,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 			rhs[i][j] = rhsVector;
 		}
 	}
-	//边界处导数
+	//边界处导数j=1, 2，jed, jed+1
 	for (int i = ist; i < ied; i++)
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -206,14 +206,14 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 							   + 1.0/24 * fluxVector[i][4][iVar]) / ds;
 
 			rhs[i][2][iVar] = (- 1.0/24 * fluxVector[i][0][iVar] -  9.0/8  * fluxVector[i][1][iVar]
-							   + 9.0/8	* fluxVector[i][2][iVar] -  1.0/24 * fluxVector[i][4][iVar]) / ds;
+							   + 9.0/8	* fluxVector[i][2][iVar] -  1.0/24 * fluxVector[i][3][iVar]) / ds;
 
-			rhs[i][jed - 1][iVar] = (- 1.0/24 * fluxVector[i][jed + 0][iVar] -  9.0/8  * fluxVector[i][jed - 1][iVar]
-									 + 9.0/8  * fluxVector[i][jed - 2][iVar] -  1.0/24 * fluxVector[i][jed - 3][iVar]) / ds;
+			rhs[i][jed    ][iVar] = (- 1.0/24 * fluxVector[i][jed + 1][iVar] -  9.0/8  * fluxVector[i][jed    ][iVar]
+									 + 9.0/8  * fluxVector[i][jed - 1][iVar] -  1.0/24 * fluxVector[i][jed - 2][iVar]) / ds;
 
-			rhs[i][jed    ][iVar] = (-11.0/12 * fluxVector[i][jed + 0][iVar] + 17.0/24 * fluxVector[i][jed - 1][iVar]
-									 + 3.0/8  * fluxVector[i][jed - 2][iVar] -  5.0/24 * fluxVector[i][jed - 3][iVar]
-									 + 1.0/24 * fluxVector[i][jed - 4][iVar]) / ds;
+			rhs[i][jed + 1][iVar] = (-11.0/12 * fluxVector[i][jed + 1][iVar] + 17.0/24 * fluxVector[i][jed    ][iVar]
+									 + 3.0/8  * fluxVector[i][jed - 1][iVar] -  5.0/24 * fluxVector[i][jed - 2][iVar]
+									 + 1.0/24 * fluxVector[i][jed - 3][iVar]) / ds;
 		}
 	}
 }

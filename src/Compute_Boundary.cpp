@@ -127,10 +127,10 @@ void Compute_Boundary_Double_Mach()
 	}
 
 	//上边界
-	for (int j = jed; j < total_points_y; j++)
+	for (int j = jed + 1; j <= jed + 2; j++)
 	//for (int j = jed - 1; j < total_points_y; j++)
 	{
-		for (int i = ist; i < ied; i++)
+		for (int i = ist; i <= ied; i++)
 		{
 			double x_node, y_node;
 			grid_points[i][j].Get_Point_Coord(x_node, y_node);
@@ -152,9 +152,9 @@ void Compute_Boundary_Double_Mach()
 	}
 
 	//右边界：outflow
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = ied; i < total_points_x; i++)
+		for (int i = ied + 1; i <= ied + 2; i++)
 		//for (int i = ied - 1; i < total_points_x; i++)
 		{
 			qField[i][j][IR] = qField[i - 1][j][IR];
@@ -165,7 +165,7 @@ void Compute_Boundary_Double_Mach()
 	}
 
 	//下边界
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = jst - 1; j >= 0; j--)
 		//for (int j = jst; j >= 0; j--)

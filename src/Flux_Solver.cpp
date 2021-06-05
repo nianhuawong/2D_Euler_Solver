@@ -24,40 +24,30 @@ Flux_Solver::Flux_Solver()
 	Get_IJK_Region(ist, ied, jst, jed);
 
 	Allocate_3D_Vector(fluxVector,  num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(fluxVector1, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	Allocate_3D_Vector(fluxVector2, num_half_point_x, num_half_point_y, num_of_prim_vars);
+	Allocate_3D_Vector(fluxVector1, total_points_x, total_points_y, num_of_prim_vars);
+	Allocate_3D_Vector(fluxVector2, total_points_x, total_points_y, num_of_prim_vars);
+
 }
 
 void Flux_Solver::Solve_Flux()
 {
 	if (method_of_flux == 1)
 	{
-		Flux_LR_Roe();
 		Roe_Scheme();
 	}
 	else if (method_of_flux == 2)
 	{	
-		Flux_LR_Steger_Warming();
-		Steger_Warming_Scheme();	//二阶Steger_Warming
+		Steger_Warming_Scheme();//二阶Steger_Warming
 	}
 	else if (method_of_flux == 3)
 	{
-		//整数节点通量计算：Steger-Warming方法
-		Flux_LR_Steger_Warming(); 
-
 		//半节点左右通量插值：WENO方法
-		WENO_Scheme();	
-
-		//半节点通量值：Steger_Warming进行正负通量相加
-		Steger_Warming_Scheme();
+		WENO_Scheme();		
 	}
 	else if (method_of_flux == 4)
 	{
 		//WCNS原始变量插值已经做完；
-		//计算半节点左右通量
-		Flux_LR_Roe();	
-		
-		//Roe计算半节点通量
+		//计算半节点左右通量和roe通量
 		Roe_Scheme();	
 	}
 	else
@@ -70,10 +60,12 @@ void Flux_Solver::WENO_Scheme()
 {
 	if (solve_direction == 'x')
 	{
+		this->Steger_Warming_Scheme_X();  //整数节点通量计算：Steger-Warming方法
 		this->WENO_Scheme_X();
 	}
 	else if (solve_direction == 'y')
 	{
+		this->Steger_Warming_Scheme_Y();
 		this->WENO_Scheme_Y();
 	}
 	else
@@ -91,10 +83,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		//for (int i = 0; i < num_half_point_x; i++)
-		for (int i = 1; i < num_half_point_x - 3; i++)
+		for (int i = 1; i <= ied - 1 ; i++)//i=0, ied, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -111,10 +102,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		//for (int i = 0; i < num_half_point_x; i++)
-		for (int i = 2; i < num_half_point_x - 2; i++)
+		for (int i = 2; i <= ied; i++)//i=0, 1, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -131,10 +121,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		//for (int i = 0; i < num_half_point_x; i++)
-		for (int i = 1; i < num_half_point_x - 3; i++)
+		for (int i = 1; i <= ied - 1; i++)//i=0, ied, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -157,10 +146,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		//for (int i = 0; i < num_half_point_x; i++)
-		for (int i = 2; i < num_half_point_x - 2; i++)
+		for (int i = 2; i <= ied; i++)//i=0, 1, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -182,10 +170,9 @@ void Flux_Solver::WENO_Scheme_X()
 	double eps = 1e-6;
 
 	//j+1/2(-)处的通量
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
-		//for (int i = 2; i < num_half_point_x - 2; i++)
+		for (int i = 2; i <= ied - 1; i++)//i = 0, 1, ied, ied + 1没有计算，在后续计算
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -204,10 +191,9 @@ void Flux_Solver::WENO_Scheme_X()
 	}
 
 	//j+1/2(+)处的通量
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
-		//for (int i = 2; i < num_half_point_x - 2; i++)
+		for (int i = 2; i <= ied - 1; i++)//i = 0, 1, ied, ied + 1没有计算，在后续计算
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -224,6 +210,22 @@ void Flux_Solver::WENO_Scheme_X()
 			}
 		}
 	}
+//
+// 	   i=0,1,ied,ied+1处的通量值
+// 	   
+// 
+	//半节点通量值：Steger_Warming进行正负通量相加
+	for (int j = jst; j <= jed; j++)
+	{
+		for (int i = 0; i <= ied + 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				fluxVector[i][j][iVar] = fluxVector1[i][j][iVar] + fluxVector2[i][j][iVar];
+			}
+		}
+	}
 }
 
 void Flux_Solver::WENO_Scheme_Y()
@@ -235,10 +237,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		//for (int j = 0; j < num_half_point_y; j++)
-		for (int j = 1; j < num_half_point_y - 3; j++)
+		for (int j = 1; j <= jed - 1; j++)//j=0, jed, jed + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -255,10 +256,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		//for (int j = 0; j < num_half_point_y; j++)
-		for (int j = 2; j < num_half_point_y - 2; j++)
+		for (int j = 2; j <= ied; j++)//i=0, 1, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -275,10 +275,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		//for (int j = 0; j < num_half_point_y; j++)
-		for (int j = 1; j < num_half_point_y - 3; j++)
+		for (int j = 1; j <= jed - 1; j++)//j=0, jed, jed + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -303,8 +302,7 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	for (int i = ist; i < ied; i++)
 	{
-		//for (int j = 0; j < num_half_point_y; j++)
-		for (int j = 2; j < num_half_point_y - 2; j++)
+		for (int j = 2; j <= ied; j++)//i=0, 1, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -326,10 +324,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	double eps = 1e-6;
 
 	//j+1/2(-)处的通量
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
-		//for (int j = 1; j < num_half_point_y - 3; j++)
+		for (int j = 2; j <= jed - 1; j++)//j = 0, 1, jed, jed + 1没有计算，在后续计算
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -348,10 +345,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	}
 
 	//j+1/2(+)处的通量
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
-		//for (int j = 1; j < num_half_point_y - 3; j++)
+		for (int j = 2; j <= jed - 1; j++)//j = 0, 1, jed, jed + 1没有计算，在后续计算
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -368,17 +364,33 @@ void Flux_Solver::WENO_Scheme_Y()
 			}
 		}
 	}
+
+	// 	   i=0,1,ied,ied+1处的通量值
+	// 	   
+	// 
+	//半节点通量值：Steger_Warming进行正负通量相加
+	for (int j = jst; j <= jed; j++)
+	{
+		for (int i = 0; i <= ied + 1; i++)
+		{
+			if (marker[i][j] == 0) continue;
+			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+			{
+				fluxVector[i][j][iVar] = fluxVector1[i][j][iVar] + fluxVector2[i][j][iVar];
+			}
+		}
+	}
 }
 
-void Flux_Solver::Flux_LR_Roe()
+void Flux_Solver::Roe_Scheme()
 {
 	if (solve_direction == 'x')
 	{
-		this->Flux_LR_Roe_X();
+		this->Roe_Scheme_X();
 	}
 	else if (solve_direction == 'y')
 	{
-		this->Flux_LR_Roe_Y();
+		this->Roe_Scheme_Y();
 	}
 	else
 	{
@@ -386,19 +398,29 @@ void Flux_Solver::Flux_LR_Roe()
 	}
 }
 
-void Flux_Solver::Flux_LR_Roe_X()
+void Flux_Solver::Roe_Scheme_X()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-#ifdef _OPENMP
-#pragma omp parallel for
+
+#ifndef _OPENMP
+	VDouble fluxVector1(num_of_prim_vars);
+	VDouble fluxVector2(num_of_prim_vars);
+	VDouble2D Jacobian_A;
+	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 #endif
-	for (int i = 0; i < num_half_point_x; i++)
+
+#ifdef _OPENMP
+#pragma omp parallel
 	{
-		//for (int j = 0; j < num_half_point_y; j++)
-		for (int j = jst; j < jed; j++)
+		VDouble fluxVector1(num_of_prim_vars);
+		VDouble fluxVector2(num_of_prim_vars);
+		VDouble2D Jacobian_A;
+		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+#pragma omp for 	
+#endif
+	for (int i = 0; i <= ied + 1; i++)
+	{
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -406,32 +428,79 @@ void Flux_Solver::Flux_LR_Roe_X()
 			double u1   = qField1[i][j][IU];
 			double v1	= qField1[i][j][IV];
 			double p1   = qField1[i][j][IP];
+			double H1   = Enthalpy(rho1, u1, v1, p1, gama);
 
-			Inviscid_Flux_F(fluxVector1[i][j], rho1, u1, v1, p1);
+			Inviscid_Flux_F(fluxVector1, rho1, u1, v1, p1);
 
 			double rho2 = qField2[i][j][IR];
 			double u2   = qField2[i][j][IU];
 			double v2   = qField2[i][j][IV];
 			double p2   = qField2[i][j][IP];
+			double H2   = Enthalpy(rho2, u2, v2, p2, gama);
 
-			Inviscid_Flux_F(fluxVector2[i][j], rho2, u2, v2, p2);
+			Inviscid_Flux_F(fluxVector2, rho2, u2, v2, p2);
+
+			double D = sqrt(rho2 / rho1);
+
+			double rho_roe = sqrt(rho1 * rho2);
+			double u_roe = (u1 + u2 * D) / (1 + D);
+			double v_roe = (v1 + v2 * D) / (1 + D);
+			double H_roe = (H1 + H2 * D) / (1 + D);
+			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
+			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值
+
+			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
+
+			VDouble qPrimitive1 = qField1[i][j];
+			VDouble qPrimitive2 = qField2[i][j];
+
+			VDouble qConservative1(num_of_prim_vars);
+			VDouble qConservative2(num_of_prim_vars);
+			Primitive_To_Conservative(qPrimitive1, qConservative1);
+			Primitive_To_Conservative(qPrimitive2, qConservative2);
+
+			VDouble dq(num_of_prim_vars);
+			dq[IR] = qConservative2[IR] - qConservative1[IR];
+			dq[IU] = qConservative2[IU] - qConservative1[IU];
+			dq[IV] = qConservative2[IV] - qConservative1[IV];
+			dq[IP] = qConservative2[IP] - qConservative1[IP];
+
+			VDouble flux_add(num_of_prim_vars);
+			MatrixMultiply(Jacobian_A, dq, flux_add, 4, 4);
+
+			fluxVector[i][j][IR] = 0.5 * (fluxVector1[IR] + fluxVector2[IR] - flux_add[IR]);
+			fluxVector[i][j][IU] = 0.5 * (fluxVector1[IU] + fluxVector2[IU] - flux_add[IU]);
+			fluxVector[i][j][IV] = 0.5 * (fluxVector1[IV] + fluxVector2[IV] - flux_add[IV]);
+			fluxVector[i][j][IP] = 0.5 * (fluxVector1[IP] + fluxVector2[IP] - flux_add[IP]);
 		}
 	}
+#ifdef _OPENMP
+}
+#endif // _OPENMP
 }
 
-void Flux_Solver::Flux_LR_Roe_Y()
+void Flux_Solver::Roe_Scheme_Y()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int i = ist; i < ied - 1; i++)
-	//{
-	//	for (int j = jst; j < jed - 1; j++)
-#ifdef _OPENMP
-#pragma omp parallel for
+#ifndef _OPENMP
+	VDouble2D Jacobian_A;
+	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+	VDouble fluxVector1(num_of_prim_vars);
+	VDouble fluxVector2(num_of_prim_vars);
 #endif
-	//for (int i = 0; i < num_half_point_x; i++)
-	for (int i = ist; i < ied; i++)
+
+#ifdef _OPENMP
+#pragma omp parallel
 	{
-		for (int j = 0; j < num_half_point_y; j++)
+		VDouble2D Jacobian_A;
+		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
+		VDouble fluxVector1(num_of_prim_vars);
+		VDouble fluxVector2(num_of_prim_vars);
+#pragma omp for 	
+#endif
+	for (int i = ist; i <= ied; i++)
+	{
+		for (int j = 0; j <= jed + 1; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -439,41 +508,79 @@ void Flux_Solver::Flux_LR_Roe_Y()
 			double u1   = qField1[i][j][IU];
 			double v1   = qField1[i][j][IV];
 			double p1   = qField1[i][j][IP];
+			double H1   = Enthalpy(rho1, u1, v1, p1, gama);
 
-			Inviscid_Flux_G(fluxVector1[i][j], rho1, u1, v1, p1);
+			Inviscid_Flux_G(fluxVector1, rho1, u1, v1, p1);
 
 			double rho2 = qField2[i][j][IR];
 			double u2   = qField2[i][j][IU];
 			double v2   = qField2[i][j][IV];
 			double p2   = qField2[i][j][IP];
+			double H2   = Enthalpy(rho2, u2, v2, p2, gama);
 
-			Inviscid_Flux_G(fluxVector2[i][j], rho2, u2, v2, p2);
+			Inviscid_Flux_G(fluxVector2, rho2, u2, v2, p2);
+
+			double D = sqrt(rho2 / rho1);
+
+			double rho_roe = sqrt(rho1 * rho2);
+			double u_roe = (u1 + u2 * D) / (1 + D);
+			double v_roe = (v1 + v2 * D) / (1 + D);
+			double H_roe = (H1 + H2 * D) / (1 + D);
+			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
+			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值			
+
+			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
+
+			VDouble qPrimitive1 = qField1[i][j];
+			VDouble qPrimitive2 = qField2[i][j];
+
+			VDouble qConservative1(num_of_prim_vars);
+			VDouble qConservative2(num_of_prim_vars);
+			Primitive_To_Conservative(qPrimitive1, qConservative1);
+			Primitive_To_Conservative(qPrimitive2, qConservative2);
+
+			VDouble dq(num_of_prim_vars);
+			dq[IR] = qConservative2[IR] - qConservative1[IR];
+			dq[IU] = qConservative2[IU] - qConservative1[IU];
+			dq[IV] = qConservative2[IV] - qConservative1[IV];
+			dq[IP] = qConservative2[IP] - qConservative1[IP];
+
+			VDouble flux_add(num_of_prim_vars);
+			MatrixMultiply(Jacobian_A, dq, flux_add, 4, 4);
+
+			fluxVector[i][j][IR] = 0.5 * (fluxVector1[IR] + fluxVector2[IR] - flux_add[IR]);
+			fluxVector[i][j][IU] = 0.5 * (fluxVector1[IU] + fluxVector2[IU] - flux_add[IU]);
+			fluxVector[i][j][IV] = 0.5 * (fluxVector1[IV] + fluxVector2[IV] - flux_add[IV]);
+			fluxVector[i][j][IP] = 0.5 * (fluxVector1[IP] + fluxVector2[IP] - flux_add[IP]);
 		}
 	}
+#ifdef _OPENMP
+}
+#endif // _OPENMP
 }
 
-void Flux_Solver::Flux_LR_Steger_Warming()
+void Flux_Solver::Steger_Warming_Scheme()
 {
 	if (method_of_half_q == 1)		//MUSCL插值之后计算半节点通量
 	{
 		if (solve_direction == 'x')
 		{
-			this->Flux_LR_Steger_Warming_Interp_X();
+			this->Steger_Warming_Scheme_Interp_X();
 		}
 		else if (solve_direction == 'y')
 		{
-			this->Flux_LR_Steger_Warming_Interp_Y();
+			this->Steger_Warming_Scheme_Interp_Y();
 		}
 	}
 	else if (method_of_half_q == 2)	//不插值，直接计算整数节点通量
 	{
 		if (solve_direction == 'x')
 		{
-			this->Flux_LR_Steger_Warming_X();
+			this->Steger_Warming_Scheme_X();
 		}
 		else if (solve_direction == 'y')
 		{
-			this->Flux_LR_Steger_Warming_Y();
+			this->Steger_Warming_Scheme_Y();
 		}
 		else
 		{
@@ -482,38 +589,19 @@ void Flux_Solver::Flux_LR_Steger_Warming()
 	}
 }
 
-void Flux_Solver::Steger_Warming_Scheme()
-{
-	VInt2D& marker = mesh->Get_Marker();
-
-	//严格来讲，也要分成x和y两个方向。
-	for (int j = 0; j < num_half_point_y; j++)
-	{
-		for (int i = 0; i < num_half_point_x; i++)
-		{
-			if (marker[i][j] == 0) continue;
-
-			fluxVector[i][j][IR] = fluxVector1[i][j][IR] + fluxVector2[i][j][IR];
-			fluxVector[i][j][IU] = fluxVector1[i][j][IU] + fluxVector2[i][j][IU];
-			fluxVector[i][j][IV] = fluxVector1[i][j][IV] + fluxVector2[i][j][IV];
-			fluxVector[i][j][IP] = fluxVector1[i][j][IP] + fluxVector2[i][j][IP];
-
-			if (IsNaN(fluxVector[i][j]))
-			{
-				int kkk = 1;
-			}
-		}
-	}
-}
-
-void Flux_Solver::Flux_LR_Steger_Warming_X()
+void Flux_Solver::Steger_Warming_Scheme_X()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
 
-	for (int j = jst; j < jed; j++)
+	//VDouble3D fluxVector1;
+	//VDouble3D fluxVector2;
+	//Allocate_3D_Vector(fluxVector1, total_points_x, total_points_y, num_of_prim_vars);
+	//Allocate_3D_Vector(fluxVector2, total_points_x, total_points_y, num_of_prim_vars);
+
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int i = 0; i < ied + 2; i++)	//所有整数节点通量
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -544,14 +632,18 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 	}
 }
 
-void Flux_Solver::Flux_LR_Steger_Warming_Y()
+void Flux_Solver::Steger_Warming_Scheme_Y()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
+	//VDouble3D fluxVector1;
+	//VDouble3D fluxVector2;
+	//Allocate_3D_Vector(fluxVector1, total_points_x, total_points_y, num_of_prim_vars);
+	//Allocate_3D_Vector(fluxVector2, total_points_x, total_points_y, num_of_prim_vars);
 
-	for (int j = 0; j < num_half_point_y; j++)
+	for (int j = 0; j <= jed + 2; j++)
 	{
-		for (int i = ist; i < ied; i++)
+		for (int i = ist; i <= ied; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -582,14 +674,16 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 	}
 }
 
-void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
+void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
 
-	for (int j = jst; j < jed; j++)
+	VDouble fluxVector1(num_of_prim_vars);
+	VDouble fluxVector2(num_of_prim_vars);
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int i = 0; i <= ied + 1; i++)//每个通量点的值都有了
 		{
 			if (marker[i][j] == 0) continue;
 			if ((i == 60 || i == 61) && j == 62)
@@ -616,7 +710,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 				int kkk = 1;
 			}
 
-			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
+			Steger_Flux_F(fluxVector1, rho, u, v, p, lmd_m);
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
@@ -638,19 +732,27 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 				int kkk = 1;
 			}
 
-			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_p);
+			Steger_Flux_F(fluxVector2, rho, u, v, p, lmd_p);
+
+			fluxVector[i][j][IR] = fluxVector1[IR] + fluxVector2[IR];
+			fluxVector[i][j][IU] = fluxVector1[IU] + fluxVector2[IU];
+			fluxVector[i][j][IV] = fluxVector1[IV] + fluxVector2[IV];
+			fluxVector[i][j][IP] = fluxVector1[IP] + fluxVector2[IP];
 		}
 	}
 }
 
-void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
+void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
 
-	for (int j = 0; j < num_half_point_y; j++)
+	VDouble fluxVector1(num_of_prim_vars);
+	VDouble fluxVector2(num_of_prim_vars);
+
+	for (int j = 0; j <= jed + 1; j++)  //每个通量点的值都有了
 	{
-		for (int i = ist; i < ied; i++)
+		for (int i = ist; i <= ied; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			if (i == 16 && j == 2)//((i==60||i == 61) && j == 62)
@@ -677,7 +779,7 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 				int kkk = 1;
 			}
 
-			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
+			Steger_Flux_G(fluxVector1, rho, u, v, p, mu_m);
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
@@ -699,7 +801,12 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 				int kkk = 1;
 			}
 
-			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_p);
+			Steger_Flux_G(fluxVector2, rho, u, v, p, mu_p);
+
+			fluxVector[i][j][IR] = fluxVector1[IR] + fluxVector2[IR];
+			fluxVector[i][j][IU] = fluxVector1[IU] + fluxVector2[IU];
+			fluxVector[i][j][IV] = fluxVector1[IV] + fluxVector2[IV];
+			fluxVector[i][j][IP] = fluxVector1[IP] + fluxVector2[IP];
 		}
 	}
 }
@@ -742,82 +849,6 @@ void Flux_Solver::Inviscid_Flux_G(VDouble& fluxVector, double rho, double u, dou
 	fluxVector[IU] = rho * u * v;
 	fluxVector[IV] = rho * v * v + p;
 	fluxVector[IP] = (E + p) * v;
-}
-
-void Flux_Solver::Roe_Scheme()
-{
-#ifndef _OPENMP
-	VDouble2D Jacobian_A;
-	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
-#endif
-
-	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-#ifdef _OPENMP
-#pragma omp parallel
-	{
-		VDouble2D Jacobian_A;
-		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
-#pragma omp for 	
-#endif
-	for (int i = 0; i < num_half_point_x; i++)	//四个角也算了，但是没用
-	{
-		for (int j = 0; j < num_half_point_y; j++)
-		{
-			if (marker[i][j] == 0) continue;
-
-			double rho1 = qField1[i][j][IR];
-			double u1   = qField1[i][j][IU];
-			double v1	= qField1[i][j][IV];
-			double p1   = qField1[i][j][IP];
-			double H1  = Enthalpy(rho1, u1, v1, p1, gama);
-
-			double rho2 = qField2[i][j][IR];
-			double u2   = qField2[i][j][IU];
-			double v2   = qField2[i][j][IV];
-			double p2   = qField2[i][j][IP];
-			double H2  = Enthalpy(rho2, u2, v2, p2, gama);
-
-			double D = sqrt(rho2 / rho1);
-
-			double rho_roe = sqrt(rho1 * rho2);
-			double u_roe = (u1 + u2 * D) / (1 + D);
-			double v_roe = (v1 + v2 * D) / (1 + D);
-			double H_roe = (H1 + H2 * D) / (1 + D);
-			double c2_roe = (gama - 1) * (H_roe - 0.5 * (u_roe * u_roe + v_roe * v_roe));
-			double c_roe = sqrt(fabs(c2_roe));//声速取绝对值			
-
-			Compute_Jacobian(Jacobian_A, u_roe, v_roe, c_roe, H_roe);
-			
-			VDouble qPrimitive1 = qField1[i][j];
-			VDouble qPrimitive2 = qField2[i][j];
-			
-			VDouble qConservative1(num_of_prim_vars);
-			VDouble qConservative2(num_of_prim_vars);
-			Primitive_To_Conservative(qPrimitive1, qConservative1);
-			Primitive_To_Conservative(qPrimitive2, qConservative2);
-
-			VDouble dq(num_of_prim_vars);
-			dq[IR] = qConservative2[IR] - qConservative1[IR];
-			dq[IU] = qConservative2[IU] - qConservative1[IU];
-			dq[IV] = qConservative2[IV] - qConservative1[IV];
-			dq[IP] = qConservative2[IP] - qConservative1[IP];
-
-			VDouble flux_add(num_of_prim_vars);
-			MatrixMultiply(Jacobian_A, dq, flux_add, 4, 4);
-
-			fluxVector[i][j][IR] = 0.5 * (fluxVector1[i][j][IR] + fluxVector2[i][j][IR] - flux_add[IR]);
-			fluxVector[i][j][IU] = 0.5 * (fluxVector1[i][j][IU] + fluxVector2[i][j][IU] - flux_add[IU]);
-			fluxVector[i][j][IV] = 0.5 * (fluxVector1[i][j][IV] + fluxVector2[i][j][IV] - flux_add[IV]);
-			fluxVector[i][j][IP] = 0.5 * (fluxVector1[i][j][IP] + fluxVector2[i][j][IP] - flux_add[IP]);
-		}
-	}
-#ifdef _OPENMP
-	}
-#endif // _OPENMP
-
 }
 
 double Flux_Solver::Enthalpy(double rho, double u, double v, double p, double gama)

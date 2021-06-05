@@ -25,9 +25,9 @@ void Time_Step::Compute_Time_Step()
 #ifdef _OPENMP
 #pragma omp parallel for shared( a_max )
 #endif
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 

@@ -39,6 +39,18 @@ void Time_Marching_Solver::Time_Marching()
 
 void Update_Flowfield(int iStage)
 {
+	if (solve_direction == 'x')
+	{
+		Update_Flowfield_X(iStage);
+	}
+	else if (solve_direction == 'y')
+	{
+		Update_Flowfield_Y(iStage);
+	}
+}
+
+void Update_Flowfield_X(int iStage)
+{
 	double RK_Coeff_a = RK_Coeff[iStage][0];
 	double RK_Coeff_b = RK_Coeff[iStage][1];
 	double RK_Coeff_c = RK_Coeff[iStage][2];
@@ -68,44 +80,117 @@ void Update_Flowfield(int iStage)
 		VDouble qConservative1(num_of_prim_vars);
 #pragma omp  for
 #endif	
-	for (int i = ist; i < ied; i++)
-	{
-		for (int j = jst; j < jed; j++)
+		for (int i = 0; i <= ied; i++)
 		{
-			if (i == 16 && j == 2)
+			for (int j = jst; j <= jed; j++)
 			{
-				int kkk = 1;
+				if (i == 16 && j == 2)
+				{
+					int kkk = 1;
+				}
+				if (marker[i][j] == 0) continue;
+
+				rhsVector = rhs[i][j];			//rhs(q0),用上一步的q计算得到的rhs
+
+				qPrimitive0 = qField_N0[i][j];	//RK公式里第一项,q0
+				Primitive_To_Conservative(qPrimitive0, qConservative0);
+
+				qPrimitive1 = qField_N1[i][j];	//RK公式里第二项，q0、q1、q2，也即上一stage的q值
+				Primitive_To_Conservative(qPrimitive1, qConservative1);
+
+				for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+				{
+					qConservative1[iVar] = RK_Coeff_a * qConservative0[iVar] + RK_Coeff_b * qConservative1[iVar] + RK_Coeff_c * time_step * rhsVector[iVar];
+				}
+
+				Conservative_To_Primitive(qConservative1, qPrimitive1);
+
+				if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
+				{
+					int kkk = 1;
+					//SolutionFix(qPrimitive1, i, j);
+				}
+				//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
+				qField_N1[i][j] = qPrimitive1;
 			}
-			if (marker[i][j] == 0) continue;
-
-			rhsVector = rhs[i][j];			//rhs(q0),用上一步的q计算得到的rhs
-
-			qPrimitive0 = qField_N0[i][j];	//RK公式里第一项,q0
-			Primitive_To_Conservative(qPrimitive0, qConservative0);
-
-			qPrimitive1 = qField_N1[i][j];	//RK公式里第二项，q0、q1、q2，也即上一stage的q值
-			Primitive_To_Conservative(qPrimitive1, qConservative1);
-			
-			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-			{
-				qConservative1[iVar] = RK_Coeff_a * qConservative0[iVar] + RK_Coeff_b * qConservative1[iVar] + RK_Coeff_c * time_step * rhsVector[iVar];
-			} 
-
-			Conservative_To_Primitive(qConservative1, qPrimitive1);
-			
-			if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
-			{
-				SolutionFix(qPrimitive1, i, j);
-			}
-			//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
-			qField_N1[i][j] = qPrimitive1;	
 		}
-	}
 #ifdef _OPENMP
 	}
 #endif // _OPENMP
 
 }
+
+void Update_Flowfield_Y(int iStage)
+{
+	double RK_Coeff_a = RK_Coeff[iStage][0];
+	double RK_Coeff_b = RK_Coeff[iStage][1];
+	double RK_Coeff_c = RK_Coeff[iStage][2];
+
+	VInt2D& marker = mesh->Get_Marker();
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+
+	double minimumPressureLimit = 1.0e-6 * 116.5;
+	double minimumDensityLimit = 1.0e-6 * 8;
+
+#ifndef _OPENMP
+	VDouble rhsVector(num_of_prim_vars);
+	VDouble qPrimitive0(num_of_prim_vars);
+	VDouble qPrimitive1(num_of_prim_vars);
+	VDouble qConservative0(num_of_prim_vars);
+	VDouble qConservative1(num_of_prim_vars);
+#endif // !_OPENMP
+
+#ifdef _OPENMP
+#pragma omp parallel
+	{
+		VDouble rhsVector(num_of_prim_vars);
+		VDouble qPrimitive0(num_of_prim_vars);
+		VDouble qPrimitive1(num_of_prim_vars);
+		VDouble qConservative0(num_of_prim_vars);
+		VDouble qConservative1(num_of_prim_vars);
+#pragma omp  for
+#endif	
+		for (int i = ist; i <= ied; i++)
+		{
+			for (int j = 0; j <= jed; j++)
+			{
+				if (i == 16 && j == 2)
+				{
+					int kkk = 1;
+				}
+				if (marker[i][j] == 0) continue;
+
+				rhsVector = rhs[i][j];			//rhs(q0),用上一步的q计算得到的rhs
+
+				qPrimitive0 = qField_N0[i][j];	//RK公式里第一项,q0
+				Primitive_To_Conservative(qPrimitive0, qConservative0);
+
+				qPrimitive1 = qField_N1[i][j];	//RK公式里第二项，q0、q1、q2，也即上一stage的q值
+				Primitive_To_Conservative(qPrimitive1, qConservative1);
+
+				for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+				{
+					qConservative1[iVar] = RK_Coeff_a * qConservative0[iVar] + RK_Coeff_b * qConservative1[iVar] + RK_Coeff_c * time_step * rhsVector[iVar];
+				}
+
+				Conservative_To_Primitive(qConservative1, qPrimitive1);
+
+				if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
+				{
+					int kkk = 1;
+					//SolutionFix(qPrimitive1, i, j);
+				}
+				//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
+				qField_N1[i][j] = qPrimitive1;
+			}
+		}
+#ifdef _OPENMP
+	}
+#endif // _OPENMP
+
+}
+
 
 void Set_Field()
 {
