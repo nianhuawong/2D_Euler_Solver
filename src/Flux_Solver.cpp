@@ -258,7 +258,7 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = 2; j <= ied; j++)//i=0, 1, ied + 1三个点没有值
+		for (int j = 2; j <= jed; j++)//i=0, 1, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -302,7 +302,7 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	for (int i = ist; i < ied; i++)
 	{
-		for (int j = 2; j <= ied; j++)//i=0, 1, ied + 1三个点没有值
+		for (int j = 2; j <= jed; j++)//i=0, 1, ied + 1三个点没有值
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
