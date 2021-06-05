@@ -83,6 +83,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 1; i <= ied - 1 ; i++)//i=0, ied, ied + 1三个点没有值
@@ -102,6 +105,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 2; i <= ied; i++)//i=0, 1, ied + 1三个点没有值
@@ -121,6 +127,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 1; i <= ied - 1; i++)//i=0, ied, ied + 1三个点没有值
@@ -146,6 +155,9 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 2; i <= ied; i++)//i=0, 1, ied + 1三个点没有值
@@ -170,6 +182,9 @@ void Flux_Solver::WENO_Scheme_X()
 	double eps = 1e-6;
 
 	//j+1/2(-)处的通量
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 2; i <= ied - 1; i++)//i = 0, 1, ied, ied + 1没有计算，在后续计算
@@ -191,6 +206,9 @@ void Flux_Solver::WENO_Scheme_X()
 	}
 
 	//j+1/2(+)处的通量
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 2; i <= ied - 1; i++)//i = 0, 1, ied, ied + 1没有计算，在后续计算
@@ -229,6 +247,9 @@ void Flux_Solver::WENO_Scheme_X()
 	}
 
 	//半节点通量值：Steger_Warming进行正负通量相加
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 0; i <= ied + 1; i++)
@@ -251,6 +272,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
 	VInt2D& marker = mesh->Get_Marker();
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 1; j <= jed - 1; j++)//j=0, jed, jed + 1三个点没有值
@@ -270,6 +294,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 2; j <= jed; j++)//i=0, 1, ied + 1三个点没有值
@@ -289,6 +316,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 1; j <= jed - 1; j++)//j=0, jed, jed + 1三个点没有值
@@ -314,6 +344,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 2; j <= jed; j++)//i=0, 1, ied + 1三个点没有值
@@ -338,6 +371,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	double eps = 1e-6;
 
 	//j+1/2(-)处的通量
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 2; j <= jed - 1; j++)//j = 0, 1, jed, jed + 1没有计算，在后续计算
@@ -359,6 +395,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	}
 
 	//j+1/2(+)处的通量
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 2; j <= jed - 1; j++)//j = 0, 1, jed, jed + 1没有计算，在后续计算
@@ -397,6 +436,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	}
 
 	//半节点通量值：Steger_Warming进行正负通量相加
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 0; j <= jed + 1; j++)
@@ -626,7 +668,9 @@ void Flux_Solver::Steger_Warming_Scheme_X()
 	//VDouble3D fluxVector2;
 	//Allocate_3D_Vector(fluxVector1, total_points_x, total_points_y, num_of_prim_vars);
 	//Allocate_3D_Vector(fluxVector2, total_points_x, total_points_y, num_of_prim_vars);
-
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 0; i < ied + 2; i++)	//所有整数节点通量
@@ -668,7 +712,9 @@ void Flux_Solver::Steger_Warming_Scheme_Y()
 	//VDouble3D fluxVector2;
 	//Allocate_3D_Vector(fluxVector1, total_points_x, total_points_y, num_of_prim_vars);
 	//Allocate_3D_Vector(fluxVector2, total_points_x, total_points_y, num_of_prim_vars);
-
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (int j = 0; j <= jed + 2; j++)
 	{
 		for (int i = ist; i <= ied; i++)
