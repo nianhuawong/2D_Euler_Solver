@@ -14,3 +14,4 @@ protected:
 };
 
 void Update_Flowfield(int iStage);
+void SolutionFix(VDouble& primitiveVector, int i, int j);

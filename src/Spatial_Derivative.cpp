@@ -65,18 +65,26 @@ void Spatial_Derivative::Spatial_Derivative_X()
 #endif
 	for (int i = 1; i < num_half_point_x; i++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
-
+			if (i == 61 && j == 62)
+			{
+				int kkk = 1;
+			}
 			VDouble rhsVector(num_of_prim_vars);
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
 				rhsVector[iVar] = -(fluxVector[i][j][iVar] - fluxVector[i - 1][j][iVar]) / dx;
 			}
 			rhs[i][j] = rhsVector;
+			if (IsNaN(rhsVector))
+			{
+				int kkk = 1;
+			}
 		}
 	}
+	//i=0和i=total_num_pointx的空间导数项没有值
 }
 
 void Spatial_Derivative::Spatial_Derivative_Y()
@@ -90,31 +98,38 @@ void Spatial_Derivative::Spatial_Derivative_Y()
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = 0; i < num_half_point_x; i++)
+	for (int i = ist; i < ied; i++)
 	{
 		for (int j = 1; j < num_half_point_y; j++)
 		{
 			if (marker[i][j] == 0) continue;
-
+			if (i == 16 && j == 2)//((i==60||i == 61) && j == 62)
+			{
+				int kkk = 1;
+			}
 			VDouble rhsVector(num_of_prim_vars);
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
 				rhsVector[iVar] = -(fluxVector[i][j][iVar] - fluxVector[i][j - 1][iVar]) / dy;
 			}
 			rhs[i][j] = rhsVector;
+			if (IsNaN(rhsVector))
+			{
+				int kkk = 1;
+			}
 		}
 	}
 }
 
 void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 {
-	double ds = dy;
+	double ds = dx;
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = ist + 1; i < ied - 1; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -128,6 +143,31 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 				rhsVector[iVar] = - rhsVector[iVar];
 			}
 			rhs[i][j] = rhsVector;
+
+			if (IsNaN(rhsVector))
+			{
+				int kkk = 1;
+			}
+		}
+	}
+	//边界处导数
+	for (int j = jst; j < jed; j++)
+	{
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		{
+			rhs[1][j][iVar] = (-11.0/12 * fluxVector[0][j][iVar] + 17.0/24 * fluxVector[1][j][iVar]
+							   + 3.0/8  * fluxVector[2][j][iVar] -  5.0/24 * fluxVector[3][j][iVar]
+							   + 1.0/24 * fluxVector[4][j][iVar]) / ds;
+
+			rhs[2][j][iVar] = (- 1.0/24 * fluxVector[0][j][iVar] -  9.0/8  * fluxVector[1][j][iVar]
+							   + 9.0/8	* fluxVector[2][j][iVar] -  1.0/24 * fluxVector[4][j][iVar]) / ds;
+
+			rhs[ied - 1][j][iVar] = (- 1.0/24 * fluxVector[ied    ][j][iVar] -  9.0/8  * fluxVector[ied - 1][j][iVar]
+									 + 9.0/8  * fluxVector[ied - 2][j][iVar] -  1.0/24 * fluxVector[ied - 3][j][iVar]) / ds;
+
+			rhs[ied    ][j][iVar] = (-11.0/12 * fluxVector[ied    ][j][iVar] + 17.0/24 * fluxVector[ied - 1][j][iVar]
+									 + 3.0/8  * fluxVector[ied - 2][j][iVar] -  5.0/24 * fluxVector[ied - 3][j][iVar]
+									 + 1.0/24 * fluxVector[ied - 4][j][iVar]) / ds;
 		}
 	}
 }
@@ -138,9 +178,9 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 	
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = jst + 1; j < jed - 1; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -154,6 +194,26 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 				rhsVector[iVar] = - rhsVector[iVar];
 			}
 			rhs[i][j] = rhsVector;
+		}
+	}
+	//边界处导数
+	for (int i = ist; i < ied; i++)
+	{
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		{
+			rhs[i][1][iVar] = (-11.0/12 * fluxVector[i][0][iVar] + 17.0/24 * fluxVector[i][1][iVar]
+							   + 3.0/8  * fluxVector[i][2][iVar] -  5.0/24 * fluxVector[i][3][iVar]
+							   + 1.0/24 * fluxVector[i][4][iVar]) / ds;
+
+			rhs[i][2][iVar] = (- 1.0/24 * fluxVector[i][0][iVar] -  9.0/8  * fluxVector[i][1][iVar]
+							   + 9.0/8	* fluxVector[i][2][iVar] -  1.0/24 * fluxVector[i][4][iVar]) / ds;
+
+			rhs[i][jed - 1][iVar] = (- 1.0/24 * fluxVector[i][jed + 0][iVar] -  9.0/8  * fluxVector[i][jed - 1][iVar]
+									 + 9.0/8  * fluxVector[i][jed - 2][iVar] -  1.0/24 * fluxVector[i][jed - 3][iVar]) / ds;
+
+			rhs[i][jed    ][iVar] = (-11.0/12 * fluxVector[i][jed + 0][iVar] + 17.0/24 * fluxVector[i][jed - 1][iVar]
+									 + 3.0/8  * fluxVector[i][jed - 2][iVar] -  5.0/24 * fluxVector[i][jed - 3][iVar]
+									 + 1.0/24 * fluxVector[i][jed - 4][iVar]) / ds;
 		}
 	}
 }

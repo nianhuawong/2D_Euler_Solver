@@ -26,8 +26,6 @@ Flux_Solver::Flux_Solver()
 	Allocate_3D_Vector(fluxVector,  num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(fluxVector1, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(fluxVector2, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	
-	//Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 }
 
 void Flux_Solver::Solve_Flux()
@@ -93,10 +91,10 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		//for (int i = ist; i < ied - 1; i++)
-		for (int i = ist; i < ied - 2; i++)
+		//for (int i = 0; i < num_half_point_x; i++)
+		for (int i = 1; i < num_half_point_x - 3; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -113,9 +111,10 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		//for (int i = 0; i < num_half_point_x; i++)
+		for (int i = 2; i < num_half_point_x - 2; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -132,10 +131,10 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		//for (int i = ist; i < ied - 1; i++)
-		for (int i = ist; i < ied - 2; i++)
+		//for (int i = 0; i < num_half_point_x; i++)
+		for (int i = 1; i < num_half_point_x - 3; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -158,9 +157,10 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		//for (int i = 0; i < num_half_point_x; i++)
+		for (int i = 2; i < num_half_point_x - 2; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -182,9 +182,10 @@ void Flux_Solver::WENO_Scheme_X()
 	double eps = 1e-6;
 
 	//j+1/2(-)处的通量
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
+		//for (int i = 2; i < num_half_point_x - 2; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -203,9 +204,10 @@ void Flux_Solver::WENO_Scheme_X()
 	}
 
 	//j+1/2(+)处的通量
-	for (int j = jst; j < jed - 1; j++)
+	for (int j = jst; j < jed; j++)
 	{
-		for (int i = ist; i < ied - 1; i++)
+		for (int i = 0; i < num_half_point_x; i++)
+		//for (int i = 2; i < num_half_point_x - 2; i++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -233,10 +235,10 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
 	VInt2D& marker = mesh->Get_Marker();
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		//for (int j = jst; j < jed - 1; j++)
-		for (int j = jst; j < jed - 2; j++)
+		//for (int j = 0; j < num_half_point_y; j++)
+		for (int j = 1; j < num_half_point_y - 3; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -253,9 +255,10 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		//for (int j = 0; j < num_half_point_y; j++)
+		for (int j = 2; j < num_half_point_y - 2; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -272,10 +275,10 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS11, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS31, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		//for (int j = jst; j < jed - 1; j++)
-		for (int j = jst; j < jed - 2; j++)
+		//for (int j = 0; j < num_half_point_y; j++)
+		for (int j = 1; j < num_half_point_y - 3; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -298,9 +301,10 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		//for (int j = 0; j < num_half_point_y; j++)
+		for (int j = 2; j < num_half_point_y - 2; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -322,9 +326,10 @@ void Flux_Solver::WENO_Scheme_Y()
 	double eps = 1e-6;
 
 	//j+1/2(-)处的通量
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = 0; j < num_half_point_y; j++)
+		//for (int j = 1; j < num_half_point_y - 3; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -343,9 +348,10 @@ void Flux_Solver::WENO_Scheme_Y()
 	}
 
 	//j+1/2(+)处的通量
-	for (int i = ist; i < ied - 1; i++)
+	for (int i = ist; i < ied; i++)
 	{
-		for (int j = jst; j < jed - 1; j++)
+		for (int j = 0; j < num_half_point_y; j++)
+		//for (int j = 1; j < num_half_point_y - 3; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -391,7 +397,8 @@ void Flux_Solver::Flux_LR_Roe_X()
 #endif
 	for (int i = 0; i < num_half_point_x; i++)
 	{
-		for (int j = 0; j < num_half_point_y; j++)
+		//for (int j = 0; j < num_half_point_y; j++)
+		for (int j = jst; j < jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -421,7 +428,8 @@ void Flux_Solver::Flux_LR_Roe_Y()
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = 0; i < num_half_point_x; i++)
+	//for (int i = 0; i < num_half_point_x; i++)
+	for (int i = ist; i < ied; i++)
 	{
 		for (int j = 0; j < num_half_point_y; j++)
 		{
@@ -477,10 +485,8 @@ void Flux_Solver::Flux_LR_Steger_Warming()
 void Flux_Solver::Steger_Warming_Scheme()
 {
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-	//	{
+
+	//严格来讲，也要分成x和y两个方向。
 	for (int j = 0; j < num_half_point_y; j++)
 	{
 		for (int i = 0; i < num_half_point_x; i++)
@@ -491,6 +497,11 @@ void Flux_Solver::Steger_Warming_Scheme()
 			fluxVector[i][j][IU] = fluxVector1[i][j][IU] + fluxVector2[i][j][IU];
 			fluxVector[i][j][IV] = fluxVector1[i][j][IV] + fluxVector2[i][j][IV];
 			fluxVector[i][j][IP] = fluxVector1[i][j][IP] + fluxVector2[i][j][IP];
+
+			if (IsNaN(fluxVector[i][j]))
+			{
+				int kkk = 1;
+			}
 		}
 	}
 }
@@ -499,11 +510,8 @@ void Flux_Solver::Flux_LR_Steger_Warming_X()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-	//	{
-	for (int j = 0; j < num_half_point_y; j++)
+
+	for (int j = jst; j < jed; j++)
 	{
 		for (int i = 0; i < num_half_point_x; i++)
 		{
@@ -540,13 +548,10 @@ void Flux_Solver::Flux_LR_Steger_Warming_Y()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-	//	{
+
 	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int i = ist; i < ied; i++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -581,21 +586,21 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-	//	{
-	for (int j = 0; j < num_half_point_y; j++)
+
+	for (int j = jst; j < jed; j++)
 	{
 		for (int i = 0; i < num_half_point_x; i++)
 		{
 			if (marker[i][j] == 0) continue;
-
+			if ((i == 60 || i == 61) && j == 62)
+			{
+				int kkk = 1;
+			}
 			double rho = qField1[i][j][IR];
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
 			double p   = qField1[i][j][IP];
-			double a   = sqrt(fabs(gama * p / rho));//声速取绝对值
+			double a   = sqrt(gama * p / rho);//声速取绝对值
 
 			double lmd1 = u;
 			double lmd3 = u - a;
@@ -606,13 +611,18 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
 			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
 
+			if (IsNaN(lmd_m))
+			{
+				int kkk = 1;
+			}
+
 			Steger_Flux_F(fluxVector1[i][j], rho, u, v, p, lmd_m);
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
 			v   = qField2[i][j][IV];
 			p   = qField2[i][j][IP];
-			a   = sqrt(fabs(gama * p / rho));//声速取绝对值
+			a   = sqrt(gama * p / rho);//声速取绝对值
 
 			lmd1 = u;
 			lmd3 = u - a;
@@ -623,6 +633,11 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_X()
 			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
 			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
 
+			if (IsNaN(lmd_p))
+			{
+				int kkk = 1;
+			}
+
 			Steger_Flux_F(fluxVector2[i][j], rho, u, v, p, lmd_p);
 		}
 	}
@@ -632,16 +647,16 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-	//	{
+
 	for (int j = 0; j < num_half_point_y; j++)
 	{
-		for (int i = 0; i < num_half_point_x; i++)
+		for (int i = ist; i < ied; i++)
 		{
 			if (marker[i][j] == 0) continue;
-
+			if (i == 16 && j == 2)//((i==60||i == 61) && j == 62)
+			{
+				int kkk = 1;
+			}
 			double rho = qField1[i][j][IR];
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
@@ -656,6 +671,11 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
 			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
 			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
+
+			if (IsNaN(mu_m))
+			{
+				int kkk = 1;
+			}
 
 			Steger_Flux_G(fluxVector1[i][j], rho, u, v, p, mu_m);
 
@@ -674,6 +694,11 @@ void Flux_Solver::Flux_LR_Steger_Warming_Interp_Y()
 			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
 			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
 
+			if (IsNaN(mu_p))
+			{
+				int kkk = 1;
+			}
+
 			Steger_Flux_G(fluxVector2[i][j], rho, u, v, p, mu_p);
 		}
 	}
@@ -684,10 +709,10 @@ void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, doubl
 	double a = sqrt(fabs(gama * p / rho));//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
-	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  lmd[0] +			 lmd[1] +			lmd[2]);
-	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * lmd[0] + (u - a) * lmd[1] + (u + a) * lmd[2]);
-	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] +		 v * lmd[1] +		v * lmd[2]);
-	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) *  lmd[0] + (h - a * u) * lmd[1] + (h + a * u) * lmd[2]);
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  lmd[0] +			 lmd[1] +			    lmd[2]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * lmd[0] + (u - a) * lmd[1] + (u + a)	  * lmd[2]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * lmd[0] +		 v * lmd[1] +		    v * lmd[2]);
+	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) *		   (u * u + v * v) * lmd[0] + (h - a * u) * lmd[1] + (h + a * u) * lmd[2]);
 }	
 
 void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu)
@@ -695,10 +720,10 @@ void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, doubl
 	double a = sqrt(fabs(gama * p / rho));	//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
-	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  mu[0] +			mu[1] +			  mu[2]);
-	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] +		u * mu[1] +		  u * mu[2]);
-	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * mu[0] + (v - a) * mu[1] + (v + a) * mu[2]);
-	fluxVector[IP] = rho / (2 * gama) * ((gama - 1) * (pow(u, 2) + pow(v, 2)) * mu[0] + (h - a * v) * mu[1] + (h + a * v) * mu[2]);
+	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  mu[0] +			mu[1] +				  mu[2]);
+	fluxVector[IU] = rho / (2 * gama) * (2 * (gama - 1) * u * mu[0] +		u * mu[1] +			  u * mu[2]);
+	fluxVector[IV] = rho / (2 * gama) * (2 * (gama - 1) * v * mu[0] + (v - a) * mu[1] +		(v + a) * mu[2]);
+	fluxVector[IP] = rho / (2 * gama) * (    (gama - 1) *     (v * v + u * u) * mu[0] + (h - a * v) * mu[1] + (h + a * v) * mu[2]);
 }
 
 void Flux_Solver::Inviscid_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p)
@@ -737,7 +762,7 @@ void Flux_Solver::Roe_Scheme()
 		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 #pragma omp for 	
 #endif
-	for (int i = 0; i < num_half_point_x; i++)
+	for (int i = 0; i < num_half_point_x; i++)	//四个角也算了，但是没用
 	{
 		for (int j = 0; j < num_half_point_y; j++)
 		{

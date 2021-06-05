@@ -32,32 +32,34 @@ void Init_Global_Param()
 	lastTime = Get_Current_Time(); 
 	nowTime  = lastTime;
 
-	num_of_prim_vars = 4;		//原始变量个数，控制方程个数
+	num_of_prim_vars = 4;			//原始变量个数，控制方程个数
 
-	max_num_of_steps = 10000;
+	max_num_of_steps	  = 2000;
+	residual_output_steps = 2;		//残差输出间隔步数
+	flow_save_steps		  = 200;		//流场输出间隔步数
+	converge_criterion	  = 1e-8;	//残差收敛标准
+	tec_file_name		  = "../flow.plt";
 
-	cfl_num   = 0.3;
-	time_step = 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
+	cfl_num			  = 0.3;
+	time_step		  = 0.0;	//时间步长要根据最大特征值确定，这里只是初始化
 	physical_time     = 0.0;
 	max_simu_time	  = 0.2;
-	method_of_half_q  = 1;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
+	method_of_half_q  = 3;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
 	muscl_k			  = 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
-	method_of_limiter = 2;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee	4-1st;
-	method_of_flux    = 2;		//1-Roe,	  2-Steger Warming  3-WENO,		  4-WCNS
+	method_of_limiter = 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee	4-1st;
+	method_of_flux    = 4;		//1-Roe,	  2-Steger Warming  3-WENO,		  4-WCNS 
 	entropy_fix_coeff = 0.01;	//Roe格式熵修正系数epsilon
 
-	num_grid_point_x = 241 * 1;
-	num_grid_point_y = 61 * 1;
+	num_grid_point_x  = 241 * 1;
+	num_grid_point_y  = 61 * 1;
 
-	solve_direction  = 'x';
-
-	residual_output_steps = 2;		//残差输出间隔步数
-	flow_save_steps		  = 200;	//流场输出间隔步数
-	converge_criterion	  = 1e-8;	//残差收敛标准
-	tec_file_name		  = "../../flow.plt";
+	solve_direction   = 'x';
 	
-	num_of_RK_stages	= 3;
-	RK_Coeff			= { {1.0, 0.0, 1.0},{3.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0},{1.0 / 3.0, 2.0 / 3.0, 2.0 / 3.0} };
+	//num_of_RK_stages	= 3;
+	//RK_Coeff			= { {1.0, 0.0, 1.0},{3.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0},{1.0 / 3.0, 2.0 / 3.0, 2.0 / 3.0} };
+	
+	num_of_RK_stages	= 2;
+	RK_Coeff			= { {1.0, 0.0, 1.0},{0.5, 0.5, 0.5} };
 }
 
 void Load_Q()

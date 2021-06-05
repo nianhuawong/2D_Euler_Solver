@@ -31,14 +31,14 @@ void Simulation::Run()
 
 	for (current_step = 1; current_step <= max_num_of_steps; ++current_step)
 	{
-		if (current_step == 28)
+		if (current_step == 2)
 		{
 			int kkk = 1;
 		}
 
 		Solve_Time_Step();
 
-		Compute_Boundary();
+		//Compute_Boundary();
 
 		Set_Solve_Direction('x');
 		Time_Integration();
