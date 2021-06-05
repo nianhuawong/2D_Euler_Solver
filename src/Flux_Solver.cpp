@@ -314,7 +314,7 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(IS12, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS22, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(IS32, num_half_point_x, num_half_point_y, num_of_prim_vars);
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 2; j <= jed; j++)//i=0, 1, ied + 1三个点没有值
 		{
@@ -397,9 +397,9 @@ void Flux_Solver::WENO_Scheme_Y()
 	}
 
 	//半节点通量值：Steger_Warming进行正负通量相加
-	for (int j = jst; j <= jed; j++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int i = 0; i <= ied + 1; i++)
+		for (int j = 0; j <= jed + 1; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -600,21 +600,21 @@ void Flux_Solver::Steger_Warming_Scheme()
 			this->Steger_Warming_Scheme_Interp_Y();
 		}
 	}
-	else if (method_of_half_q == 2)	//不插值，直接计算整数节点通量
-	{
-		if (solve_direction == 'x')
-		{
-			this->Steger_Warming_Scheme_X();
-		}
-		else if (solve_direction == 'y')
-		{
-			this->Steger_Warming_Scheme_Y();
-		}
-		else
-		{
-			cout << "出错，请检查！" << endl;
-		}
-	}
+	//else if (method_of_half_q == 2)	//不插值，直接计算整数节点通量
+	//{
+	//	if (solve_direction == 'x')
+	//	{
+	//		this->Steger_Warming_Scheme_X();
+	//	}
+	//	else if (solve_direction == 'y')
+	//	{
+	//		this->Steger_Warming_Scheme_Y();
+	//	}
+	//	else
+	//	{
+	//		cout << "出错，请检查！" << endl;
+	//	}
+	//}
 }
 
 void Flux_Solver::Steger_Warming_Scheme_X()
