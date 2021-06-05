@@ -74,11 +74,11 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_X()
 		{
 			qField1[0][j][iVar] = qField[0][j][iVar]; //虚拟点i=0, ied + 1的值还没有
 			qField2[0][j][iVar] = qField[1][j][iVar];
-			qField1[1][j][iVar] = qField[1][j][iVar];
-			qField2[1][j][iVar] = qField[2][j][iVar];
+			//qField1[1][j][iVar] = qField[1][j][iVar];
+			//qField2[1][j][iVar] = qField[2][j][iVar];
 
-			qField1[ied    ][j][iVar] = qField[ied    ][j][iVar];
-			qField2[ied    ][j][iVar] = qField[ied + 1][j][iVar];
+			//qField1[ied    ][j][iVar] = qField[ied    ][j][iVar];
+			//qField2[ied    ][j][iVar] = qField[ied + 1][j][iVar];
 			qField1[ied + 1][j][iVar] = qField[ied + 1][j][iVar];
 			qField2[ied + 1][j][iVar] = qField[ied + 2][j][iVar];
 		}
@@ -88,18 +88,6 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_X()
 void QlQr_Solver::Boundary_QlQr_MUSCL_Y()
 {
 	//VInt2D& marker = mesh->Get_Marker();
-	//for (int i = ist; i < ied; i++)
-	//{
-	//	for (int j = 0; j < num_half_point_y; j++)
-	//	{
-	//		if (marker[i][j] == 0) continue;
-	//		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
-	//		{
-	//			qField1[i][j][iVar] = qField[i][j    ][iVar];
-	//			qField2[i][j][iVar] = qField[i][j + 1][iVar];
-	//		}
-	//	}
-	//}
 
 	for (int i = ist; i <= ied; i++)
 	{
@@ -107,11 +95,11 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_Y()
 		{
 			qField1[i][0][iVar] = qField[i][0][iVar];
 			qField2[i][0][iVar] = qField[i][1][iVar];
-			qField1[i][1][iVar] = qField[i][1][iVar];
-			qField2[i][1][iVar] = qField[i][2][iVar];
+			//qField1[i][1][iVar] = qField[i][1][iVar];
+			//qField2[i][1][iVar] = qField[i][2][iVar];
 
-			qField1[i][jed    ][iVar] = qField[i][jed    ][iVar];
-			qField2[i][jed    ][iVar] = qField[i][jed + 1][iVar];
+			//qField1[i][jed    ][iVar] = qField[i][jed    ][iVar];
+			//qField2[i][jed    ][iVar] = qField[i][jed + 1][iVar];
 			qField1[i][jed + 1][iVar] = qField[i][jed + 1][iVar];
 			qField2[i][jed + 1][iVar] = qField[i][jed + 2][iVar];
 		}

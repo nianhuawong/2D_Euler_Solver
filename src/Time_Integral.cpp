@@ -80,7 +80,7 @@ void Update_Flowfield_X(int iStage)
 		VDouble qConservative1(num_of_prim_vars);
 #pragma omp  for
 #endif	
-		for (int i = 0; i <= ied; i++)
+		for (int i = 1; i <= ied + 1; i++)
 		{
 			for (int j = jst; j <= jed; j++)
 			{
@@ -108,7 +108,7 @@ void Update_Flowfield_X(int iStage)
 				if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
 				{
 					int kkk = 1;
-					//SolutionFix(qPrimitive1, i, j);
+					SolutionFix(qPrimitive1, i, j);
 				}
 				//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 				qField_N1[i][j] = qPrimitive1;
@@ -153,7 +153,7 @@ void Update_Flowfield_Y(int iStage)
 #endif	
 		for (int i = ist; i <= ied; i++)
 		{
-			for (int j = 0; j <= jed; j++)
+			for (int j = 1; j <= jed + 1; j++)
 			{
 				if (i == 16 && j == 2)
 				{
@@ -179,7 +179,7 @@ void Update_Flowfield_Y(int iStage)
 				if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
 				{
 					int kkk = 1;
-					//SolutionFix(qPrimitive1, i, j);
+					SolutionFix(qPrimitive1, i, j);
 				}
 				//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 				qField_N1[i][j] = qPrimitive1;

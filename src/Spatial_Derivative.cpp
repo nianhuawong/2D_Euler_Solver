@@ -56,16 +56,12 @@ void Spatial_Derivative::Spatial_Derivative_X()
 {
 	VInt2D& marker = mesh->Get_Marker();
 
-	//for (int j = jst; j < jed - 1; j++)
-	//{
-	//	for (int i = ist; i < ied - 1; i++)
-	//	{
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = 1; i < num_half_point_x; i++)
+	for (int i = 1; i <= ied + 1; i++)//i=0和i=ied+2的空间导数项没有值
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 			if (i == 61 && j == 62)
@@ -84,23 +80,18 @@ void Spatial_Derivative::Spatial_Derivative_X()
 			}
 		}
 	}
-	//i=0和i=total_num_pointx的空间导数项没有值
 }
 
 void Spatial_Derivative::Spatial_Derivative_Y()
 {
 	VInt2D& marker = mesh->Get_Marker();
 
-	//for (int i = ist; i < ied - 1; i++)
-	//{
-	//	for (int j = jst; j < jed - 1; j++)
-	//	{
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = 1; j < num_half_point_y; j++)
+		for (int j = 1; j <= jed + 1; j++)//j=0和j=jed+2的空间导数项没有值
 		{
 			if (marker[i][j] == 0) continue;
 			if (i == 16 && j == 2)//((i==60||i == 61) && j == 62)

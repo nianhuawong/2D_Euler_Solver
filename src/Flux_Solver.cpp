@@ -707,8 +707,8 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
 
-	VDouble fluxVector1(num_of_prim_vars);
-	VDouble fluxVector2(num_of_prim_vars);
+	VDouble fluxVector11(num_of_prim_vars);
+	VDouble fluxVector22(num_of_prim_vars);
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 0; i <= ied + 1; i++)//每个通量点的值都有了
@@ -722,7 +722,7 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
 			double p   = qField1[i][j][IP];
-			double a   = sqrt(gama * p / rho);//声速取绝对值
+			double a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			double lmd1 = u;
 			double lmd3 = u - a;
@@ -738,13 +738,13 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 				int kkk = 1;
 			}
 
-			Steger_Flux_F(fluxVector1, rho, u, v, p, lmd_m);
+			Steger_Flux_F(fluxVector11, rho, u, v, p, lmd_m);
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
 			v   = qField2[i][j][IV];
 			p   = qField2[i][j][IP];
-			a   = sqrt(gama * p / rho);//声速取绝对值
+			a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			lmd1 = u;
 			lmd3 = u - a;
@@ -760,12 +760,12 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 				int kkk = 1;
 			}
 
-			Steger_Flux_F(fluxVector2, rho, u, v, p, lmd_p);
+			Steger_Flux_F(fluxVector22, rho, u, v, p, lmd_p);
 
-			fluxVector[i][j][IR] = fluxVector1[IR] + fluxVector2[IR];
-			fluxVector[i][j][IU] = fluxVector1[IU] + fluxVector2[IU];
-			fluxVector[i][j][IV] = fluxVector1[IV] + fluxVector2[IV];
-			fluxVector[i][j][IP] = fluxVector1[IP] + fluxVector2[IP];
+			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
+			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
+			fluxVector[i][j][IV] = fluxVector11[IV] + fluxVector22[IV];
+			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
 		}
 	}
 }
@@ -775,8 +775,8 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
 
-	VDouble fluxVector1(num_of_prim_vars);
-	VDouble fluxVector2(num_of_prim_vars);
+	VDouble fluxVector11(num_of_prim_vars);
+	VDouble fluxVector22(num_of_prim_vars);
 
 	for (int j = 0; j <= jed + 1; j++)  //每个通量点的值都有了
 	{
@@ -807,7 +807,7 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 				int kkk = 1;
 			}
 
-			Steger_Flux_G(fluxVector1, rho, u, v, p, mu_m);
+			Steger_Flux_G(fluxVector11, rho, u, v, p, mu_m);
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
@@ -829,12 +829,12 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 				int kkk = 1;
 			}
 
-			Steger_Flux_G(fluxVector2, rho, u, v, p, mu_p);
+			Steger_Flux_G(fluxVector22, rho, u, v, p, mu_p);
 
-			fluxVector[i][j][IR] = fluxVector1[IR] + fluxVector2[IR];
-			fluxVector[i][j][IU] = fluxVector1[IU] + fluxVector2[IU];
-			fluxVector[i][j][IV] = fluxVector1[IV] + fluxVector2[IV];
-			fluxVector[i][j][IP] = fluxVector1[IP] + fluxVector2[IP];
+			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
+			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
+			fluxVector[i][j][IV] = fluxVector11[IV] + fluxVector22[IV];
+			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
 		}
 	}
 }
@@ -852,7 +852,7 @@ void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, doubl
 
 void Flux_Solver::Steger_Flux_G(VDouble& fluxVector, double rho, double u, double v, double p, VDouble mu)
 {
-	double a = sqrt(fabs(gama * p / rho));	//声速取绝对值
+	double a = sqrt(fabs(gama * p / rho));//声速取绝对值
 	double h = Enthalpy(rho, u, v, p, gama);
 
 	fluxVector[IR] = rho / (2 * gama) * (2 * (gama - 1) *	  mu[0] +			mu[1] +				  mu[2]);
