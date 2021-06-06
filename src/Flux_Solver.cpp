@@ -647,6 +647,7 @@ void Flux_Solver::VanLeer_Scheme()
 
 void Flux_Solver::VanLeer_Scheme_X()
 {
+	double nx = 1.0, ny = 0.0;
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
 	for (int j = jst; j <= jed; j++)
@@ -659,9 +660,10 @@ void Flux_Solver::VanLeer_Scheme_X()
 			double v1   = qField1[i][j][IV];
 			double p1   = qField1[i][j][IP];
 			double c1   = sqrt(fabs(gama * p1 / rho1));//声速取绝对值
-			double V1   = sqrt(u1 * u1 + v1 * v1);
-			double m1   = V1 / c1;
-			
+			double vn1  = nx * u1 + ny * v1;
+			double m1   = vn1 / c1;
+			double h1   = Enthalpy(rho1, u1, v1, p1, gama);
+
 			double m1p, m2m;
 			if (m1 >= 1)
 			{
@@ -681,8 +683,9 @@ void Flux_Solver::VanLeer_Scheme_X()
 			double v2   = qField2[i][j][IV];
 			double p2   = qField2[i][j][IP];
 			double c2   = sqrt(fabs(gama * p2 / rho2));//声速取绝对值
-			double V2   = sqrt(u2 * u2 + v2 * v2);
-			double m2   = V2 / c2;
+			double vn2  = nx * u2 + ny * v2;
+			double m2   = vn2 / c2;
+			double h2 = Enthalpy(rho2, u2, v2, p2, gama);
 
 			if (m2 >= 1)
 			{
@@ -701,26 +704,34 @@ void Flux_Solver::VanLeer_Scheme_X()
 
 			if (fabs(mn) < 1)
 			{
-				double fmass1 =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
-				double fmass2 = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+				double fmass =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+				double term0 = (-vn1 + 2.0 * c1) / gama;
+				double term1 = pow((gama - 1) * vn1 + 2.0 * c1, 2);
+				double term2 = 0.5 * (u1 * u1 + v1 * v1 - vn1 * vn1);
+				//F+
+				fluxVector11[IR] = fmass;
+				fluxVector11[IU] = fmass * (u1 + nx * term0);
+				fluxVector11[IV] = fmass * (v1 + ny * term0);
+				//fluxVector11[IP] = fmass * h1;
+				fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 
-				double term1 = pow((gama - 1) * V1 + 2.0 * c1, 2);
-				double term2 = 0.5 * (u1 * u1 + v1 * v1 - V1 * V1);
-				fluxVector11[IR] = fmass1;
-				fluxVector11[IU] = fmass1 * ((-V1 + 2.0 * c1) / gama + u1);
-				fluxVector11[IV] = fmass1 * ((-V1 + 2.0 * c1) / gama + v1);
-				fluxVector11[IP] = fmass1 * ( term1 / 2.0 / (pow(gama, 2) - 1));
+				//F-
+				fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+				term0 = (-vn2 - 2.0 * c2) / gama;
+				term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
+				term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
 
-				term1 = pow((gama - 1) * V2 - 2.0 * c2, 2);
-				term2 = 0.5 * (u2 * u2 + v2 * v2 - V2 * V2);
-				fluxVector22[IR] = fmass2;
-				fluxVector22[IU] = fmass2 * ((-V2 - 2.0 * c2) / gama + u2);
-				fluxVector22[IV] = fmass2 * ((-V2 - 2.0 * c2) / gama + v2);
-				fluxVector22[IP] = fmass2 * (term1 / 2.0 / (pow(gama, 2) - 1));
+				fluxVector22[IR] = fmass;
+				fluxVector22[IU] = fmass * (u2 + nx * term0);
+				fluxVector22[IV] = fmass * (v2 + ny * term0);
+				//fluxVector22[IP] = fmass * h2;
+				fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 			}
 			else if(mn >= 1)
 			{
+				//F+
 				Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
+				//F-
 				fluxVector22[IR] = 0;
 				fluxVector22[IU] = 0;
 				fluxVector22[IV] = 0;
@@ -728,10 +739,12 @@ void Flux_Solver::VanLeer_Scheme_X()
 			}
 			else if(mn <= -1)
 			{
+				//F+
 				fluxVector11[IR] = 0;
 				fluxVector11[IU] = 0;
 				fluxVector11[IV] = 0;
 				fluxVector11[IP] = 0;
+				//F-
 				Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
 			}
 
@@ -745,6 +758,7 @@ void Flux_Solver::VanLeer_Scheme_X()
 
 void Flux_Solver::VanLeer_Scheme_Y()
 {
+	double nx = 0.0, ny = 1.0;
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
 	for (int i = ist; i <= ied; i++)
@@ -757,8 +771,9 @@ void Flux_Solver::VanLeer_Scheme_Y()
 			double v1   = qField1[i][j][IV];
 			double p1   = qField1[i][j][IP];
 			double c1   = sqrt(fabs(gama * p1 / rho1));//声速取绝对值
-			double V1   = sqrt(u1 * u1 + v1 * v1);
-			double m1   = V1 / c1;
+			double vn1  = nx * u1 + ny * v1;
+			double m1   = vn1 / c1;
+			double h1   = Enthalpy(rho1, u1, v1, p1, gama);
 			
 			double m1p, m2m;
 			if (m1 >= 1)
@@ -779,8 +794,9 @@ void Flux_Solver::VanLeer_Scheme_Y()
 			double v2   = qField2[i][j][IV];
 			double p2   = qField2[i][j][IP];
 			double c2   = sqrt(fabs(gama * p2 / rho2));//声速取绝对值
-			double V2   = sqrt(u2 * u2 + v2 * v2);
-			double m2   = V2 / c2;
+			double vn2  = nx * u2 + ny * v2;
+			double m2   = vn2 / c2;
+			double h2   = Enthalpy(rho2, u2, v2, p2, gama);
 
 			if (m2 >= 1)
 			{
@@ -799,22 +815,28 @@ void Flux_Solver::VanLeer_Scheme_Y()
 
 			if (fabs(mn) < 1)
 			{
-				double fmass1 =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
-				double fmass2 = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+				double fmass = rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+				double term0 = (-vn1 + 2.0 * c1) / gama;
+				double term1 = pow((gama - 1) * vn1 + 2.0 * c1, 2);
+				double term2 = 0.5 * (u1 * u1 + v1 * v1 - vn1 * vn1);
+				//G+
+				fluxVector11[IR] = fmass;
+				fluxVector11[IU] = fmass * (u1 + nx * term0);
+				fluxVector11[IV] = fmass * (v1 + ny * term0);
+				//fluxVector11[IP] = fmass * h1;
+				fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 
-				double term1 = pow((gama - 1) * V1 + 2.0 * c1, 2);
-				double term2 = 0.5 * (u1 * u1 + v1 * v1 - V1 * V1);
-				fluxVector11[IR] = fmass1;
-				fluxVector11[IU] = fmass1 * ((-V1 + 2.0 * c1) / gama + u1);
-				fluxVector11[IV] = fmass1 * ((-V1 + 2.0 * c1) / gama + v1);
-				fluxVector11[IP] = fmass1 * (term1 / 2.0 / (pow(gama, 2) - 1));
+				//G-
+				fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+				term0 = (-vn2 - 2.0 * c2) / gama;
+				term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
+				term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
 
-				term1 = pow((gama - 1) * V2 - 2.0 * c2, 2);
-				term2 = 0.5 * (u2 * u2 + v2 * v2 - V2 * V2);
-				fluxVector22[IR] = fmass2;
-				fluxVector22[IU] = fmass2 * ((-V2 - 2.0 * c2) / gama + u2);
-				fluxVector22[IV] = fmass2 * ((-V2 - 2.0 * c2) / gama + v2);
-				fluxVector22[IP] = fmass2 * (term1 / 2.0 / (pow(gama, 2) - 1));
+				fluxVector22[IR] = fmass;
+				fluxVector22[IU] = fmass * (u2 + nx * term0);
+				fluxVector22[IV] = fmass * (v2 + ny * term0);
+				//fluxVector22[IP] = fmass * h2;
+				fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 			}
 			else if (mn >= 1)
 			{
