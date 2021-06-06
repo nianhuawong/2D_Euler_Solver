@@ -687,24 +687,81 @@ void Flux_Solver::VanLeer_Scheme_X()
 			double m2   = vn2 / c2;
 			double h2 = Enthalpy(rho2, u2, v2, p2, gama);
 
-			if (m2 >= 1)
+			//if (m2 >= 1)
+			//{
+			//	m2m = 0;
+			//}
+			//else if (m1 <= -1)
+			//{
+			//	m2m = m2;
+			//}
+			//else
+			//{
+			//	m2m = 0.25 * (m2 - 1) * (m2 - 1);
+			//}
+
+			//double mn = m1p + m2m;
+
+			//if (fabs(mn) < 1)
+			//{
+			//	double fmass =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+			//	double term0 = (-vn1 + 2.0 * c1) / gama;
+			//	double term1 = pow((gama - 1) * vn1 + 2.0 * c1, 2);
+			//	double term2 = 0.5 * (u1 * u1 + v1 * v1 - vn1 * vn1);
+			//	//F+
+			//	fluxVector11[IR] = fmass;
+			//	fluxVector11[IU] = fmass * (u1 + nx * term0);
+			//	fluxVector11[IV] = fmass * (v1 + ny * term0);
+			//	//fluxVector11[IP] = fmass * h1;
+			//	fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+
+			//	//F-
+			//	fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+			//	term0 = (-vn2 - 2.0 * c2) / gama;
+			//	term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
+			//	term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
+
+			//	fluxVector22[IR] = fmass;
+			//	fluxVector22[IU] = fmass * (u2 + nx * term0);
+			//	fluxVector22[IV] = fmass * (v2 + ny * term0);
+			//	//fluxVector22[IP] = fmass * h2;
+			//	fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+			//}
+			//else if(mn >= 1)
+			//{
+			//	//F+
+			//	Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
+			//	//F-
+			//	fluxVector22[IR] = 0;
+			//	fluxVector22[IU] = 0;
+			//	fluxVector22[IV] = 0;
+			//	fluxVector22[IP] = 0;
+			//}
+			//else if(mn <= -1)
+			//{
+			//	//F+
+			//	fluxVector11[IR] = 0;
+			//	fluxVector11[IU] = 0;
+			//	fluxVector11[IV] = 0;
+			//	fluxVector11[IP] = 0;
+			//	//F-
+			//	Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
+			//}
+
+			if (m1 > 1.0)
 			{
-				m2m = 0;
+				Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
 			}
-			else if (m1 <= -1)
+			else if (m1 < -1.0)
 			{
-				m2m = m2;
+				fluxVector11[IR] = 0;
+				fluxVector11[IU] = 0;
+				fluxVector11[IV] = 0;
+				fluxVector11[IP] = 0;
 			}
 			else
 			{
-				m2m = 0.25 * (m2 - 1) * (m2 - 1);
-			}
-
-			double mn = m1p + m2m;
-
-			if (fabs(mn) < 1)
-			{
-				double fmass =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+				double fmass = rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
 				double term0 = (-vn1 + 2.0 * c1) / gama;
 				double term1 = pow((gama - 1) * vn1 + 2.0 * c1, 2);
 				double term2 = 0.5 * (u1 * u1 + v1 * v1 - vn1 * vn1);
@@ -712,40 +769,34 @@ void Flux_Solver::VanLeer_Scheme_X()
 				fluxVector11[IR] = fmass;
 				fluxVector11[IU] = fmass * (u1 + nx * term0);
 				fluxVector11[IV] = fmass * (v1 + ny * term0);
-				//fluxVector11[IP] = fmass * h1;
-				fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
-
-				//F-
-				fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
-				term0 = (-vn2 - 2.0 * c2) / gama;
-				term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
-				term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
-
-				fluxVector22[IR] = fmass;
-				fluxVector22[IU] = fmass * (u2 + nx * term0);
-				fluxVector22[IV] = fmass * (v2 + ny * term0);
-				//fluxVector22[IP] = fmass * h2;
-				fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+				fluxVector11[IP] = fmass * h1;
+				//fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 			}
-			else if(mn >= 1)
+
+			if (m2 > 1.0)
 			{
-				//F+
-				Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
-				//F-
 				fluxVector22[IR] = 0;
 				fluxVector22[IU] = 0;
 				fluxVector22[IV] = 0;
 				fluxVector22[IP] = 0;
 			}
-			else if(mn <= -1)
+			else if (m2 < -1.0)
 			{
-				//F+
-				fluxVector11[IR] = 0;
-				fluxVector11[IU] = 0;
-				fluxVector11[IV] = 0;
-				fluxVector11[IP] = 0;
-				//F-
 				Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
+			}
+			else
+			{
+				//F-
+				double fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+				double term0 = (-vn2 - 2.0 * c2) / gama;
+				double term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
+				double term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
+
+				fluxVector22[IR] = fmass;
+				fluxVector22[IU] = fmass * (u2 + nx * term0);
+				fluxVector22[IV] = fmass * (v2 + ny * term0);
+				fluxVector22[IP] = fmass * h2;
+				//fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 			}
 
 			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
@@ -798,22 +849,75 @@ void Flux_Solver::VanLeer_Scheme_Y()
 			double m2   = vn2 / c2;
 			double h2   = Enthalpy(rho2, u2, v2, p2, gama);
 
-			if (m2 >= 1)
+			//if (m2 >= 1)
+			//{
+			//	m2m = 0;
+			//}
+			//else if (m1 <= -1)
+			//{
+			//	m2m = m2;
+			//}
+			//else
+			//{
+			//	m2m = 0.25 * (m2 - 1) * (m2 - 1);
+			//}
+
+			//double mn = m1p + m2m;
+
+			//if (fabs(mn) < 1)
+			//{
+			//	double fmass = rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+			//	double term0 = (-vn1 + 2.0 * c1) / gama;
+			//	double term1 = pow((gama - 1) * vn1 + 2.0 * c1, 2);
+			//	double term2 = 0.5 * (u1 * u1 + v1 * v1 - vn1 * vn1);
+			//	//G+
+			//	fluxVector11[IR] = fmass;
+			//	fluxVector11[IU] = fmass * (u1 + nx * term0);
+			//	fluxVector11[IV] = fmass * (v1 + ny * term0);
+			//	//fluxVector11[IP] = fmass * h1;
+			//	fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+
+			//	//G-
+			//	fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+			//	term0 = (-vn2 - 2.0 * c2) / gama;
+			//	term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
+			//	term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
+
+			//	fluxVector22[IR] = fmass;
+			//	fluxVector22[IU] = fmass * (u2 + nx * term0);
+			//	fluxVector22[IV] = fmass * (v2 + ny * term0);
+			//	//fluxVector22[IP] = fmass * h2;
+			//	fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+			//}
+			//else if (mn >= 1)
+			//{
+			//	Inviscid_Flux_G(fluxVector11, rho1, u1, v1, p1);
+			//	fluxVector22[IR] = 0;
+			//	fluxVector22[IU] = 0;
+			//	fluxVector22[IV] = 0;
+			//	fluxVector22[IP] = 0;
+			//}
+			//else if (mn <= -1)
+			//{
+			//	fluxVector11[IR] = 0;
+			//	fluxVector11[IU] = 0;
+			//	fluxVector11[IV] = 0;
+			//	fluxVector11[IP] = 0;
+			//	Inviscid_Flux_G(fluxVector22, rho2, u2, v2, p2);
+			//}
+
+			if (m1 > 1.0)
 			{
-				m2m = 0;
+				Inviscid_Flux_G(fluxVector11, rho1, u1, v1, p1);
 			}
-			else if (m1 <= -1)
+			else if (m1 < -1.0)
 			{
-				m2m = m2;
+				fluxVector11[IR] = 0;
+				fluxVector11[IU] = 0;
+				fluxVector11[IV] = 0;
+				fluxVector11[IP] = 0;
 			}
 			else
-			{
-				m2m = 0.25 * (m2 - 1) * (m2 - 1);
-			}
-
-			double mn = m1p + m2m;
-
-			if (fabs(mn) < 1)
 			{
 				double fmass = rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
 				double term0 = (-vn1 + 2.0 * c1) / gama;
@@ -823,38 +927,36 @@ void Flux_Solver::VanLeer_Scheme_Y()
 				fluxVector11[IR] = fmass;
 				fluxVector11[IU] = fmass * (u1 + nx * term0);
 				fluxVector11[IV] = fmass * (v1 + ny * term0);
-				//fluxVector11[IP] = fmass * h1;
-				fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
-
-				//G-
-				fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
-				term0 = (-vn2 - 2.0 * c2) / gama;
-				term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
-				term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
-
-				fluxVector22[IR] = fmass;
-				fluxVector22[IU] = fmass * (u2 + nx * term0);
-				fluxVector22[IV] = fmass * (v2 + ny * term0);
-				//fluxVector22[IP] = fmass * h2;
-				fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+				fluxVector11[IP] = fmass * h1;
+				//fluxVector11[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
 			}
-			else if (mn >= 1)
+
+			if (m2 > 1.0)
 			{
-				Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
 				fluxVector22[IR] = 0;
 				fluxVector22[IU] = 0;
 				fluxVector22[IV] = 0;
 				fluxVector22[IP] = 0;
 			}
-			else if (mn <= -1)
+			else if (m2 < -1.0)
 			{
-				fluxVector11[IR] = 0;
-				fluxVector11[IU] = 0;
-				fluxVector11[IV] = 0;
-				fluxVector11[IP] = 0;
-				Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
+				Inviscid_Flux_G(fluxVector22, rho2, u2, v2, p2);
 			}
+			else
+			{
+				//G-
+				double fmass = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+				double term0 = (-vn2 - 2.0 * c2) / gama;
+				double term1 = pow((gama - 1) * vn2 - 2.0 * c2, 2);
+				double term2 = 0.5 * (u2 * u2 + v2 * v2 - vn2 * vn2);
 
+				fluxVector22[IR] = fmass;
+				fluxVector22[IU] = fmass * (u2 + nx * term0);
+				fluxVector22[IV] = fmass * (v2 + ny * term0);
+				fluxVector22[IP] = fmass * h2;
+				//fluxVector22[IP] = fmass * (term1 / 2.0 / (pow(gama, 2) - 1) + term2);
+			}
+			
 			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
 			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
 			fluxVector[i][j][IV] = fluxVector11[IV] + fluxVector22[IV];
