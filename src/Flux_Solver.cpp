@@ -498,18 +498,14 @@ void Flux_Solver::Roe_Scheme_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho1 = qField1[i][j][IR];
-			double u1   = qField1[i][j][IU];
-			double v1	= qField1[i][j][IV];
-			double p1   = qField1[i][j][IP];
+			double rho1, u1, v1, p1;
+			ExtractValue(qField1[i][j], rho1, u1, v1, p1);
 			double H1   = Enthalpy(rho1, u1, v1, p1, gama);
 
 			Inviscid_Flux_F(fluxVector1, rho1, u1, v1, p1);
 
-			double rho2 = qField2[i][j][IR];
-			double u2   = qField2[i][j][IU];
-			double v2   = qField2[i][j][IV];
-			double p2   = qField2[i][j][IP];
+			double rho2, u2, v2, p2;
+			ExtractValue(qField2[i][j], rho2, u2, v2, p2);
 			double H2   = Enthalpy(rho2, u2, v2, p2, gama);
 
 			Inviscid_Flux_F(fluxVector2, rho2, u2, v2, p2);
@@ -578,18 +574,14 @@ void Flux_Solver::Roe_Scheme_Y()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho1 = qField1[i][j][IR];
-			double u1   = qField1[i][j][IU];
-			double v1   = qField1[i][j][IV];
-			double p1   = qField1[i][j][IP];
+			double rho1, u1, v1, p1;
+			ExtractValue(qField1[i][j], rho1, u1, v1, p1);
 			double H1   = Enthalpy(rho1, u1, v1, p1, gama);
 
 			Inviscid_Flux_G(fluxVector1, rho1, u1, v1, p1);
 
-			double rho2 = qField2[i][j][IR];
-			double u2   = qField2[i][j][IU];
-			double v2   = qField2[i][j][IV];
-			double p2   = qField2[i][j][IP];
+			double rho2, u2, v2, p2;
+			ExtractValue(qField2[i][j], rho2, u2, v2, p2);
 			double H2   = Enthalpy(rho2, u2, v2, p2, gama);
 
 			Inviscid_Flux_G(fluxVector2, rho2, u2, v2, p2);
@@ -653,32 +645,33 @@ void Flux_Solver::VanLeer_Scheme_X()
 #ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
+	double rho1, u1, v1, p1;
+	double rho2, u2, v2, p2;
 #endif
 #ifdef _OPENMP
 #pragma omp parallel 
 	{
 		VDouble fluxVector11(num_of_prim_vars);
 		VDouble fluxVector22(num_of_prim_vars);
+		double rho1, u1, v1, p1;
+		double rho2, u2, v2, p2;
 #pragma omp	for
 #endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 0; i <= ied + 1; i++)//每个通量点的值都有了
 		{
-			//if (marker[i][j] == 0) continue;
-			double rho1 = qField1[i][j][IR];
-			double u1   = qField1[i][j][IU];
-			double v1   = qField1[i][j][IV];
-			double p1   = qField1[i][j][IP];
+			if (marker[i][j] == 0) continue;
+
+			ExtractValue(qField1[i][j], rho1, u1, v1, p1);
+
 			double c1   = sqrt(fabs(gama * p1 / rho1));//声速取绝对值
 			double vn1  = nx * u1 + ny * v1;
 			double m1   = vn1 / c1;
 			double h1   = Enthalpy(rho1, u1, v1, p1, gama);
 
-			double rho2 = qField2[i][j][IR];
-			double u2   = qField2[i][j][IU];
-			double v2   = qField2[i][j][IV];
-			double p2   = qField2[i][j][IP];
+			ExtractValue(qField2[i][j], rho2, u2, v2, p2);
+
 			double c2   = sqrt(fabs(gama * p2 / rho2));//声速取绝对值
 			double vn2  = nx * u2 + ny * v2;
 			double m2   = vn2 / c2;
@@ -754,12 +747,16 @@ void Flux_Solver::VanLeer_Scheme_Y()
 #ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
+	double rho1, u1, v1, p1;
+	double rho2, u2, v2, p2;
 #endif
 #ifdef _OPENMP
 #pragma omp parallel 
 	{
 		VDouble fluxVector11(num_of_prim_vars);
 		VDouble fluxVector22(num_of_prim_vars);
+		double rho1, u1, v1, p1;
+		double rho2, u2, v2, p2;
 #pragma omp	for
 #endif
 	for (int i = ist; i <= ied; i++)
@@ -767,19 +764,16 @@ void Flux_Solver::VanLeer_Scheme_Y()
 		for (int j = 0; j <= jed + 1; j++)//每个通量点的值都有了
 		{
 			if (marker[i][j] == 0) continue;
-			double rho1 = qField1[i][j][IR];
-			double u1   = qField1[i][j][IU];
-			double v1   = qField1[i][j][IV];
-			double p1   = qField1[i][j][IP];
+
+			ExtractValue(qField1[i][j], rho1, u1, v1, p1);
+
 			double c1   = sqrt(fabs(gama * p1 / rho1));//声速取绝对值
 			double vn1  = nx * u1 + ny * v1;
 			double m1   = vn1 / c1;
 			double h1   = Enthalpy(rho1, u1, v1, p1, gama);
 
-			double rho2 = qField2[i][j][IR];
-			double u2   = qField2[i][j][IU];
-			double v2   = qField2[i][j][IV];
-			double p2   = qField2[i][j][IP];
+			ExtractValue(qField2[i][j], rho2, u2, v2, p2);
+
 			double c2   = sqrt(fabs(gama * p2 / rho2));//声速取绝对值
 			double vn2  = nx * u2 + ny * v2;
 			double m2   = vn2 / c2;
@@ -880,10 +874,8 @@ void Flux_Solver::Steger_Warming_Scheme_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField[i][j][IR];
-			double u = qField[i][j][IU];
-			double v = qField[i][j][IV];
-			double p = qField[i][j][IP];
+			double rho, u, v, p;
+			ExtractValue(qField[i][j], rho, u, v, p);
 			double a = sqrt(fabs(gama * p / rho));
 
 			double lmd1 = u;
@@ -924,10 +916,9 @@ void Flux_Solver::Steger_Warming_Scheme_Y()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField[i][j][IR];
-			double u = qField[i][j][IU];
-			double v = qField[i][j][IV];
-			double p = qField[i][j][IP];
+			double rho, u, v, p;
+			ExtractValue(qField[i][j], rho, u, v, p);
+
 			double a = sqrt(fabs(gama * p / rho));
 
 			double mu1 = v;
@@ -972,11 +963,10 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField1[i][j][IR];
-			double u   = qField1[i][j][IU];
-			double v   = qField1[i][j][IV];
-			double p   = qField1[i][j][IP];
-			double a   = sqrt(fabs(gama * p / rho));//声速取绝对值
+			double rho, u, v, p;
+			ExtractValue(qField1[i][j], rho, u, v, p);
+
+			double a    = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			double lmd1 = u;
 			double lmd3 = u - a;
@@ -989,11 +979,9 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 			
 			Steger_Flux_F(fluxVector11, rho, u, v, p, lmd_p);	//F+
 
-			rho = qField2[i][j][IR];
-			u   = qField2[i][j][IU];
-			v   = qField2[i][j][IV];
-			p   = qField2[i][j][IP];
-			a   = sqrt(fabs(gama * p / rho));//声速取绝对值
+			ExtractValue(qField2[i][j], rho, u, v, p);
+
+			a    = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			lmd1 = u;
 			lmd3 = u - a;
@@ -1038,10 +1026,9 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 		{
 			if (marker[i][j] == 0) continue;
 
-			double rho = qField1[i][j][IR];
-			double u   = qField1[i][j][IU];
-			double v   = qField1[i][j][IV];
-			double p   = qField1[i][j][IP];
+			double rho, u, v, p;
+			ExtractValue(qField1[i][j], rho, u, v, p);
+
 			double a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			double mu1 = v;
@@ -1055,10 +1042,8 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 			
 			Steger_Flux_G(fluxVector11, rho, u, v, p, mu_p);	//G+
 
-			rho = qField2[i][j][IR];
-			u   = qField2[i][j][IU];
-			v   = qField2[i][j][IV];
-			p   = qField2[i][j][IP];
+			ExtractValue(qField2[i][j], rho, u, v, p);
+
 			a   = sqrt(fabs(gama * p / rho));//声速取绝对值
 
 			mu1 = v;
