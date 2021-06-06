@@ -648,8 +648,19 @@ void Flux_Solver::VanLeer_Scheme()
 void Flux_Solver::VanLeer_Scheme_X()
 {
 	double nx = 1.0, ny = 0.0;
+
+	VInt2D& marker = mesh->Get_Marker();
+#ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
+#endif
+#ifdef _OPENMP
+#pragma omp parallel 
+	{
+		VDouble fluxVector11(num_of_prim_vars);
+		VDouble fluxVector22(num_of_prim_vars);
+#pragma omp	for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 0; i <= ied + 1; i++)//每个通量点的值都有了
@@ -730,18 +741,32 @@ void Flux_Solver::VanLeer_Scheme_X()
 			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
 		}
 	}
+#ifdef _OPENMP
+}
+#endif // _OPENMP
 }
 
 void Flux_Solver::VanLeer_Scheme_Y()
 {
+	VInt2D& marker = mesh->Get_Marker();
+
 	double nx = 0.0, ny = 1.0;
+#ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
+#endif
+#ifdef _OPENMP
+#pragma omp parallel 
+	{
+		VDouble fluxVector11(num_of_prim_vars);
+		VDouble fluxVector22(num_of_prim_vars);
+#pragma omp	for
+#endif
 	for (int i = ist; i <= ied; i++)
 	{
 		for (int j = 0; j <= jed + 1; j++)//每个通量点的值都有了
 		{
-			//if (marker[i][j] == 0) continue;
+			if (marker[i][j] == 0) continue;
 			double rho1 = qField1[i][j][IR];
 			double u1   = qField1[i][j][IU];
 			double v1   = qField1[i][j][IV];
@@ -817,6 +842,9 @@ void Flux_Solver::VanLeer_Scheme_Y()
 			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
 		}
 	}
+#ifdef _OPENMP
+	}
+#endif // _OPENMP
 }
 
 void Flux_Solver::Steger_Warming_Scheme()
@@ -832,21 +860,6 @@ void Flux_Solver::Steger_Warming_Scheme()
 			this->Steger_Warming_Scheme_Interp_Y();
 		}
 	}
-	//else if (method_of_half_q == 2)	//不插值，直接计算整数节点通量
-	//{
-	//	if (solve_direction == 'x')
-	//	{
-	//		this->Steger_Warming_Scheme_X();
-	//	}
-	//	else if (solve_direction == 'y')
-	//	{
-	//		this->Steger_Warming_Scheme_Y();
-	//	}
-	//	else
-	//	{
-	//		cout << "出错，请检查！" << endl;
-	//	}
-	//}
 }
 
 void Flux_Solver::Steger_Warming_Scheme_X()
