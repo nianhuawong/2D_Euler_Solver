@@ -41,10 +41,14 @@ void Flux_Solver::Solve_Flux()
 	}
 	else if (method_of_flux == 3)
 	{
+		VanLeer_Scheme();		//二阶vanLeer
+	}
+	else if (method_of_flux == 4)
+	{
 		//半节点左右通量插值：WENO方法
 		WENO_Scheme();		
 	}
-	else if (method_of_flux == 4)
+	else if (method_of_flux == 5)
 	{
 		//WCNS原始变量插值已经做完；
 		//计算半节点左右通量和roe通量
@@ -627,6 +631,214 @@ void Flux_Solver::Roe_Scheme_Y()
 #ifdef _OPENMP
 }
 #endif // _OPENMP
+}
+
+void Flux_Solver::VanLeer_Scheme()
+{
+	if (solve_direction == 'x')
+	{
+		this->VanLeer_Scheme_X();
+	}
+	else if (solve_direction == 'y')
+	{
+		this->VanLeer_Scheme_Y();
+	}
+}
+
+void Flux_Solver::VanLeer_Scheme_X()
+{
+	VDouble fluxVector11(num_of_prim_vars);
+	VDouble fluxVector22(num_of_prim_vars);
+	for (int j = jst; j <= jed; j++)
+	{
+		for (int i = 0; i <= ied + 1; i++)//每个通量点的值都有了
+		{
+			//if (marker[i][j] == 0) continue;
+			double rho1 = qField1[i][j][IR];
+			double u1   = qField1[i][j][IU];
+			double v1   = qField1[i][j][IV];
+			double p1   = qField1[i][j][IP];
+			double c1   = sqrt(fabs(gama * p1 / rho1));//声速取绝对值
+			double V1   = sqrt(u1 * u1 + v1 * v1);
+			double m1   = V1 / c1;
+			
+			double m1p, m2m;
+			if (m1 >= 1)
+			{
+				m1p = m1;
+			}
+			else if (m1 <= -1)
+			{
+				m1p = 0;
+			}
+			else
+			{
+				m1p = 0.25 * (m1 + 1) * (m1 + 1);
+			}
+
+			double rho2 = qField2[i][j][IR];
+			double u2   = qField2[i][j][IU];
+			double v2   = qField2[i][j][IV];
+			double p2   = qField2[i][j][IP];
+			double c2   = sqrt(fabs(gama * p2 / rho2));//声速取绝对值
+			double V2   = sqrt(u2 * u2 + v2 * v2);
+			double m2   = V2 / c2;
+
+			if (m2 >= 1)
+			{
+				m2m = 0;
+			}
+			else if (m1 <= -1)
+			{
+				m2m = m2;
+			}
+			else
+			{
+				m2m = 0.25 * (m2 - 1) * (m2 - 1);
+			}
+
+			double mn = m1p + m2m;
+
+			if (fabs(mn) < 1)
+			{
+				double fmass1 =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+				double fmass2 = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+
+				double term1 = pow((gama - 1) * V1 + 2.0 * c1, 2);
+				double term2 = 0.5 * (u1 * u1 + v1 * v1 - V1 * V1);
+				fluxVector11[IR] = fmass1;
+				fluxVector11[IU] = fmass1 * ((-V1 + 2.0 * c1) / gama + u1);
+				fluxVector11[IV] = fmass1 * ((-V1 + 2.0 * c1) / gama + v1);
+				fluxVector11[IP] = fmass1 * ( term1 / 2.0 / (pow(gama, 2) - 1));
+
+				term1 = pow((gama - 1) * V2 - 2.0 * c2, 2);
+				term2 = 0.5 * (u2 * u2 + v2 * v2 - V2 * V2);
+				fluxVector22[IR] = fmass2;
+				fluxVector22[IU] = fmass2 * ((-V2 - 2.0 * c2) / gama + u2);
+				fluxVector22[IV] = fmass2 * ((-V2 - 2.0 * c2) / gama + v2);
+				fluxVector22[IP] = fmass2 * (term1 / 2.0 / (pow(gama, 2) - 1));
+			}
+			else if(mn >= 1)
+			{
+				Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
+				fluxVector22[IR] = 0;
+				fluxVector22[IU] = 0;
+				fluxVector22[IV] = 0;
+				fluxVector22[IP] = 0;
+			}
+			else if(mn <= -1)
+			{
+				fluxVector11[IR] = 0;
+				fluxVector11[IU] = 0;
+				fluxVector11[IV] = 0;
+				fluxVector11[IP] = 0;
+				Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
+			}
+
+			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
+			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
+			fluxVector[i][j][IV] = fluxVector11[IV] + fluxVector22[IV];
+			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
+		}
+	}
+}
+
+void Flux_Solver::VanLeer_Scheme_Y()
+{
+	VDouble fluxVector11(num_of_prim_vars);
+	VDouble fluxVector22(num_of_prim_vars);
+	for (int i = ist; i <= ied; i++)
+	{
+		for (int j = 0; j <= jed + 1; j++)//每个通量点的值都有了
+		{
+			//if (marker[i][j] == 0) continue;
+			double rho1 = qField1[i][j][IR];
+			double u1   = qField1[i][j][IU];
+			double v1   = qField1[i][j][IV];
+			double p1   = qField1[i][j][IP];
+			double c1   = sqrt(fabs(gama * p1 / rho1));//声速取绝对值
+			double V1   = sqrt(u1 * u1 + v1 * v1);
+			double m1   = V1 / c1;
+			
+			double m1p, m2m;
+			if (m1 >= 1)
+			{
+				m1p = m1;
+			}
+			else if (m1 <= -1)
+			{
+				m1p = 0;
+			}
+			else
+			{
+				m1p = 0.25 * (m1 + 1) * (m1 + 1);
+			}
+
+			double rho2 = qField2[i][j][IR];
+			double u2   = qField2[i][j][IU];
+			double v2   = qField2[i][j][IV];
+			double p2   = qField2[i][j][IP];
+			double c2   = sqrt(fabs(gama * p2 / rho2));//声速取绝对值
+			double V2   = sqrt(u2 * u2 + v2 * v2);
+			double m2   = V2 / c2;
+
+			if (m2 >= 1)
+			{
+				m2m = 0;
+			}
+			else if (m1 <= -1)
+			{
+				m2m = m2;
+			}
+			else
+			{
+				m2m = 0.25 * (m2 - 1) * (m2 - 1);
+			}
+
+			double mn = m1p + m2m;
+
+			if (fabs(mn) < 1)
+			{
+				double fmass1 =  rho1 * c1 * 0.25 * (m1 + 1) * (m1 + 1);
+				double fmass2 = -rho2 * c2 * 0.25 * (m2 - 1) * (m2 - 1);
+
+				double term1 = pow((gama - 1) * V1 + 2.0 * c1, 2);
+				double term2 = 0.5 * (u1 * u1 + v1 * v1 - V1 * V1);
+				fluxVector11[IR] = fmass1;
+				fluxVector11[IU] = fmass1 * ((-V1 + 2.0 * c1) / gama + u1);
+				fluxVector11[IV] = fmass1 * ((-V1 + 2.0 * c1) / gama + v1);
+				fluxVector11[IP] = fmass1 * (term1 / 2.0 / (pow(gama, 2) - 1));
+
+				term1 = pow((gama - 1) * V2 - 2.0 * c2, 2);
+				term2 = 0.5 * (u2 * u2 + v2 * v2 - V2 * V2);
+				fluxVector22[IR] = fmass2;
+				fluxVector22[IU] = fmass2 * ((-V2 - 2.0 * c2) / gama + u2);
+				fluxVector22[IV] = fmass2 * ((-V2 - 2.0 * c2) / gama + v2);
+				fluxVector22[IP] = fmass2 * (term1 / 2.0 / (pow(gama, 2) - 1));
+			}
+			else if (mn >= 1)
+			{
+				Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
+				fluxVector22[IR] = 0;
+				fluxVector22[IU] = 0;
+				fluxVector22[IV] = 0;
+				fluxVector22[IP] = 0;
+			}
+			else if (mn <= -1)
+			{
+				fluxVector11[IR] = 0;
+				fluxVector11[IU] = 0;
+				fluxVector11[IV] = 0;
+				fluxVector11[IP] = 0;
+				Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
+			}
+
+			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
+			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
+			fluxVector[i][j][IV] = fluxVector11[IV] + fluxVector22[IV];
+			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
+		}
+	}
 }
 
 void Flux_Solver::Steger_Warming_Scheme()

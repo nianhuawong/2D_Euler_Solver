@@ -28,6 +28,10 @@ protected:
 	void Steger_Warming_Scheme_Interp_X();
 	void Steger_Warming_Scheme_Interp_Y();
 
+	void VanLeer_Scheme();
+	void VanLeer_Scheme_X();
+	void VanLeer_Scheme_Y();
+
 	void WENO_Scheme();
 	void WENO_Scheme_X();
 	void WENO_Scheme_Y();
