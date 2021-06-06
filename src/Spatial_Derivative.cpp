@@ -138,33 +138,33 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			rhs[1][j][iVar] =-(-11.0/12 * fluxVector[0][j][iVar] + 17.0/24 * fluxVector[1][j][iVar]
-							   + 3.0/8  * fluxVector[2][j][iVar] -  5.0/24 * fluxVector[3][j][iVar]
-							   + 1.0/24 * fluxVector[4][j][iVar]) / ds;
+			//rhs[1][j][iVar] =-(-11.0/12 * fluxVector[0][j][iVar] + 17.0/24 * fluxVector[1][j][iVar]
+			//				   + 3.0/8  * fluxVector[2][j][iVar] -  5.0/24 * fluxVector[3][j][iVar]
+			//				   + 1.0/24 * fluxVector[4][j][iVar]) / ds;
 
-			rhs[2][j][iVar] =-(- 1.0/24 * fluxVector[0][j][iVar] -  9.0/8  * fluxVector[1][j][iVar]
-							   + 9.0/8	* fluxVector[2][j][iVar] -  1.0/24 * fluxVector[3][j][iVar]) / ds;
+			//rhs[2][j][iVar] =-(- 1.0/24 * fluxVector[0][j][iVar] -  9.0/8  * fluxVector[1][j][iVar]
+			//				   + 9.0/8	* fluxVector[2][j][iVar] -  1.0/24 * fluxVector[3][j][iVar]) / ds;
 
-			rhs[ied    ][j][iVar] = (- 1.0/24 * fluxVector[ied + 1][j][iVar] -  9.0/8  * fluxVector[ied    ][j][iVar]
-									 + 9.0/8  * fluxVector[ied - 1][j][iVar] -  1.0/24 * fluxVector[ied - 2][j][iVar]) / ds;
+			//rhs[ied    ][j][iVar] = (- 1.0/24 * fluxVector[ied + 1][j][iVar] -  9.0/8  * fluxVector[ied    ][j][iVar]
+			//						 + 9.0/8  * fluxVector[ied - 1][j][iVar] -  1.0/24 * fluxVector[ied - 2][j][iVar]) / ds;
 
-			rhs[ied + 1][j][iVar] = (-11.0/12 * fluxVector[ied + 1][j][iVar] + 17.0/24 * fluxVector[ied    ][j][iVar]
-									 + 3.0/8  * fluxVector[ied - 1][j][iVar] -  5.0/24 * fluxVector[ied - 2][j][iVar]
-									 + 1.0/24 * fluxVector[ied - 3][j][iVar]) / ds;
+			//rhs[ied + 1][j][iVar] = (-11.0/12 * fluxVector[ied + 1][j][iVar] + 17.0/24 * fluxVector[ied    ][j][iVar]
+			//						 + 3.0/8  * fluxVector[ied - 1][j][iVar] -  5.0/24 * fluxVector[ied - 2][j][iVar]
+			//						 + 1.0/24 * fluxVector[ied - 3][j][iVar]) / ds;
 
-			//rhs[1][j][iVar] =-(-22.0 * fluxVector[0][j][iVar] + 17.0 * fluxVector[1][j][iVar]
-			//				   + 9.0 * fluxVector[2][j][iVar] -  5.0 * fluxVector[3][j][iVar]
-			//				   +       fluxVector[4][j][iVar]) / 24.0 / ds;
+			rhs[1][j][iVar] =-(-22.0 * fluxVector[0][j][iVar] + 17.0 * fluxVector[1][j][iVar]
+							   + 9.0 * fluxVector[2][j][iVar] -  5.0 * fluxVector[3][j][iVar]
+							   +       fluxVector[4][j][iVar]) / 24.0 / ds;
 
-			//rhs[2][j][iVar] =-(         fluxVector[0][j][iVar] - 27.0 * fluxVector[1][j][iVar]
-			//				   + 27.0 * fluxVector[2][j][iVar] -        fluxVector[3][j][iVar]) / 24.0 / ds;
+			rhs[2][j][iVar] =-(         fluxVector[0][j][iVar] - 27.0 * fluxVector[1][j][iVar]
+							   + 27.0 * fluxVector[2][j][iVar] -        fluxVector[3][j][iVar]) / 24.0 / ds;
 
-			//rhs[ied    ][j][iVar] = (         fluxVector[ied + 1][j][iVar] - 27.0 * fluxVector[ied    ][j][iVar]
-			//						 + 27.0 * fluxVector[ied - 1][j][iVar] -        fluxVector[ied - 2][j][iVar]) / 24.0 / ds;
+			rhs[ied    ][j][iVar] = (         fluxVector[ied + 1][j][iVar] - 27.0 * fluxVector[ied    ][j][iVar]
+									 + 27.0 * fluxVector[ied - 1][j][iVar] -        fluxVector[ied - 2][j][iVar]) / 24.0 / ds;
 
-			//rhs[ied + 1][j][iVar] =-( 22.0 * fluxVector[ied + 1][j][iVar] - 17.0 * fluxVector[ied    ][j][iVar]
-			//						 - 9.0 * fluxVector[ied - 1][j][iVar] +  5.0 * fluxVector[ied - 2][j][iVar]
-			//						 -       fluxVector[ied - 3][j][iVar]) / 24.0 / ds;
+			rhs[ied + 1][j][iVar] = (-22.0 * fluxVector[ied + 1][j][iVar] + 17.0 * fluxVector[ied    ][j][iVar]
+									 + 9.0 * fluxVector[ied - 1][j][iVar] -  5.0 * fluxVector[ied - 2][j][iVar]
+									 +       fluxVector[ied - 3][j][iVar]) / 24.0 / ds;
 		}
 	}
 }
@@ -201,33 +201,33 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			rhs[i][1][iVar] =-(-11.0/12 * fluxVector[i][0][iVar] + 17.0/24 * fluxVector[i][1][iVar]
-							   + 3.0/8  * fluxVector[i][2][iVar] -  5.0/24 * fluxVector[i][3][iVar]
-							   + 1.0/24 * fluxVector[i][4][iVar]) / ds;
+			//rhs[i][1][iVar] =-(-11.0/12 * fluxVector[i][0][iVar] + 17.0/24 * fluxVector[i][1][iVar]
+			//				   + 3.0/8  * fluxVector[i][2][iVar] -  5.0/24 * fluxVector[i][3][iVar]
+			//				   + 1.0/24 * fluxVector[i][4][iVar]) / ds;
 
-			rhs[i][2][iVar] =-(- 1.0/24 * fluxVector[i][0][iVar] -  9.0/8  * fluxVector[i][1][iVar]
-							   + 9.0/8	* fluxVector[i][2][iVar] -  1.0/24 * fluxVector[i][3][iVar]) / ds;
+			//rhs[i][2][iVar] =-(- 1.0/24 * fluxVector[i][0][iVar] -  9.0/8  * fluxVector[i][1][iVar]
+			//				   + 9.0/8	* fluxVector[i][2][iVar] -  1.0/24 * fluxVector[i][3][iVar]) / ds;
 
-			rhs[i][jed    ][iVar] = (- 1.0/24 * fluxVector[i][jed + 1][iVar] -  9.0/8  * fluxVector[i][jed    ][iVar]
-									 + 9.0/8  * fluxVector[i][jed - 1][iVar] -  1.0/24 * fluxVector[i][jed - 2][iVar]) / ds;
+			//rhs[i][jed    ][iVar] = (- 1.0/24 * fluxVector[i][jed + 1][iVar] -  9.0/8  * fluxVector[i][jed    ][iVar]
+			//						 + 9.0/8  * fluxVector[i][jed - 1][iVar] -  1.0/24 * fluxVector[i][jed - 2][iVar]) / ds;
 
-			rhs[i][jed + 1][iVar] = (-11.0/12 * fluxVector[i][jed + 1][iVar] + 17.0/24 * fluxVector[i][jed    ][iVar]
-									 + 3.0/8  * fluxVector[i][jed - 1][iVar] -  5.0/24 * fluxVector[i][jed - 2][iVar]
-									 + 1.0/24 * fluxVector[i][jed - 3][iVar]) / ds;
+			//rhs[i][jed + 1][iVar] = (-11.0/12 * fluxVector[i][jed + 1][iVar] + 17.0/24 * fluxVector[i][jed    ][iVar]
+			//						 + 3.0/8  * fluxVector[i][jed - 1][iVar] -  5.0/24 * fluxVector[i][jed - 2][iVar]
+			//						 + 1.0/24 * fluxVector[i][jed - 3][iVar]) / ds;
 
-			//rhs[i][1][iVar] =-(-22.0 * fluxVector[i][0][iVar] + 17.0 * fluxVector[i][1][iVar]
-			//				   + 9.0 * fluxVector[i][2][iVar] -  5.0 * fluxVector[i][3][iVar]
-			//				   +       fluxVector[i][4][iVar]) / 24.0 / ds;
+			rhs[i][1][iVar] =-(-22.0 * fluxVector[i][0][iVar] + 17.0 * fluxVector[i][1][iVar]
+							   + 9.0 * fluxVector[i][2][iVar] -  5.0 * fluxVector[i][3][iVar]
+							   +       fluxVector[i][4][iVar]) / 24.0 / ds;
 
-			//rhs[i][2][iVar] =-(         fluxVector[i][0][iVar] - 27.0 * fluxVector[i][1][iVar]
-			//				   + 27.0 * fluxVector[i][2][iVar] -        fluxVector[i][3][iVar]) / 24.0 / ds;
+			rhs[i][2][iVar] =-(         fluxVector[i][0][iVar] - 27.0 * fluxVector[i][1][iVar]
+							   + 27.0 * fluxVector[i][2][iVar] -        fluxVector[i][3][iVar]) / 24.0 / ds;
 
-			//rhs[i][jed    ][iVar] = (         fluxVector[i][jed + 1][iVar] - 27.0 * fluxVector[i][jed    ][iVar]
-			//						 + 27.0 * fluxVector[i][jed - 1][iVar] -        fluxVector[i][jed - 2][iVar]) / 24.0 / ds;
+			rhs[i][jed    ][iVar] = (         fluxVector[i][jed + 1][iVar] - 27.0 * fluxVector[i][jed    ][iVar]
+									 + 27.0 * fluxVector[i][jed - 1][iVar] -        fluxVector[i][jed - 2][iVar]) / 24.0 / ds;
 
-			//rhs[i][jed + 1][iVar] =-( 22.0 * fluxVector[i][jed + 1][iVar] - 17.0 * fluxVector[i][jed    ][iVar]
-			//						 - 9.0 * fluxVector[i][jed - 1][iVar] +  5.0 * fluxVector[i][jed - 2][iVar]
-			//						 -       fluxVector[i][jed - 3][iVar]) / 24.0 / ds;
+			rhs[i][jed + 1][iVar] = (-22.0 * fluxVector[i][jed + 1][iVar] + 17.0 * fluxVector[i][jed    ][iVar]
+									 + 9.0 * fluxVector[i][jed - 1][iVar] -  5.0 * fluxVector[i][jed - 2][iVar]
+									 +       fluxVector[i][jed - 3][iVar]) / 24.0 / ds;
 		}
 	}
 }
