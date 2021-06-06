@@ -213,21 +213,21 @@ void QlQr_Solver::Boundary_QlQr_WCNS_X()
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			qField1[0][j][iVar] = 1.0 / 128 * (315 * qField[0][j][iVar] - 420 * qField[1][j][iVar]
-											 + 378 * qField[2][j][iVar] - 180 * qField[3][j][iVar] 
-											 + 35  * qField[4][j][iVar]);
+			qField1[0][j][iVar] = 1.0 / 128 * (315 * qField[1][j][iVar] - 420 * qField[2][j][iVar]
+											 + 378 * qField[3][j][iVar] - 180 * qField[4][j][iVar] 
+											 + 35  * qField[5][j][iVar]);
 
-			qField1[1][j][iVar] = 1.0 / 128 * (35  * qField[0][j][iVar] + 140 * qField[1][j][iVar]
-											 - 70  * qField[2][j][iVar] + 28  * qField[3][j][iVar] 
-											 - 5   * qField[4][j][iVar]);
+			qField1[1][j][iVar] = 1.0 / 128 * (35  * qField[1][j][iVar] + 140 * qField[2][j][iVar]
+											 - 70  * qField[3][j][iVar] + 28  * qField[4][j][iVar] 
+											 - 5   * qField[5][j][iVar]);
 
-			qField1[ied + 1][j][iVar] = 1.0 / 128 * (315 * qField[ied + 2][j][iVar] - 420 * qField[ied + 1][j][iVar]
-											       + 378 * qField[ied    ][j][iVar] - 180 * qField[ied - 1][j][iVar] 
-											       + 35  * qField[ied - 2][j][iVar]);
+			qField1[ied + 1][j][iVar] = 1.0 / 128 * (315 * qField[ied + 1][j][iVar] - 420 * qField[ied    ][j][iVar]
+											       + 378 * qField[ied - 1][j][iVar] - 180 * qField[ied - 2][j][iVar] 
+											       + 35  * qField[ied - 3][j][iVar]);
 
-			qField1[ied    ][j][iVar] = 1.0 / 128 * (35 * qField[ied + 2][j][iVar] + 140 * qField[ied + 1][j][iVar]
-											       - 70 * qField[ied    ][j][iVar] + 28  * qField[ied - 1][j][iVar] 
-											       - 5  * qField[ied - 2][j][iVar]);
+			qField1[ied    ][j][iVar] = 1.0 / 128 * (35 * qField[ied + 1][j][iVar] + 140 * qField[ied    ][j][iVar]
+											       - 70 * qField[ied - 1][j][iVar] + 28  * qField[ied - 2][j][iVar] 
+											       - 5  * qField[ied - 3][j][iVar]);
 
 			qField2[0][j][iVar] = qField1[0][j][iVar];
 			qField2[1][j][iVar] = qField1[1][j][iVar];
@@ -268,21 +268,21 @@ void QlQr_Solver::Boundary_QlQr_WCNS_Y()
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			qField1[i][0][iVar] = 1.0 / 128 * (315 * qField[i][0][iVar] - 420 * qField[i][1][iVar]
-											 + 378 * qField[i][2][iVar] - 180 * qField[i][3][iVar] 
-											 + 35  * qField[i][4][iVar]);
+			qField1[i][0][iVar] = 1.0 / 128 * (315 * qField[i][1][iVar] - 420 * qField[i][2][iVar]
+											 + 378 * qField[i][3][iVar] - 180 * qField[i][4][iVar] 
+											 + 35  * qField[i][5][iVar]);
 
-			qField1[i][1][iVar] = 1.0 / 128 * (35  * qField[i][0][iVar] + 140 * qField[i][1][iVar]
-											 - 70  * qField[i][2][iVar] + 28  * qField[i][3][iVar] 
-											 - 5   * qField[i][4][iVar]);
+			qField1[i][1][iVar] = 1.0 / 128 * (35  * qField[i][1][iVar] + 140 * qField[i][2][iVar]
+											 - 70  * qField[i][3][iVar] + 28  * qField[i][4][iVar] 
+											 - 5   * qField[i][5][iVar]);
 
-			qField1[i][jed + 1][iVar] = 1.0 / 128 * (315 * qField[i][jed + 2][iVar] - 420 * qField[i][jed + 1][iVar]
-											       + 378 * qField[i][jed    ][iVar] - 180 * qField[i][jed - 1][iVar] 
-											       + 35  * qField[i][jed - 2][iVar]);
+			qField1[i][jed + 1][iVar] = 1.0 / 128 * (315 * qField[i][jed + 1][iVar] - 420 * qField[i][jed    ][iVar]
+											       + 378 * qField[i][jed - 1][iVar] - 180 * qField[i][jed - 2][iVar] 
+											       + 35  * qField[i][jed - 3][iVar]);
 
-			qField1[i][jed    ][iVar] = 1.0 / 128 * (35 * qField[i][jed + 2][iVar] + 140 * qField[i][jed + 1][iVar]
-											       - 70 * qField[i][jed    ][iVar] + 28  * qField[i][jed - 1][iVar] 
-											       - 5  * qField[i][jed - 2][iVar]);
+			qField1[i][jed    ][iVar] = 1.0 / 128 * (35 * qField[i][jed + 1][iVar] + 140 * qField[i][jed    ][iVar]
+											       - 70 * qField[i][jed - 1][iVar] + 28  * qField[i][jed - 2][iVar] 
+											       - 5  * qField[i][jed - 3][iVar]);
 
 			qField2[i][0][iVar] = qField1[i][0][iVar];
 			qField2[i][1][iVar] = qField1[i][1][iVar];
@@ -382,7 +382,7 @@ void QlQr_Solver::QlQr_WCNS_X()
 	//j+1/2处的变量左右值
 #ifdef _OPENMP
 #pragma omp parallel for
-#endif
+#endif									//g,s,IS在i=0,1,ied+1,ied+2没有值
 	for (int i = ist; i <= ied - 1; i++)//从内场点开始，虚拟点的ql和qr在后面用边界格式计算
 	{
 		for (int j = jst; j <= jed; j++)
@@ -411,9 +411,9 @@ void QlQr_Solver::QlQr_WCNS_X()
 				qField1[i][j][iVar] = w1 * qField_Left1 + w2 * qField_Left2 + w3 * qField_Left3;
 
 				//取非线性加权，左右值分别取不同的权值
-				a1 = C12 / pow((eps + IS1[i][j][iVar]), 2);
-				a2 = C22 / pow((eps + IS2[i][j][iVar]), 2);
-				a3 = C32 / pow((eps + IS3[i][j][iVar]), 2);
+				a1 = C12 / pow((eps + IS1[i + 1][j][iVar]), 2);
+				a2 = C22 / pow((eps + IS2[i + 1][j][iVar]), 2);
+				a3 = C32 / pow((eps + IS3[i + 1][j][iVar]), 2);
 
 				w1 = a1 / (a1 + a2 + a3);
 				w2 = a2 / (a1 + a2 + a3);
@@ -492,7 +492,7 @@ void QlQr_Solver::QlQr_WCNS_Y()
 #endif
 	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j <= jed - 1; j++)//j=0,1,jed,jed+1没有值,后续由边界格式计算
+		for (int j = jst; j <= jed - 1; j++)//半节点j=0,1,jed,jed+1没有值,后续由边界格式计算
 		{
 			if (marker[i][j] == 0) continue;
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
@@ -518,9 +518,9 @@ void QlQr_Solver::QlQr_WCNS_Y()
 				qField1[i][j][iVar] = w1 * qField_Left1 + w2 * qField_Left2 + w3 * qField_Left3;
 
 				//取非线性加权，左右值分别取不同的权值
-				a1 = C12 / pow((eps + IS1[i][j][iVar]), 2);
-				a2 = C22 / pow((eps + IS2[i][j][iVar]), 2);
-				a3 = C32 / pow((eps + IS3[i][j][iVar]), 2);
+				a1 = C12 / pow((eps + IS1[i][j + 1][iVar]), 2);
+				a2 = C22 / pow((eps + IS2[i][j + 1][iVar]), 2);
+				a3 = C32 / pow((eps + IS3[i][j + 1][iVar]), 2);
 
 				w1 = a1 / (a1 + a2 + a3);
 				w2 = a2 / (a1 + a2 + a3);
