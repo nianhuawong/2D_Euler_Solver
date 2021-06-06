@@ -64,10 +64,7 @@ void Spatial_Derivative::Spatial_Derivative_X()
 		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
-			if (i == 61 && j == 62)
-			{
-				int kkk = 1;
-			}
+
 			VDouble rhsVector(num_of_prim_vars);
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{

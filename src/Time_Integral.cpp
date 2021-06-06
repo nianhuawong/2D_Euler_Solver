@@ -108,7 +108,7 @@ void Update_Flowfield_X(int iStage)
 				if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
 				{
 					int kkk = 1;
-					SolutionFix(qPrimitive1, i, j);
+					//SolutionFix(qPrimitive1, i, j);
 				}
 				//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 				qField_N1[i][j] = qPrimitive1;
@@ -179,7 +179,7 @@ void Update_Flowfield_Y(int iStage)
 				if (qPrimitive1[IR] < minimumDensityLimit || qPrimitive1[IP] < minimumPressureLimit)
 				{
 					int kkk = 1;
-					SolutionFix(qPrimitive1, i, j);
+					//SolutionFix(qPrimitive1, i, j);
 				}
 				//RK公式里左端项，q1、q2、q3，即下一stage的q值，还要继续用该值计算rhs(q1)、rhs(q2)
 				qField_N1[i][j] = qPrimitive1;

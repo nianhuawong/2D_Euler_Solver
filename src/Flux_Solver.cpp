@@ -964,18 +964,23 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-
+#ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
+#endif
+#ifdef _OPENMP
+#pragma omp parallel 
+{
+		VDouble fluxVector11(num_of_prim_vars);
+		VDouble fluxVector22(num_of_prim_vars);
+#pragma omp	for
+#endif
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = 0; i <= ied + 1; i++)//每个通量点的值都有了
 		{
 			if (marker[i][j] == 0) continue;
-			if ((i == 60 || i == 61) && j == 62)
-			{
-				int kkk = 1;
-			}
+
 			double rho = qField1[i][j][IR];
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
@@ -986,17 +991,12 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 			double lmd3 = u - a;
 			double lmd4 = u + a;
 
-			VDouble lmd_m(3);//lamda-
-			lmd_m[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
-			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
-			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
-
-			if (IsNaN(lmd_m))
-			{
-				int kkk = 1;
-			}
-
-			Steger_Flux_F(fluxVector11, rho, u, v, p, lmd_m);
+			VDouble lmd_p(3);//q1对应于lamda+
+			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
+			
+			Steger_Flux_F(fluxVector11, rho, u, v, p, lmd_p);	//F+
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
@@ -1008,17 +1008,12 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 			lmd3 = u - a;
 			lmd4 = u + a;
 
-			VDouble lmd_p(3);//lamda+
-			lmd_p[0] = 0.5 * (lmd1 + sqrt(lmd1 * lmd1 + eps * eps));
-			lmd_p[1] = 0.5 * (lmd3 + sqrt(lmd3 * lmd3 + eps * eps));
-			lmd_p[2] = 0.5 * (lmd4 + sqrt(lmd4 * lmd4 + eps * eps));
-
-			if (IsNaN(lmd_p))
-			{
-				int kkk = 1;
-			}
-
-			Steger_Flux_F(fluxVector22, rho, u, v, p, lmd_p);
+			VDouble lmd_m(3);//q2对应于lamda-
+			lmd_m[0] = 0.5 * (lmd1 - sqrt(lmd1 * lmd1 + eps * eps));
+			lmd_m[1] = 0.5 * (lmd3 - sqrt(lmd3 * lmd3 + eps * eps));
+			lmd_m[2] = 0.5 * (lmd4 - sqrt(lmd4 * lmd4 + eps * eps));
+			
+			Steger_Flux_F(fluxVector22, rho, u, v, p, lmd_m);	//F-
 
 			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
 			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
@@ -1026,25 +1021,32 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
 		}
 	}
+#ifdef _OPENMP
+}
+#endif // _OPENMP
 }
 
 void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 {
 	double eps = 1e-4;
 	VInt2D& marker = mesh->Get_Marker();
-
+#ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
-
+#endif
+#ifdef _OPENMP
+#pragma omp parallel 
+	{
+		VDouble fluxVector11(num_of_prim_vars);
+		VDouble fluxVector22(num_of_prim_vars);
+#pragma omp	for
+#endif
 	for (int j = 0; j <= jed + 1; j++)  //每个通量点的值都有了
 	{
 		for (int i = ist; i <= ied; i++)
 		{
 			if (marker[i][j] == 0) continue;
-			if (i == 16 && j == 2)//((i==60||i == 61) && j == 62)
-			{
-				int kkk = 1;
-			}
+
 			double rho = qField1[i][j][IR];
 			double u   = qField1[i][j][IU];
 			double v   = qField1[i][j][IV];
@@ -1055,17 +1057,12 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 			double mu3 = v - a;
 			double mu4 = v + a;
 
-			VDouble mu_m(3);//mu-
-			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
-			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
-			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
-
-			if (IsNaN(mu_m))
-			{
-				int kkk = 1;
-			}
-
-			Steger_Flux_G(fluxVector11, rho, u, v, p, mu_m);
+			VDouble mu_p(3);//q1对应于mu+
+			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
+			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
+			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
+			
+			Steger_Flux_G(fluxVector11, rho, u, v, p, mu_p);	//G+
 
 			rho = qField2[i][j][IR];
 			u   = qField2[i][j][IU];
@@ -1077,17 +1074,12 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 			mu3 = v - a;
 			mu4 = v + a;
 
-			VDouble mu_p(3);//mu+
-			mu_p[0] = 0.5 * (mu1 + sqrt(mu1 * mu1 + eps * eps));
-			mu_p[1] = 0.5 * (mu3 + sqrt(mu3 * mu3 + eps * eps));
-			mu_p[2] = 0.5 * (mu4 + sqrt(mu4 * mu4 + eps * eps));
-
-			if (IsNaN(mu_p))
-			{
-				int kkk = 1;
-			}
-
-			Steger_Flux_G(fluxVector22, rho, u, v, p, mu_p);
+			VDouble mu_m(3);//q2对应于mu-
+			mu_m[0] = 0.5 * (mu1 - sqrt(mu1 * mu1 + eps * eps));
+			mu_m[1] = 0.5 * (mu3 - sqrt(mu3 * mu3 + eps * eps));
+			mu_m[2] = 0.5 * (mu4 - sqrt(mu4 * mu4 + eps * eps));
+			
+			Steger_Flux_G(fluxVector22, rho, u, v, p, mu_m);	//G-
 
 			fluxVector[i][j][IR] = fluxVector11[IR] + fluxVector22[IR];
 			fluxVector[i][j][IU] = fluxVector11[IU] + fluxVector22[IU];
@@ -1095,6 +1087,9 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 			fluxVector[i][j][IP] = fluxVector11[IP] + fluxVector22[IP];
 		}
 	}
+#ifdef _OPENMP
+	}
+#endif // _OPENMP
 }
 
 void Flux_Solver::Steger_Flux_F(VDouble& fluxVector, double rho, double u, double v, double p, VDouble lmd)

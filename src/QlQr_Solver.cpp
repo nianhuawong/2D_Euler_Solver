@@ -118,10 +118,7 @@ void QlQr_Solver::QlQr_MUSCL_X()
 		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
-			if ( (i==16 &&j==2) )//|| ((i==60||i == 61) && j == 62))
-			{
-				int kkk = 1;
-			}
+
 			VDouble qVector_m1 = qField[i - 1][j];
 			VDouble qVector_c0 = qField[i    ][j];
 			VDouble qVector_p1 = qField[i + 1][j];
@@ -148,10 +145,6 @@ void QlQr_Solver::QlQr_MUSCL_X()
 
 				qField2[i][j][iVar] = qVector_p1[iVar] - 1.0 / 4.0 * ((1 - muscl_k) * fai3 * du_p3
 																	+ (1 + muscl_k) * fai4 * du_p1);
-				//if (IsNaN(qField1[i][j]) || IsNaN(qField2[i][j]))
-				//{
-				//	int kkk = 1;
-				//}
 			}
 		}
 	}
@@ -169,10 +162,7 @@ void QlQr_Solver::QlQr_MUSCL_Y()
 		for (int j = 1; j <= jed; j++) //虚拟点j=0, jed + 1的值还没有
 		{
 			if (marker[i][j] == 0) continue;
-			if ((i == 16 && j == 2))//|| ((i==60||i == 61) && j == 62))
-			{
-				int kkk = 1;
-			}
+
 			VDouble qVector_m1 = qField[i][j - 1];
 			VDouble qVector_c0 = qField[i][j    ];
 			VDouble qVector_p1 = qField[i][j + 1];
