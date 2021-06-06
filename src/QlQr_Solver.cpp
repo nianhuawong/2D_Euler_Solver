@@ -213,21 +213,21 @@ void QlQr_Solver::Boundary_QlQr_WCNS_X()
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			qField1[0][j][iVar] = 1.0 / 128 * (315 * qField[1][j][iVar] - 420 * qField[2][j][iVar]
-											 + 378 * qField[3][j][iVar] - 180 * qField[4][j][iVar] 
-											 + 35  * qField[5][j][iVar]);
+			qField1[0][j][iVar] = 1.0 / 128 * (315 * qField[0][j][iVar] - 420 * qField[1][j][iVar]
+											 + 378 * qField[2][j][iVar] - 180 * qField[3][j][iVar] 
+											 + 35  * qField[4][j][iVar]);
 
-			qField1[1][j][iVar] = 1.0 / 128 * (35  * qField[1][j][iVar] + 140 * qField[2][j][iVar]
-											 - 70  * qField[3][j][iVar] + 28  * qField[4][j][iVar] 
-											 - 5   * qField[5][j][iVar]);
+			qField1[1][j][iVar] = 1.0 / 128 * (35  * qField[0][j][iVar] + 140 * qField[1][j][iVar]
+											 - 70  * qField[2][j][iVar] + 28  * qField[3][j][iVar] 
+											 - 5   * qField[4][j][iVar]);
 
-			qField1[ied + 1][j][iVar] = 1.0 / 128 * (315 * qField[ied + 1][j][iVar] - 420 * qField[ied    ][j][iVar]
-											       + 378 * qField[ied - 1][j][iVar] - 180 * qField[ied - 2][j][iVar] 
-											       + 35  * qField[ied - 3][j][iVar]);
+			qField1[ied + 1][j][iVar] = 1.0 / 128 * (315 * qField[ied + 2][j][iVar] - 420 * qField[ied + 1][j][iVar]
+											       + 378 * qField[ied    ][j][iVar] - 180 * qField[ied - 1][j][iVar] 
+											       + 35  * qField[ied - 2][j][iVar]);
 
-			qField1[ied    ][j][iVar] = 1.0 / 128 * (35 * qField[ied + 1][j][iVar] + 140 * qField[ied    ][j][iVar]
-											       - 70 * qField[ied - 1][j][iVar] + 28  * qField[ied - 2][j][iVar] 
-											       - 5  * qField[ied - 3][j][iVar]);
+			qField1[ied    ][j][iVar] = 1.0 / 128 * (35 * qField[ied + 2][j][iVar] + 140 * qField[ied + 1][j][iVar]
+											       - 70 * qField[ied    ][j][iVar] + 28  * qField[ied - 1][j][iVar] 
+											       - 5  * qField[ied - 2][j][iVar]);
 
 			qField2[0][j][iVar] = qField1[0][j][iVar];
 			qField2[1][j][iVar] = qField1[1][j][iVar];
@@ -236,6 +236,30 @@ void QlQr_Solver::Boundary_QlQr_WCNS_X()
 			qField2[ied + 1][j][iVar] = qField1[ied + 1][j][iVar];
 		}
 	}
+	
+	//for (int j = jst; j <= jed; j++)//确定i=0,1,ied,ied+1的值
+	//{
+	//	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+	//	{
+	//		qField1[0][j][iVar] = 1.0 / 16 * ( 5 * qField[0][j][iVar] + 15 * qField[1][j][iVar]
+	//										 - 5 * qField[2][j][iVar] +      qField[3][j][iVar]);
+
+	//		qField1[1][j][iVar] = 1.0 / 16 * (-    qField[0][j][iVar] + 9 * qField[1][j][iVar]
+	//										 + 9 * qField[2][j][iVar] -     qField[3][j][iVar]);
+
+	//		qField1[ied    ][j][iVar] = 1.0 / 16 * (-    qField[ied + 2][j][iVar] + 9 * qField[ied + 1][j][iVar]
+	//										       + 9 * qField[ied    ][j][iVar] -     qField[ied - 1][j][iVar]);
+
+	//		qField1[ied + 1][j][iVar] = 1.0 / 16 * ( 5 * qField[ied + 2][j][iVar] + 15 * qField[ied + 1][j][iVar]
+	//										       - 5 * qField[ied    ][j][iVar] +      qField[ied - 1][j][iVar]);
+
+	//		qField2[0][j][iVar] = qField1[0][j][iVar];
+	//		qField2[1][j][iVar] = qField1[1][j][iVar];
+
+	//		qField2[ied    ][j][iVar] = qField1[ied    ][j][iVar];
+	//		qField2[ied + 1][j][iVar] = qField1[ied + 1][j][iVar];
+	//	}
+	//}
 }
 
 void QlQr_Solver::Boundary_QlQr_WCNS_Y()
@@ -244,21 +268,21 @@ void QlQr_Solver::Boundary_QlQr_WCNS_Y()
 	{
 		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 		{
-			qField1[i][0][iVar] = 1.0 / 128 * (315 * qField[i][1][iVar] - 420 * qField[i][2][iVar]
-											 + 378 * qField[i][3][iVar] - 180 * qField[i][4][iVar] 
-											 + 35  * qField[i][5][iVar]);
+			qField1[i][0][iVar] = 1.0 / 128 * (315 * qField[i][0][iVar] - 420 * qField[i][1][iVar]
+											 + 378 * qField[i][2][iVar] - 180 * qField[i][3][iVar] 
+											 + 35  * qField[i][4][iVar]);
 
-			qField1[i][1][iVar] = 1.0 / 128 * (35  * qField[i][1][iVar] + 140 * qField[i][2][iVar]
-											 - 70  * qField[i][3][iVar] + 28  * qField[i][4][iVar] 
-											 - 5   * qField[i][5][iVar]);
+			qField1[i][1][iVar] = 1.0 / 128 * (35  * qField[i][0][iVar] + 140 * qField[i][1][iVar]
+											 - 70  * qField[i][2][iVar] + 28  * qField[i][3][iVar] 
+											 - 5   * qField[i][4][iVar]);
 
-			qField1[i][jed + 1][iVar] = 1.0 / 128 * (315 * qField[i][jed + 1][iVar] - 420 * qField[i][jed    ][iVar]
-											       + 378 * qField[i][jed - 1][iVar] - 180 * qField[i][jed - 2][iVar] 
-											       + 35  * qField[i][jed - 3][iVar]);
+			qField1[i][jed + 1][iVar] = 1.0 / 128 * (315 * qField[i][jed + 2][iVar] - 420 * qField[i][jed + 1][iVar]
+											       + 378 * qField[i][jed    ][iVar] - 180 * qField[i][jed - 1][iVar] 
+											       + 35  * qField[i][jed - 2][iVar]);
 
-			qField1[i][jed    ][iVar] = 1.0 / 128 * (35 * qField[i][jed + 1][iVar] + 140 * qField[i][jed    ][iVar]
-											       - 70 * qField[i][jed - 1][iVar] + 28  * qField[i][jed - 2][iVar] 
-											       - 5  * qField[i][jed - 3][iVar]);
+			qField1[i][jed    ][iVar] = 1.0 / 128 * (35 * qField[i][jed + 2][iVar] + 140 * qField[i][jed + 1][iVar]
+											       - 70 * qField[i][jed    ][iVar] + 28  * qField[i][jed - 1][iVar] 
+											       - 5  * qField[i][jed - 2][iVar]);
 
 			qField2[i][0][iVar] = qField1[i][0][iVar];
 			qField2[i][1][iVar] = qField1[i][1][iVar];
@@ -267,6 +291,30 @@ void QlQr_Solver::Boundary_QlQr_WCNS_Y()
 			qField2[i][jed + 1][iVar] = qField1[i][jed + 1][iVar];
 		}
 	}
+	// 
+	//for (int i = ist; i <= ied; i++)//确定j=0,1,jed,jed+1的值
+	//{
+	//	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+	//	{
+	//		qField1[i][0][iVar] = 1.0 / 16 * ( 5 * qField[i][0][iVar] + 15 * qField[i][1][iVar]
+	//										 - 5 * qField[i][2][iVar] +      qField[i][3][iVar]);
+
+	//		qField1[i][1][iVar] = 1.0 / 16 * (-    qField[i][0][iVar] + 9 * qField[i][1][iVar]
+	//										 + 9 * qField[i][2][iVar] -     qField[i][3][iVar]);
+
+	//		qField1[i][jed    ][iVar] = 1.0 / 16 * (-    qField[i][jed + 2][iVar] + 9 * qField[i][jed + 1][iVar]
+	//										       + 9 * qField[i][jed    ][iVar] -     qField[i][jed - 1][iVar]);
+
+	//		qField1[i][jed + 1][iVar] = 1.0 / 16 * ( 5 * qField[i][jed + 2][iVar] + 15 * qField[i][jed + 1][iVar]
+	//										       - 5 * qField[i][jed    ][iVar] +      qField[i][jed - 1][iVar]);
+
+	//		qField2[i][0][iVar] = qField1[i][0][iVar];
+	//		qField2[i][1][iVar] = qField1[i][1][iVar];
+
+	//		qField2[i][jed    ][iVar] = qField1[i][jed    ][iVar];
+	//		qField2[i][jed + 1][iVar] = qField1[i][jed + 1][iVar];
+	//	}
+	//}
 }
 
 void QlQr_Solver::QlQr_WCNS_X()
