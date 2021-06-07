@@ -4,12 +4,13 @@
 #include <ctime>
 using namespace std;
 
-#define IR 0
-#define IU 1
-#define IV 2
-#define IP 3
-#define SMALL 1E-40
-#define PI 3.141592653589793238
+#define IR		0
+#define IU		1
+#define IV		2
+#define IP		3
+
+#define SMALL	1E-40
+#define PI		3.141592653589793238
 
 typedef vector < int      > VInt;
 typedef vector < VInt     > VInt2D;
@@ -19,23 +20,23 @@ typedef vector < double      > VDouble;
 typedef vector < VDouble     > VDouble2D;
 typedef vector < VDouble2D   > VDouble3D;
 
-extern int num_of_prim_vars;
-extern int current_step, max_num_of_steps;
-extern double cfl_num, time_step, physical_time, max_simu_time;
-extern int method_of_half_q;
-extern int method_of_limiter;
-extern int method_of_flux;
-extern double muscl_k;
-extern double entropy_fix_coeff;
-extern char solve_direction;
-extern int residual_output_steps;
-extern int flow_save_steps;
-extern double converge_criterion;
-extern bool stop_by_residual;
-extern string tec_file_name;
-extern int num_of_RK_stages;
-extern VDouble2D RK_Coeff;
-extern clock_t lastTime, nowTime;
+extern int			num_of_prim_vars;
+extern int			current_step, max_num_of_steps;
+extern double		cfl_num, time_step, physical_time, max_simu_time;
+extern int			method_of_half_q;
+extern int			method_of_limiter;
+extern int			method_of_flux;
+extern double		muscl_k;
+extern double		entropy_fix_coeff;
+extern char			solve_direction;
+extern int			residual_output_steps;
+extern int			flow_save_steps;
+extern double		converge_criterion;
+extern bool			stop_by_residual;
+extern string		tec_file_name;
+extern int			num_of_RK_stages;
+extern VDouble2D	RK_Coeff;
+extern clock_t		lastTime, nowTime;
 
 template < typename T >
 void Allocate_2D_Vector(vector< vector< T > >& array, int dim1, int dim2)
@@ -90,10 +91,12 @@ void MatrixMultiply(vector< vector< T1 > >& a, vector< T2 >& b, vector< T3 >& c,
 
 void Primitive_To_Conservative(VDouble& primitive, VDouble& conservative);
 void Conservative_To_Primitive(VDouble& conservative, VDouble& primitive);
+
 bool Need_Stop_Iteration();
 bool IsNaN(VDouble& data);
 
 clock_t Get_Current_Time();
 double GetClockTicksPerSecond();
+
 void ExtractValue(VDouble primitiveVector, double& rm, double& um, double& vm, double& pm);
 void Read_Parameter_File(string fileName);

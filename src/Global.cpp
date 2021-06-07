@@ -11,22 +11,22 @@
 #include <sys/times.h>
 #endif
 
-int num_of_prim_vars;
-int current_step, max_num_of_steps;
-double cfl_num, time_step, physical_time, max_simu_time;
-int method_of_half_q;
-int method_of_limiter;
-int method_of_flux;
-double muscl_k;
-double entropy_fix_coeff;
-char solve_direction;
-int residual_output_steps;
-int flow_save_steps;
-double converge_criterion;
-string tec_file_name;
-int num_of_RK_stages;
-VDouble2D RK_Coeff;
-clock_t lastTime, nowTime;
+int			num_of_prim_vars;
+int			current_step, max_num_of_steps;
+double		cfl_num, time_step, physical_time, max_simu_time;
+int			method_of_half_q;
+int			method_of_limiter;
+int			method_of_flux;
+double		muscl_k;
+double		entropy_fix_coeff;
+char		solve_direction;
+int			residual_output_steps;
+int			flow_save_steps;
+double		converge_criterion;
+string		tec_file_name;
+int			num_of_RK_stages;
+VDouble2D	RK_Coeff;
+clock_t		lastTime, nowTime;
 
 void Init_Global_Param()
 {
@@ -65,7 +65,9 @@ void Init_Global_Param()
 	entropy_fix_coeff			= 0.001;	//Roe格式熵修正系数epsilon
 	//==============================================================================================
 
-	Read_Parameter_File("./input.txt");
+#ifndef _WIN32
+	Read_Parameter_File("./input.txt");	//在集群上计算时，可通过参数文件设置参数
+#endif // !_WIN32	
 }
 
 void Load_Q()
