@@ -33,6 +33,8 @@ protected:
 	void QlQr_WCNS_Y();
 	void Boundary_QlQr_WCNS_X();
 	void Boundary_QlQr_WCNS_Y();
+	void Boundary_QlQr_WCNS_X_5th();
+	void Boundary_QlQr_WCNS_Y_5th();
 protected:
 
 };
