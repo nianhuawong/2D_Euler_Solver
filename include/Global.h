@@ -96,3 +96,4 @@ bool IsNaN(VDouble& data);
 clock_t Get_Current_Time();
 double GetClockTicksPerSecond();
 void ExtractValue(VDouble primitiveVector, double& rm, double& um, double& vm, double& pm);
+void Read_Parameter_File(string fileName);

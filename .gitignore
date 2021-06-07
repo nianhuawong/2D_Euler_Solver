@@ -7,3 +7,6 @@
 /Jacobian.m
 /build
 /out
+/results
+/doit
+/run.sh
