@@ -100,3 +100,5 @@ double GetClockTicksPerSecond();
 
 void ExtractValue(VDouble primitiveVector, double& rm, double& um, double& vm, double& pm);
 void Read_Parameter_File(string fileName);
+
+void MakeDirectory(const string& directoryName);

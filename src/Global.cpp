@@ -11,6 +11,12 @@
 #include <sys/times.h>
 #endif
 
+#ifdef WIN32
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#endif
+
 int			num_of_prim_vars;
 int			current_step, max_num_of_steps;
 double		cfl_num, time_step, physical_time, max_simu_time;
@@ -64,6 +70,7 @@ void Init_Global_Param()
 	method_of_flux				= 2;		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
 	entropy_fix_coeff			= 0.001;	//Roe格式熵修正系数epsilon
 	//==============================================================================================
+	MakeDirectory("./results");
 
 #ifndef _WIN32
 	Read_Parameter_File("./input.txt");	//在集群上计算时，可通过参数文件设置参数
@@ -203,4 +210,17 @@ void Read_Parameter_File(string fileName)
 
 	file.clear();
 	file.close();
+}
+
+void MakeDirectory(const string& directoryName)
+{
+#ifdef WIN32
+	int flag = _mkdir(directoryName.c_str());
+#else
+	int flag = mkdir(directoryName.c_str(), S_IRWXU);
+#endif
+	if (flag == 0)
+	{
+		cout << directoryName << " directory has been created successfully !\n";
+	}
 }
