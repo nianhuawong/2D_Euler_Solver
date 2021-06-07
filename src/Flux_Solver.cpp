@@ -843,8 +843,8 @@ void Flux_Solver::VanLeer_Scheme_Y()
 
 void Flux_Solver::Steger_Warming_Scheme()
 {
-	if (method_of_half_q == 1)		//MUSCL插值之后计算半节点通量
-	{
+//	if (method_of_half_q == 1)		//插值之后计算半节点通量
+//	{
 		if (solve_direction == 'x')
 		{
 			this->Steger_Warming_Scheme_Interp_X();
@@ -853,7 +853,7 @@ void Flux_Solver::Steger_Warming_Scheme()
 		{
 			this->Steger_Warming_Scheme_Interp_Y();
 		}
-	}
+//	}
 }
 
 void Flux_Solver::Steger_Warming_Scheme_X()
