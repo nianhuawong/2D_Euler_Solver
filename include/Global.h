@@ -37,7 +37,8 @@ extern string		tec_file_name;
 extern int			num_of_RK_stages;
 extern VDouble2D	RK_Coeff;
 extern clock_t		lastTime, nowTime;
-
+extern int			global_case_id;
+extern int			grid_refine_coeff;
 template < typename T >
 void Allocate_2D_Vector(vector< vector< T > >& array, int dim1, int dim2)
 {

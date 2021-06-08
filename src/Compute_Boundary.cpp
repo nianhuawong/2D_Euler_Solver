@@ -5,8 +5,14 @@
 
 void Compute_Boundary()
 {
-	Compute_Boundary_Blunt_Body();
-	//Compute_Boundary_Double_Mach();
+	if (global_case_id == 1)
+	{
+		Compute_Boundary_Double_Mach();
+	}
+	else if (global_case_id == 2)
+	{
+		Compute_Boundary_Blunt_Body();
+	}
 }
 
 void Compute_Boundary_Blunt_Body()
@@ -47,12 +53,20 @@ void Compute_Boundary_Blunt_Body()
 		for (int j = jst; j >= 0; j--)
 		{
 			qField[i][j][IR] = qField[i][j + 1][IR];
-			qField[i][j][IU] = qField[i][j + 1][IU];
-			qField[i][j][IV] = qField[i][j + 1][IV];
-			//qField[i][j][IU] = 0.0;
-			//qField[i][j][IV] = 0.0;
+			//qField[i][j][IU] = qField[i][j + 1][IU];
+			//qField[i][j][IV] = qField[i][j + 1][IV];
+			qField[i][j][IU] = 0.0;
+			qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = qField[i][j + 1][IP];
 		}
+
+		//qField[i][jst    ][IU] = 0.0;
+		//qField[i][jst - 1][IU] = -qField[i][jst + 1][IU];
+		//qField[i][jst - 2][IU] = -qField[i][jst + 1][IU];
+
+		//qField[i][jst    ][IV] = 0.0;
+		//qField[i][jst - 1][IV] = -qField[i][jst + 1][IV];
+		//qField[i][jst - 2][IV] = -qField[i][jst + 1][IV];
 	}
 
 	//左边界：超声速入口    ！！！左边界条件设置放在下边界后面，确保左下角点设置为入口边界
@@ -77,6 +91,14 @@ void Compute_Boundary_Blunt_Body()
 			qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = qField[i - 1][j][IP];
 		}
+
+		//qField[ist + Iw    ][j][IU] = 0.0;
+		//qField[ist + Iw + 1][j][IU] = -qField[ist + Iw - 1][j][IU];
+		//qField[ist + Iw + 2][j][IU] = -qField[ist + Iw - 1][j][IU];
+
+		//qField[ist + Iw    ][j][IV] = 0.0;
+		//qField[ist + Iw + 1][j][IV] = -qField[ist + Iw - 1][j][IV];
+		//qField[ist + Iw + 2][j][IV] = -qField[ist + Iw - 1][j][IV];
 	}
 
 	//上物面, no-slip wall
@@ -89,6 +111,14 @@ void Compute_Boundary_Blunt_Body()
 			qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = qField[i][j + 1][IP];
 		}
+
+		//qField[i][jst + Jw2    ][IU] = 0.0;
+		//qField[i][jst + Jw2 - 1][IU] = -qField[i][jst + Jw2 + 1][IU];
+		//qField[i][jst + Jw2 - 2][IU] = -qField[i][jst + Jw2 + 1][IU];
+
+		//qField[i][jst + Jw2    ][IV] = 0.0;
+		//qField[i][jst + Jw2 - 1][IV] = -qField[i][jst + Jw2 + 1][IV];
+		//qField[i][jst + Jw2 - 2][IV] = -qField[i][jst + Jw2 + 1][IV];
 	}
 
 	//下物面, no-slip wall
@@ -101,7 +131,71 @@ void Compute_Boundary_Blunt_Body()
 			qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = qField[i][j - 1][IP];
 		}
+
+		//qField[i][jst + Jw1    ][IU] = 0.0;
+		//qField[i][jst + Jw1 + 1][IU] = -qField[i][jst + Jw1 - 1][IU];
+		//qField[i][jst + Jw1 + 2][IU] = -qField[i][jst + Jw1 - 1][IU];
+
+		//qField[i][jst + Jw1    ][IV] = 0.0;
+		//qField[i][jst + Jw1 + 1][IV] = -qField[i][jst + Jw1 - 1][IV];
+		//qField[i][jst + Jw1 + 2][IV] = -qField[i][jst + Jw1 - 1][IV];
 	}
+
+	//角点处理，左上，设置参考角点标号
+	int II = ist + Iw;
+	int JJ = jst + Jw2;
+	//1点，对角方向
+	qField[II + 2][JJ - 2][IR] =  qField[II][JJ][IR];
+	qField[II + 2][JJ - 2][IU] = -qField[II][JJ][IU];
+	qField[II + 2][JJ - 2][IV] = -qField[II][JJ][IV];
+	qField[II + 2][JJ - 2][IP] =  qField[II][JJ][IP];
+
+	//2点, x方向取值
+	qField[II + 1][JJ - 2][IR] =  qField[II - 1][JJ - 2][IR];
+	qField[II + 1][JJ - 2][IU] = -qField[II - 1][JJ - 2][IU];
+	qField[II + 1][JJ - 2][IV] = -qField[II - 1][JJ - 2][IV];
+	qField[II + 1][JJ - 2][IP] =  qField[II - 1][JJ - 2][IP];
+
+	//3点, y方向取值
+	qField[II + 2][JJ - 1][IR] =  qField[II + 2][JJ + 1][IR];
+	qField[II + 2][JJ - 1][IU] = -qField[II + 2][JJ + 1][IU];
+	qField[II + 2][JJ - 1][IV] = -qField[II + 2][JJ + 1][IV];
+	qField[II + 2][JJ - 1][IP] =  qField[II + 2][JJ + 1][IP];
+
+	//4点， x方向取值和y方向取值的算术平均
+	qField[II + 1][JJ - 1][IR] = 0.5 * (qField[II - 1][JJ - 1][IR] + qField[II + 1][JJ + 1][IR]);
+	qField[II + 1][JJ - 1][IU] = 0.5 * (qField[II - 1][JJ - 1][IU] + qField[II + 1][JJ + 1][IU]);
+	qField[II + 1][JJ - 1][IV] = 0.5 * (qField[II - 1][JJ - 1][IV] + qField[II + 1][JJ + 1][IV]);
+	qField[II + 1][JJ - 1][IP] = 0.5 * (qField[II - 1][JJ - 1][IP] + qField[II + 1][JJ + 1][IP]);
+	
+	//=========================
+	//角点处理，左下，设置参考角点标号
+	II = ist + Iw;
+	JJ = jst + Jw1;
+
+	//1点，对角方向
+	qField[II + 2][JJ + 2][IR] =  qField[II][JJ][IR];
+	qField[II + 2][JJ + 2][IU] = -qField[II][JJ][IU];
+	qField[II + 2][JJ + 2][IV] = -qField[II][JJ][IV];
+	qField[II + 2][JJ + 2][IP] =  qField[II][JJ][IP];
+
+	//2点, x方向取值
+	qField[II + 1][JJ + 2][IR] =  qField[II - 1][JJ + 2][IR];
+	qField[II + 1][JJ + 2][IU] = -qField[II - 1][JJ + 2][IU];
+	qField[II + 1][JJ + 2][IV] = -qField[II - 1][JJ + 2][IV];
+	qField[II + 1][JJ + 2][IP] =  qField[II - 1][JJ + 2][IP];
+
+	//3点, y方向取值
+	qField[II + 2][JJ + 1][IR] =  qField[II + 2][JJ - 1][IR];
+	qField[II + 2][JJ + 1][IU] = -qField[II + 2][JJ - 1][IU];
+	qField[II + 2][JJ + 1][IV] = -qField[II + 2][JJ - 1][IV];
+	qField[II + 2][JJ + 1][IP] =  qField[II + 2][JJ - 1][IP];
+
+	//4点， x方向取值和y方向取值的算术平均
+	qField[II + 1][JJ + 1][IR] = 0.5 * (qField[II - 1][JJ + 1][IR] + qField[II + 1][JJ - 1][IR]);
+	qField[II + 1][JJ + 1][IU] = 0.5 * (qField[II - 1][JJ + 1][IU] + qField[II + 1][JJ - 1][IU]);
+	qField[II + 1][JJ + 1][IV] = 0.5 * (qField[II - 1][JJ + 1][IV] + qField[II + 1][JJ - 1][IV]);
+	qField[II + 1][JJ + 1][IP] = 0.5 * (qField[II - 1][JJ + 1][IP] + qField[II + 1][JJ - 1][IP]);
 }
 
 void Compute_Boundary_Double_Mach()

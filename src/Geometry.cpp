@@ -12,15 +12,20 @@ double dx, dy;
 
 void Generate_Mesh()
 {
-//===================================================================================
-	double hx  = 4.0, hy  = 2.0;
-	double hx1 = 0.6, hy1 = 0.8, hy2 = 1.2;
-	Iw  = hx1 / hx * (num_grid_point_x - 1); //物面左边界的标号I，起始标号为0，不包含虚拟点
-	Jw1 = hy1 / hy * (num_grid_point_y - 1); //物面下边界的标号J
-	Jw2 = hy2 / hy * (num_grid_point_y - 1); //物面上边界的标号J
-//=================
-	//double hx = 3.0, hy = 1.0;
-//===================================================================================
+	if (global_case_id == 1)
+	{
+		Generate_Mesh_Double_Mach();
+	}
+	else if (global_case_id == 2)
+	{
+		Generate_Mesh_Blunt_Body();
+	}
+}
+
+void Generate_Mesh_Double_Mach()
+{
+	double hx = 3.0, hy = 1.0;
+
 	num_ghost_point = 2;
 	total_points_x = num_grid_point_x + 2 * num_ghost_point;
 	total_points_y = num_grid_point_y + 2 * num_ghost_point;
@@ -60,7 +65,58 @@ void Generate_Mesh()
 			marker_q[i][j] = 1;
 			marker_f[i][j] = 1;
 			iBlank  [i][j] = 1;
-			//=====================================
+		}
+	}
+}
+
+void Generate_Mesh_Blunt_Body()
+{
+	double hx  = 4.0, hy  = 2.0;
+	double hx1 = 0.6, hy1 = 0.8, hy2 = 1.2;
+	Iw  = hx1 / hx * (num_grid_point_x - 1); //物面左边界的标号I，起始标号为0，不包含虚拟点
+	Jw1 = hy1 / hy * (num_grid_point_y - 1); //物面下边界的标号J
+	Jw2 = hy2 / hy * (num_grid_point_y - 1); //物面上边界的标号J
+
+	num_ghost_point = 2;
+	total_points_x = num_grid_point_x + 2 * num_ghost_point;
+	total_points_y = num_grid_point_y + 2 * num_ghost_point;
+
+	num_half_point_x = total_points_x - 1;   //半点个数，即单元数，点数减1
+	num_half_point_y = total_points_y - 1;
+	
+	dx = hx / (num_grid_point_x - 1);
+	dy = hy / (num_grid_point_y - 1);
+
+	mesh = new Structured_Mesh(total_points_x, total_points_y);
+	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
+	VInt2D& marker_q = mesh->Get_Marker_Q();
+	VInt2D& marker_f = mesh->Get_Marker_F();
+	VInt2D& iBlank = mesh->Get_IBlank();
+
+	mesh->Set_Mesh_Dimension (num_grid_point_x, num_grid_point_y);
+	mesh->Set_Num_Ghost_Point(num_ghost_point);
+	mesh->Set_Dxdy(dx, dy);
+
+	int ist, ied, jst, jed;
+	Get_IJK_Region(ist, ied, jst, jed);
+	mesh->Set_Range(ist, ied, jst, jed);
+
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (int i = 0; i <= ied + 2; i++)
+	{
+		for (int j = 0; j <= jed + 2; j++)
+		{
+			double x_node = (i - ist) * dx;
+			double y_node = (j - jst) * dy;
+
+			grid_points[i][j].Set_Point_Coord(x_node, y_node);
+
+			marker_q[i][j] = 1;
+			marker_f[i][j] = 1;
+			iBlank  [i][j] = 1;
+			
 			if (i > ist + Iw && j > jst + Jw1 && j < jst + Jw2)
 			{
 				iBlank[i][j] = 0;		//标记哪些点是在物体里面
@@ -68,14 +124,13 @@ void Generate_Mesh()
 
 			if (i > ist + Iw + 2 && j > jst + Jw1 && j < jst + Jw2)
 			{
-				marker_q[i][j] = 0;		//标记哪些点是在物体里面，不参加计算
+				marker_q[i][j] = 0;		//标记哪些变量点是在物体里面，不参加计算
 			}
 
 			if (i > ist + Iw + 1 && j > jst + Jw1 && j < jst + Jw2)
 			{
-				marker_f[i][j] = 0;		//标记哪些点是在物体里面，不参加计算
+				marker_f[i][j] = 0;		//标记哪些通量点是在物体里面，不参加计算
 			}
-			//=====================================
 		}
 	}
 }
@@ -86,20 +141,17 @@ void Structured_Mesh::Set_Marker_Value()
 	{
 		for (int j = 0; j <= jed + 2; j++)
 		{
-			double x_node = (i - ist) * dx;
-			double y_node = (j - jst) * dy;
-
 			marker_q[i][j] = 1;
 			marker_f[i][j] = 1;
 
 			if (i > ist + Iw && j > jst + Jw1 + 2 && j < jst + Jw2 - 2)
 			{
-				marker_q[i][j] = 0;		//标记哪些点是在物体里面，不参加计算
+				marker_q[i][j] = 0;		//标记哪些变量点是在物体里面，不参加计算
 			}
 
 			if (i > ist + Iw && j > jst + Jw1 + 1 && j < jst + Jw2 - 2)
 			{
-				marker_f[i][j] = 0;		//标记哪些点是在物体里面，不参加计算
+				marker_f[i][j] = 0;		//标记哪些通量点是在物体里面，不参加计算
 			}
 		}
 	}

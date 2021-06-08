@@ -42,8 +42,8 @@ void Residual::Compute_Residual()
 			{
 				if (marker[i][j] == 0) continue;
 				
-				//double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j][iVar]);
-				double res1 = fabs(rhs[i][j][iVar]);
+				double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j][iVar]);
+				//double res1 = fabs(rhs[i][j][iVar]);
 				double res2 = res1 * res1;
 
 				if (res1 > res_max)

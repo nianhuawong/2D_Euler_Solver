@@ -486,8 +486,8 @@ void Flux_Solver::Roe_Scheme_X()
 #ifdef _OPENMP
 #pragma omp parallel
 	{
-		VDouble fluxVector1(num_of_prim_vars);
-		VDouble fluxVector2(num_of_prim_vars);
+		VDouble fluxVector11(num_of_prim_vars);
+		VDouble fluxVector22(num_of_prim_vars);
 		VDouble2D Jacobian_A;
 		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 #pragma omp for 	
@@ -564,8 +564,8 @@ void Flux_Solver::Roe_Scheme_Y()
 	{
 		VDouble2D Jacobian_A;
 		Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
-		VDouble fluxVector1(num_of_prim_vars);
-		VDouble fluxVector2(num_of_prim_vars);
+		VDouble fluxVector11(num_of_prim_vars);
+		VDouble fluxVector22(num_of_prim_vars);
 #pragma omp for 	
 #endif
 	for (int i = ist; i <= ied; i++)

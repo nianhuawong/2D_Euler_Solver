@@ -57,3 +57,5 @@ public:
 
 void Set_Mesh_Dimension(int NI, int NJ);
 void Get_IJK_Region(int& ist, int& ied, int& jst, int& jed);
+void Generate_Mesh_Double_Mach();
+void Generate_Mesh_Blunt_Body();

@@ -5,8 +5,14 @@
 
 void Init_Flow()
 {
-	Init_Flow_Blunt_Body();
-	//Init_Flow_Double_Mach();
+	if (global_case_id == 1)
+	{
+		Init_Flow_Double_Mach();
+	}
+	else if (global_case_id == 2)
+	{
+		Init_Flow_Blunt_Body();
+	}
 }
 
 void Init_Flow_Blunt_Body()

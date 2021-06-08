@@ -33,10 +33,57 @@ string		tec_file_name;
 int			num_of_RK_stages;
 VDouble2D	RK_Coeff;
 clock_t		lastTime, nowTime;
+int			global_case_id;
+int			grid_refine_coeff;
+
+void Input_Parameters()
+{
+	global_case_id					= 2;					//1-双马赫反射, 2-平头钝体
+
+	if (global_case_id == 1)
+	{
+		num_grid_point_x			= 1 * 240 + 1;
+		num_grid_point_y			= 1 * 60 + 1;
+
+		max_num_of_steps			= 2000;
+		residual_output_steps		= 2;		//残差输出间隔步数
+		flow_save_steps				= 50;		//流场输出间隔步数
+		converge_criterion			= 1e-8;		//残差收敛标准
+		tec_file_name				= "./results/flow.plt";
+
+		cfl_num						= 0.3;
+		max_simu_time				= 0.2;
+
+		method_of_half_q			= 1;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
+		muscl_k						= 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
+		method_of_limiter			= 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee,	4-1st
+		method_of_flux				= 1;		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
+		entropy_fix_coeff			= 0.01;		//Roe格式熵修正系数epsilon
+	}
+	else if (global_case_id == 2)
+	{
+		num_grid_point_x = 1 * 200 + 1;
+		num_grid_point_y = 1 * 100 + 1;
+
+		max_num_of_steps			= 2000;
+		residual_output_steps		= 2;		//残差输出间隔步数
+		flow_save_steps				= 50;		//流场输出间隔步数
+		converge_criterion			= 1e-8;		//残差收敛标准
+		tec_file_name				= "./results/flow.plt";
+
+		cfl_num						= 0.3;
+		max_simu_time				= 2.0;
+
+		method_of_half_q			= 1;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
+		muscl_k						= 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
+		method_of_limiter			= 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee,	4-1st
+		method_of_flux				= 1; 		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
+		entropy_fix_coeff			= 0.1;		//Roe格式熵修正系数epsilon
+	}
+}
 
 void Init_Global_Param()
 {
-	//==============================================================================================
 	lastTime = Get_Current_Time(); 
 	nowTime  = lastTime;
 
@@ -50,30 +97,10 @@ void Init_Global_Param()
 	
 	//num_of_RK_stages	= 2;
 	//RK_Coeff			= { {1.0, 0.0, 1.0},{0.5, 0.5, 0.5} };
-	//==============================================================================================
-
-	//num_grid_point_x = 1 * 240 + 1;
-	//num_grid_point_y = 1 * 60  + 1;
-
-	num_grid_point_x = 1 * 200 + 1;
-	num_grid_point_y = 1 * 100 + 1;
-
-	max_num_of_steps			= 200000;
-	residual_output_steps		= 2;		//残差输出间隔步数
-	flow_save_steps				= 50;		//流场输出间隔步数
-	converge_criterion			= 1e-8;		//残差收敛标准
-	tec_file_name				= "./results/flow.plt";
-
-	cfl_num						= 0.3;
-	max_simu_time				= 1000;
-
-	method_of_half_q			= 3;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
-	muscl_k						= 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
-	method_of_limiter			= 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee,	4-1st
-	method_of_flux				= 2;		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
-	entropy_fix_coeff			= 0.1;	//Roe格式熵修正系数epsilon
-	//==============================================================================================
 	
+	//设置运行参数
+	Input_Parameters();
+
 	MakeDirectory("./results");
 
 #ifndef _WIN32
@@ -96,7 +123,10 @@ void Set_Solve_Direction(char direction)
 	}
 	else if(direction == 'y')
 	{
-		mesh->Set_Marker_Value();
+		if (global_case_id == 2)
+		{
+			mesh->Set_Marker_Value();
+		}		
 
 		//最关键的点：y方向计算的qField和x方向计算的qField是相同的！！这是算子分裂法的关键。
 		//也正因为如此，在计算y方向时，无需重新计算边界条件
@@ -205,14 +235,24 @@ void Read_Parameter_File(string fileName)
 	fstream file;
 	file.open(fileName, ios_base::in);
 
-	int n;
-	file >> n;
-	num_grid_point_x = n * 240 + 1;
-	num_grid_point_y = n * 60  + 1;
+	file >> global_case_id;		//1-双马赫反射, 2-平头钝体
+	file >> grid_refine_coeff;	//网格加密参数，取1、2、4、8
+	file >> max_num_of_steps;	//最大迭代步数
 
 	file >> method_of_half_q;	//半节点插值方法	//1-MUSCL,	  2-WENO(不插值),   3-WCNS
 	file >> method_of_limiter;	//MUSCL限制器种类	//0-nolim,    1-vanleer,        2-minmod,	  3-superbee,	4-1st
 	file >> method_of_flux;		//通量计算方法		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS
+	
+	if (global_case_id == 1)
+	{
+		num_grid_point_x = grid_refine_coeff * 240 + 1;
+		num_grid_point_y = grid_refine_coeff * 60 + 1;
+	}
+	else if (global_case_id == 2)
+	{
+		num_grid_point_x = grid_refine_coeff * 200 + 1;
+		num_grid_point_y = grid_refine_coeff * 100 + 1;
+	}
 
 	file.clear();
 	file.close();
