@@ -52,24 +52,28 @@ void Init_Global_Param()
 	//RK_Coeff			= { {1.0, 0.0, 1.0},{0.5, 0.5, 0.5} };
 	//==============================================================================================
 
-	num_grid_point_x = 2 * 240 + 1;
-	num_grid_point_y = 2 * 60  + 1;
+	//num_grid_point_x = 1 * 240 + 1;
+	//num_grid_point_y = 1 * 60  + 1;
 
-	max_num_of_steps			= 2000;
+	num_grid_point_x = 1 * 200 + 1;
+	num_grid_point_y = 1 * 100 + 1;
+
+	max_num_of_steps			= 200000;
 	residual_output_steps		= 2;		//残差输出间隔步数
 	flow_save_steps				= 50;		//流场输出间隔步数
 	converge_criterion			= 1e-8;		//残差收敛标准
 	tec_file_name				= "./results/flow.plt";
 
 	cfl_num						= 0.3;
-	max_simu_time				= 0.2;
+	max_simu_time				= 1000;
 
 	method_of_half_q			= 3;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
 	muscl_k						= 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
 	method_of_limiter			= 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee,	4-1st
 	method_of_flux				= 2;		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
-	entropy_fix_coeff			= 0.001;	//Roe格式熵修正系数epsilon
+	entropy_fix_coeff			= 0.1;	//Roe格式熵修正系数epsilon
 	//==============================================================================================
+	
 	MakeDirectory("./results");
 
 #ifndef _WIN32
@@ -92,6 +96,8 @@ void Set_Solve_Direction(char direction)
 	}
 	else if(direction == 'y')
 	{
+		mesh->Set_Marker_Value();
+
 		//最关键的点：y方向计算的qField和x方向计算的qField是相同的！！这是算子分裂法的关键。
 		//也正因为如此，在计算y方向时，无需重新计算边界条件
 		qField	  = qField_N0;		//将qField还原为计算x方向之前的Q值，y方向还是用原来的qField来计算rhs

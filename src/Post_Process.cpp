@@ -30,7 +30,7 @@ Residual::Residual()
 
 void Residual::Compute_Residual()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 	{
 		int count = 0;
@@ -42,8 +42,8 @@ void Residual::Compute_Residual()
 			{
 				if (marker[i][j] == 0) continue;
 				
-				double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j][iVar]);
-				//double res1 = fabs(rhs[i][j][iVar]);
+				//double res1 = fabs( qField_N1[i][j][iVar] - qField[i][j][iVar]);
+				double res1 = fabs(rhs[i][j][iVar]);
 				double res2 = res1 * res1;
 
 				if (res1 > res_max)
@@ -125,7 +125,7 @@ void Output_Flowfield()
 	fstream file;
 	file.open(tec_file_name, ios_base::out);
 
-	file << "VARIABLES = \"x\", \"y\", \"rho\", \"u\",\"v\", \"p\"" << endl;
+	file << "VARIABLES = \"x\", \"y\", \"rho\", \"u\", \"v\", \"p\", \"m\", \"iblank\" " << endl;
 	file << "ZONE T = \"Zone 1\"" << endl;
 	file << "I = " << num_grid_point_x << "  J = " << num_grid_point_y << "  K =1" << "  ZONETYPE=Ordered" << endl;
 	file << "DATAPACKING=POINT"   << endl;
@@ -137,24 +137,25 @@ void Output_Flowfield()
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 
+	double gama = 1.4;
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_IBlank();
 	for (int j = jst; j <= jed; j++)
 	{
 		for (int i = ist; i <= ied; i++)
 		{
-			//if (marker[i][j] == 0) continue;
-
 			double xcoord, ycoord;
 			grid_points[i][j].Get_Point_Coord(xcoord, ycoord);
 
-			double rho = qField_N1[i][j][IR];
+			double rho = qField_N1[i][j][IR] + SMALL;
 			double u   = qField_N1[i][j][IU];
 			double v   = qField_N1[i][j][IV];
 			double p   = qField_N1[i][j][IP];
+			double a   = sqrt(gama * p / rho) + SMALL;
+			double m   = sqrt(u * u + v * v) / a;
 
 			file << xcoord << "    " << ycoord << "    " << rho << "    " << u << "    " 
-				 << v      << "    " << p << endl;
+				 << v      << "    " << p      << "    " << m   << "    " << marker[i][j] << endl;
 		}
 	}
 	

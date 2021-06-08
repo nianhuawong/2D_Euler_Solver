@@ -86,7 +86,7 @@ void Flux_Solver::WENO_Scheme_X()
 	Allocate_3D_Vector(q21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -275,7 +275,7 @@ void Flux_Solver::WENO_Scheme_Y()
 	Allocate_3D_Vector(q21, num_half_point_x, num_half_point_y, num_of_prim_vars);
 	Allocate_3D_Vector(q31, num_half_point_x, num_half_point_y, num_of_prim_vars);
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -474,11 +474,11 @@ void Flux_Solver::Roe_Scheme()
 
 void Flux_Solver::Roe_Scheme_X()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 
 #ifndef _OPENMP
-	VDouble fluxVector1(num_of_prim_vars);
-	VDouble fluxVector2(num_of_prim_vars);
+	VDouble fluxVector11(num_of_prim_vars);
+	VDouble fluxVector22(num_of_prim_vars);
 	VDouble2D Jacobian_A;
 	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
 #endif
@@ -502,13 +502,13 @@ void Flux_Solver::Roe_Scheme_X()
 			ExtractValue(qField1[i][j], rho1, u1, v1, p1);
 			double H1   = Enthalpy(rho1, u1, v1, p1, gama);
 
-			Inviscid_Flux_F(fluxVector1, rho1, u1, v1, p1);
+			Inviscid_Flux_F(fluxVector11, rho1, u1, v1, p1);
 
 			double rho2, u2, v2, p2;
 			ExtractValue(qField2[i][j], rho2, u2, v2, p2);
 			double H2   = Enthalpy(rho2, u2, v2, p2, gama);
 
-			Inviscid_Flux_F(fluxVector2, rho2, u2, v2, p2);
+			Inviscid_Flux_F(fluxVector22, rho2, u2, v2, p2);
 
 			double D = sqrt(rho2 / rho1);
 
@@ -538,10 +538,10 @@ void Flux_Solver::Roe_Scheme_X()
 			VDouble flux_add(num_of_prim_vars);
 			MatrixMultiply(Jacobian_A, dq, flux_add, 4, 4);
 
-			fluxVector[i][j][IR] = 0.5 * (fluxVector1[IR] + fluxVector2[IR] - flux_add[IR]);
-			fluxVector[i][j][IU] = 0.5 * (fluxVector1[IU] + fluxVector2[IU] - flux_add[IU]);
-			fluxVector[i][j][IV] = 0.5 * (fluxVector1[IV] + fluxVector2[IV] - flux_add[IV]);
-			fluxVector[i][j][IP] = 0.5 * (fluxVector1[IP] + fluxVector2[IP] - flux_add[IP]);
+			fluxVector[i][j][IR] = 0.5 * (fluxVector11[IR] + fluxVector22[IR] - flux_add[IR]);
+			fluxVector[i][j][IU] = 0.5 * (fluxVector11[IU] + fluxVector22[IU] - flux_add[IU]);
+			fluxVector[i][j][IV] = 0.5 * (fluxVector11[IV] + fluxVector22[IV] - flux_add[IV]);
+			fluxVector[i][j][IP] = 0.5 * (fluxVector11[IP] + fluxVector22[IP] - flux_add[IP]);
 		}
 	}
 #ifdef _OPENMP
@@ -551,12 +551,12 @@ void Flux_Solver::Roe_Scheme_X()
 
 void Flux_Solver::Roe_Scheme_Y()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifndef _OPENMP
 	VDouble2D Jacobian_A;
 	Allocate_2D_Vector(Jacobian_A, num_of_prim_vars, num_of_prim_vars);
-	VDouble fluxVector1(num_of_prim_vars);
-	VDouble fluxVector2(num_of_prim_vars);
+	VDouble fluxVector11(num_of_prim_vars);
+	VDouble fluxVector22(num_of_prim_vars);
 #endif
 
 #ifdef _OPENMP
@@ -578,13 +578,13 @@ void Flux_Solver::Roe_Scheme_Y()
 			ExtractValue(qField1[i][j], rho1, u1, v1, p1);
 			double H1   = Enthalpy(rho1, u1, v1, p1, gama);
 
-			Inviscid_Flux_G(fluxVector1, rho1, u1, v1, p1);
+			Inviscid_Flux_G(fluxVector11, rho1, u1, v1, p1);
 
 			double rho2, u2, v2, p2;
 			ExtractValue(qField2[i][j], rho2, u2, v2, p2);
 			double H2   = Enthalpy(rho2, u2, v2, p2, gama);
 
-			Inviscid_Flux_G(fluxVector2, rho2, u2, v2, p2);
+			Inviscid_Flux_G(fluxVector22, rho2, u2, v2, p2);
 
 			double D = sqrt(rho2 / rho1);
 
@@ -614,10 +614,10 @@ void Flux_Solver::Roe_Scheme_Y()
 			VDouble flux_add(num_of_prim_vars);
 			MatrixMultiply(Jacobian_A, dq, flux_add, 4, 4);
 
-			fluxVector[i][j][IR] = 0.5 * (fluxVector1[IR] + fluxVector2[IR] - flux_add[IR]);
-			fluxVector[i][j][IU] = 0.5 * (fluxVector1[IU] + fluxVector2[IU] - flux_add[IU]);
-			fluxVector[i][j][IV] = 0.5 * (fluxVector1[IV] + fluxVector2[IV] - flux_add[IV]);
-			fluxVector[i][j][IP] = 0.5 * (fluxVector1[IP] + fluxVector2[IP] - flux_add[IP]);
+			fluxVector[i][j][IR] = 0.5 * (fluxVector11[IR] + fluxVector22[IR] - flux_add[IR]);
+			fluxVector[i][j][IU] = 0.5 * (fluxVector11[IU] + fluxVector22[IU] - flux_add[IU]);
+			fluxVector[i][j][IV] = 0.5 * (fluxVector11[IV] + fluxVector22[IV] - flux_add[IV]);
+			fluxVector[i][j][IP] = 0.5 * (fluxVector11[IP] + fluxVector22[IP] - flux_add[IP]);
 		}
 	}
 #ifdef _OPENMP
@@ -641,7 +641,7 @@ void Flux_Solver::VanLeer_Scheme_X()
 {
 	double nx = 1.0, ny = 0.0;
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
@@ -741,7 +741,7 @@ void Flux_Solver::VanLeer_Scheme_X()
 
 void Flux_Solver::VanLeer_Scheme_Y()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 
 	double nx = 0.0, ny = 1.0;
 #ifndef _OPENMP
@@ -859,7 +859,7 @@ void Flux_Solver::Steger_Warming_Scheme()
 void Flux_Solver::Steger_Warming_Scheme_X()
 {
 	double eps = 1e-4;
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 
 	//VDouble3D fluxVector1;
 	//VDouble3D fluxVector2;
@@ -902,7 +902,7 @@ void Flux_Solver::Steger_Warming_Scheme_X()
 void Flux_Solver::Steger_Warming_Scheme_Y()
 {
 	double eps = 1e-4;
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	//VDouble3D fluxVector1;
 	//VDouble3D fluxVector2;
 	//Allocate_3D_Vector(fluxVector1, total_points_x, total_points_y, num_of_prim_vars);
@@ -945,7 +945,7 @@ void Flux_Solver::Steger_Warming_Scheme_Y()
 void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 {
 	double eps = 1e-4;
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);
@@ -1008,7 +1008,7 @@ void Flux_Solver::Steger_Warming_Scheme_Interp_X()
 void Flux_Solver::Steger_Warming_Scheme_Interp_Y()
 {
 	double eps = 1e-4;
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifndef _OPENMP
 	VDouble fluxVector11(num_of_prim_vars);
 	VDouble fluxVector22(num_of_prim_vars);

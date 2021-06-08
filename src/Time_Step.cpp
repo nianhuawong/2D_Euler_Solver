@@ -21,7 +21,7 @@ void Time_Step::Compute_Time_Step()
 	double a_max = -1e40;
 	double gama  = 1.4;
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 #ifdef _OPENMP
 #pragma omp parallel for shared( a_max )
 #endif

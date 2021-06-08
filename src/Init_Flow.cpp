@@ -5,8 +5,8 @@
 
 void Init_Flow()
 {
-	//Init_Flow_Blunt_Body();
-	Init_Flow_Double_Mach();
+	Init_Flow_Blunt_Body();
+	//Init_Flow_Double_Mach();
 }
 
 void Init_Flow_Blunt_Body()
@@ -17,13 +17,13 @@ void Init_Flow_Blunt_Body()
 	Allocate_3D_Vector(qField_N1, total_points_x, total_points_y, num_of_prim_vars);
 
 	//流场赋初值
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst; j < jed; j++)
+		for (int j = jst; j <= jed; j++)
 		{
 			if (marker[i][j] == 0) continue;
 
@@ -42,7 +42,7 @@ void Init_Flow_Double_Mach()
 	Allocate_3D_Vector(qField_N1, total_points_x, total_points_y, num_of_prim_vars);
 
 	//流场赋初值
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 
 	double gama = 1.4;

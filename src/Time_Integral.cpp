@@ -55,7 +55,7 @@ void Update_Flowfield_X(int iStage)
 	double RK_Coeff_b = RK_Coeff[iStage][1];
 	double RK_Coeff_c = RK_Coeff[iStage][2];
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 
@@ -84,10 +84,6 @@ void Update_Flowfield_X(int iStage)
 		{
 			for (int j = jst; j <= jed; j++)
 			{
-				if (i == 16 && j == 2)
-				{
-					int kkk = 1;
-				}
 				if (marker[i][j] == 0) continue;
 
 				rhsVector = rhs[i][j];			//rhs(q0),用上一步的q计算得到的rhs
@@ -126,7 +122,7 @@ void Update_Flowfield_Y(int iStage)
 	double RK_Coeff_b = RK_Coeff[iStage][1];
 	double RK_Coeff_c = RK_Coeff[iStage][2];
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
 
@@ -155,10 +151,6 @@ void Update_Flowfield_Y(int iStage)
 		{
 			for (int j = 1; j <= jed + 1; j++)
 			{
-				if (i == 16 && j == 2)
-				{
-					int kkk = 1;
-				}
 				if (marker[i][j] == 0) continue;
 
 				rhsVector = rhs[i][j];			//rhs(q0),用上一步的q计算得到的rhs
@@ -188,7 +180,6 @@ void Update_Flowfield_Y(int iStage)
 #ifdef _OPENMP
 	}
 #endif // _OPENMP
-
 }
 
 void Set_Field()
@@ -199,7 +190,6 @@ void Set_Field()
 
 void SolutionFix(VDouble& primitiveVector, int iCell, int jCell)
 {
-	
 	for (int iEquation = 0; iEquation < num_of_prim_vars; ++iEquation)
 	{
 		primitiveVector[iEquation] = 0.0;
@@ -212,9 +202,8 @@ void SolutionFix(VDouble& primitiveVector, int iCell, int jCell)
 	int kkStart = -1;
 	int kkEnd = 1;
 
-		kkStart = 0;
-		kkEnd = 0;
-
+	kkStart = 0;
+	kkEnd = 0;
 
 	int numberOfPoints = 0;
 

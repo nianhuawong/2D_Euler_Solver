@@ -54,7 +54,7 @@ void Spatial_Derivative::Compute_Spatial_Derivative()
 
 void Spatial_Derivative::Spatial_Derivative_X()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -77,7 +77,7 @@ void Spatial_Derivative::Spatial_Derivative_X()
 
 void Spatial_Derivative::Spatial_Derivative_Y()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -87,10 +87,7 @@ void Spatial_Derivative::Spatial_Derivative_Y()
 		for (int j = 1; j <= jed + 1; j++)//j=0和j=jed+2的空间导数项没有值
 		{
 			if (marker[i][j] == 0) continue;
-			if (i == 16 && j == 2)//((i==60||i == 61) && j == 62)
-			{
-				int kkk = 1;
-			}
+
 			VDouble rhsVector(num_of_prim_vars);
 			for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
 			{
@@ -106,7 +103,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_X()
 	double ds = dx;
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -160,7 +157,7 @@ void Spatial_Derivative::Spatial_Derivative_WCNS_Y()
 	double ds = dy;
 	double a  = 75.0 / 64.0, b = -25.0 / 384.0, c = 3.0 / 640;
 	
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

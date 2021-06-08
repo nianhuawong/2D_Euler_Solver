@@ -83,6 +83,18 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_X()
 			qField2[ied + 1][j][iVar] = qField[ied + 2][j][iVar];
 		}
 	}
+
+	for (int j = jst + Jw1 + 1; j <= jst + Jw2 - 1; j++)
+	{
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		{
+			qField1[ist + Iw][j][iVar] = qField[ist + Iw    ][j][iVar];
+			qField2[ist + Iw][j][iVar] = qField[ist + Iw + 1][j][iVar];
+
+			qField1[ist + Iw + 1][j][iVar] = qField[ist + Iw + 1][j][iVar];
+			qField2[ist + Iw + 1][j][iVar] = qField[ist + Iw + 2][j][iVar];
+		}
+	}
 }
 
 void QlQr_Solver::Boundary_QlQr_MUSCL_Y()
@@ -104,12 +116,30 @@ void QlQr_Solver::Boundary_QlQr_MUSCL_Y()
 			qField2[i][jed + 1][iVar] = qField[i][jed + 2][iVar];
 		}
 	}
+
+	for (int i = ist + Iw + 1; i <= ied; i++)
+	{
+		for (int iVar = 0; iVar < num_of_prim_vars; iVar++)
+		{
+			qField1[i][jst + Jw1][iVar] = qField[i][jst + Jw1    ][iVar];
+			qField2[i][jst + Jw1][iVar] = qField[i][jst + Jw1 + 1][iVar];
+
+			qField1[i][jst + Jw1 + 1][iVar] = qField[i][jst + Jw1 + 1][iVar];
+			qField2[i][jst + Jw1 + 1][iVar] = qField[i][jst + Jw1 + 2][iVar];
+
+			qField1[i][jst + Jw2 - 1][iVar] = qField[i][jst + Jw2 - 1][iVar];
+			qField2[i][jst + Jw2 - 1][iVar] = qField[i][jst + Jw2    ][iVar];
+
+			qField1[i][jst + Jw2 - 2][iVar] = qField[i][jst + Jw2 - 2][iVar];
+			qField2[i][jst + Jw2 - 2][iVar] = qField[i][jst + Jw2 - 1][iVar];
+		}
+	}
 }
 
 void QlQr_Solver::QlQr_MUSCL_X()
 {
 	//在x方向进行插值
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -153,7 +183,7 @@ void QlQr_Solver::QlQr_MUSCL_X()
 void QlQr_Solver::QlQr_MUSCL_Y()
 {
 	//在y方向进行插值
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_F();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -341,7 +371,7 @@ void QlQr_Solver::QlQr_WCNS_X()
 
 	double ds = dx;
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
@@ -449,7 +479,7 @@ void QlQr_Solver::QlQr_WCNS_Y()
 
 	double ds = dy;
 
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif

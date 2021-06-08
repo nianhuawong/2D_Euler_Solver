@@ -5,31 +5,20 @@
 
 void Compute_Boundary()
 {
-	//Compute_Boundary_Blunt_Body();
-	Compute_Boundary_Double_Mach();
+	Compute_Boundary_Blunt_Body();
+	//Compute_Boundary_Double_Mach();
 }
 
 void Compute_Boundary_Blunt_Body()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	int ist, ied, jst, jed;
 	Get_IJK_Region(ist, ied, jst, jed);
-	//左边界：超声速入口
-	for (int i = 0; i < ist; i++)
-	{
-		for (int j = jst; j < jed; j++)
-		{
-			qField[i][j][IR] = 1.0;
-			qField[i][j][IU] = 3.0;
-			qField[i][j][IV] = 0.0;
-			qField[i][j][IP] = 0.71429;
-		}
-	}
 
 	//上边界：outflow
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jed; j < total_points_y; j++)
+		for (int j = jed; j <= jed + 2; j++)
 		{
 			qField[i][j][IR] = qField[i][j - 1][IR];
 			qField[i][j][IU] = qField[i][j - 1][IU];
@@ -39,11 +28,11 @@ void Compute_Boundary_Blunt_Body()
 	}
 
 	//右边界：outflow
-	for (int j = jst; j < jed; j++)
+	for (int j = jst; j <= jed; j++)
 	{
-		for (int i = ied; i < total_points_x; i++)
+		for (int i = ied; i <= ied + 2; i++)
 		{
-			if (marker[i - 1][j] == 0) continue;
+			if (marker[i][j] == 0) continue;
 
 			qField[i][j][IR] = qField[i - 1][j][IR];
 			qField[i][j][IU] = qField[i - 1][j][IU];
@@ -53,21 +42,35 @@ void Compute_Boundary_Blunt_Body()
 	}
 
 	//下边界, no-slip wall
-	for (int i = ist; i < ied; i++)
+	for (int i = ist; i <= ied; i++)
 	{
-		for (int j = jst - 1; j >= 0; j--)
+		for (int j = jst; j >= 0; j--)
 		{
 			qField[i][j][IR] = qField[i][j + 1][IR];
-			qField[i][j][IU] = 0.0;
-			qField[i][j][IV] = 0.0;
+			qField[i][j][IU] = qField[i][j + 1][IU];
+			qField[i][j][IV] = qField[i][j + 1][IV];
+			//qField[i][j][IU] = 0.0;
+			//qField[i][j][IV] = 0.0;
 			qField[i][j][IP] = qField[i][j + 1][IP];
 		}
 	}
 
-	//左物面, no-slip wall
-	for (int j = jst + Jw1; j < jst + Jw2; j++)
+	//左边界：超声速入口    ！！！左边界条件设置放在下边界后面，确保左下角点设置为入口边界
+	for (int i = 0; i <= ist; i++)
 	{
-		for (int i = ist + Iw; i < ist + Iw + num_ghost_point; i++)
+		for (int j = jst; j <= jed; j++)
+		{
+			qField[i][j][IR] = 1.0;
+			qField[i][j][IU] = 3.0;
+			qField[i][j][IV] = 0.0;
+			qField[i][j][IP] = 0.71429;
+		}
+	}
+
+	//左物面, no-slip wall
+	for (int j = jst + Jw1; j <= jst + Jw2; j++)
+	{
+		for (int i = ist + Iw; i <= ist + Iw + num_ghost_point; i++)
 		{
 			qField[i][j][IR] = qField[i - 1][j][IR];
 			qField[i][j][IU] = 0.0;
@@ -77,10 +80,9 @@ void Compute_Boundary_Blunt_Body()
 	}
 
 	//上物面, no-slip wall
-	for (int i = ist + Iw; i < ied; i++)
+	for (int i = ist + Iw; i <= ied; i++)
 	{
-		//for (int j = Jw2; j < num_ghost_point + Jw2; j++)
-		for (int j = jst + Jw2 - 1; j >= Jw2; j--)
+		for (int j = jst + Jw2; j >= Jw2; j--)
 		{
 			qField[i][j][IR] = qField[i][j + 1][IR];
 			qField[i][j][IU] = 0.0;
@@ -90,9 +92,9 @@ void Compute_Boundary_Blunt_Body()
 	}
 
 	//下物面, no-slip wall
-	for (int i = ist + Iw; i < ied; i++)
+	for (int i = ist + Iw; i <= ied; i++)
 	{
-		for (int j = jst + Jw1; j < jst + Jw1 + num_ghost_point; j++)
+		for (int j = jst + Jw1; j <= jst + Jw1 + num_ghost_point; j++)
 		{
 			qField[i][j][IR] = qField[i][j - 1][IR];
 			qField[i][j][IU] = 0.0;
@@ -104,7 +106,7 @@ void Compute_Boundary_Blunt_Body()
 
 void Compute_Boundary_Double_Mach()
 {
-	VInt2D& marker = mesh->Get_Marker();
+	VInt2D& marker = mesh->Get_Marker_Q();
 	vector< vector< Point > >& grid_points = mesh->Get_Grid_Points();
 
 	int ist, ied, jst, jed;
