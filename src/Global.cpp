@@ -62,22 +62,22 @@ void Input_Parameters()
 	}
 	else if (global_case_id == 2)
 	{
-		num_grid_point_x = 1 * 200 + 1;
-		num_grid_point_y = 1 * 100 + 1;
+		num_grid_point_x = 4 * 100 + 1;
+		num_grid_point_y = 4 * 50 + 1;
 
-		max_num_of_steps			= 2000;
+		max_num_of_steps			= 5000;
 		residual_output_steps		= 2;		//残差输出间隔步数
-		flow_save_steps				= 50;		//流场输出间隔步数
+		flow_save_steps				= 250;		//流场输出间隔步数
 		converge_criterion			= 1e-8;		//残差收敛标准
 		tec_file_name				= "./results/flow.plt";
 
-		cfl_num						= 0.3;
-		max_simu_time				= 2.0;
+		cfl_num						= 0.4;
+		max_simu_time				= 10;
 
 		method_of_half_q			= 1;		//1-MUSCL,	  2-WENO(不插值),   3-WCNS
 		muscl_k						= 1.0/3;	//0.0-二阶迎风偏置，		    1/3-二阶迎风偏置
 		method_of_limiter			= 1;		//0-nolim,    1-vanleer,        2-minmod,	  3-superbee,	4-1st
-		method_of_flux				= 1; 		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
+		method_of_flux				= 2; 		//1-Roe,	  2-Steger,			3-VanLeer,    4-WENO,		5-WCNS 
 		entropy_fix_coeff			= 0.1;		//Roe格式熵修正系数epsilon
 	}
 }
@@ -92,11 +92,11 @@ void Init_Global_Param()
 	time_step			= 0.0;			//时间步长要根据最大特征值确定，这里只是初始化
 	solve_direction		= 'x';
 	
-	num_of_RK_stages	= 3;
-	RK_Coeff			= { {1.0, 0.0, 1.0},{3.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0},{1.0 / 3.0, 2.0 / 3.0, 2.0 / 3.0} };
+	//num_of_RK_stages	= 3;
+	//RK_Coeff			= { {1.0, 0.0, 1.0},{3.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0},{1.0 / 3.0, 2.0 / 3.0, 2.0 / 3.0} };
 	
-	//num_of_RK_stages	= 2;
-	//RK_Coeff			= { {1.0, 0.0, 1.0},{0.5, 0.5, 0.5} };
+	num_of_RK_stages	= 2;
+	RK_Coeff			= { {1.0, 0.0, 1.0},{0.5, 0.5, 0.5} };
 	
 	//设置运行参数
 	Input_Parameters();
