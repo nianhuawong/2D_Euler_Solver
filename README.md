@@ -17,3 +17,6 @@ This code can solve:
 2. supersonic flow past a blunt body
 
 3. other 2d inviscid problems (with some modifications of the code)
+
+
+For more information, please contact nhwang@skla.cardc.cn
